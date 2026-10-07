@@ -1,0 +1,40 @@
+{
+  "name": "کایار — KAYAR",
+  "short_name": "کایار",
+  "description": "ابر اپلیکیشن ورزشی کایار؛ مربیان، بدن‌یار، مرشد و کمپین‌ها — همه در یک پلتفرم.",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0C0E",
+  "theme_color": "#0A0C0E",
+  "categories": ["health", "fitness", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "مربیان",
+      "url": "./#/coaches",
+      "icons": [{ "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "بدن‌یار",
+      "url": "./#/bodyyar",
+      "icons": [{ "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
