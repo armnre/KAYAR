@@ -174,23 +174,31 @@ export function AppShell({
 
       <nav
         aria-label="ناوبری موبایل"
-        className="glass fixed inset-x-0 bottom-0 z-40 flex items-center justify-around border-t border-line px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden"
+        className="glass fixed inset-x-0 bottom-0 z-40 flex items-stretch justify-around border-t border-line px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1.5 lg:hidden"
       >
-        {bottom.map((it) => (
-          <a
-            key={it.id}
-            href={it.href}
-            aria-current={active === it.id ? "page" : undefined}
-            className={`flex min-h-[52px] min-w-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-xl text-[0.65rem] font-bold transition ${
-              active === it.id ? "text-neon" : "text-muted"
-            }`}
-          >
-            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${active === it.id ? "bg-neon/15" : ""}`}>
-              <Icon name={it.icon} size={18} />
-            </span>
-            {it.label}
-          </a>
-        ))}
+        {bottom.map((it) => {
+          const on = active === it.id;
+          return (
+            <a
+              key={it.id}
+              href={it.href}
+              aria-current={on ? "page" : undefined}
+              className={`relative flex min-h-[54px] min-w-[54px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl text-[0.64rem] font-bold transition ${
+                on ? "text-neon" : "text-muted active:bg-white/5"
+              }`}
+            >
+              <span
+                className={`flex h-7 w-7 items-center justify-center rounded-xl transition-all duration-200 ${
+                  on ? "-translate-y-0.5 bg-neon/15 shadow-[0_8px_20px_-10px_#D7FF1F]" : ""
+                }`}
+              >
+                <Icon name={it.icon} size={18} />
+              </span>
+              {it.label}
+              {on && <span className="absolute -top-1.5 h-1 w-6 rounded-full bg-neon" />}
+            </a>
+          );
+        })}
       </nav>
     </div>
   );

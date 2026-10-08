@@ -4,11 +4,11 @@ import { useKayar } from "../app/store";
 import { Icon } from "../components/icons";
 import type { Goal, Level } from "../app/kernel";
 
-const goals: { id: Goal; label: string; desc: string }[] = [
-  { id: "fatloss", label: "کاهش وزن", desc: "چربی‌سوزی پایدار، بدون رژیم افراطی" },
-  { id: "muscle", label: "عضله‌سازی", desc: "قدرت و حجم با پیشروی بار" },
-  { id: "fitness", label: "آمادگی عمومی", desc: "انرژی روزانه و عادت تمرین" },
-  { id: "flexibility", label: "انعطاف و ریکاوری", desc: "درد کمتر، خواب بهتر" },
+const goals: { id: Goal; label: string; desc: string; icon: "flame" | "dumbbell" | "bolt" | "moon" }[] = [
+  { id: "fatloss", label: "کاهش وزن", desc: "چربی‌سوزی پایدار، بدون رژیم افراطی", icon: "flame" },
+  { id: "muscle", label: "عضله‌سازی", desc: "قدرت و حجم با پیشروی بار", icon: "dumbbell" },
+  { id: "fitness", label: "آمادگی عمومی", desc: "انرژی روزانه و عادت تمرین", icon: "bolt" },
+  { id: "flexibility", label: "انعطاف و ریکاوری", desc: "درد کمتر، خواب بهتر", icon: "moon" },
 ];
 
 const levels: { id: Level; label: string }[] = [
@@ -59,13 +59,16 @@ export default function Onboarding() {
                 key={g.id}
                 type="button"
                 onClick={() => setGoal(g.id)}
-                className={`panel flex items-center justify-between p-4 text-right ${goal === g.id ? "border-neon" : ""}`}
+                className={`panel card-hover flex items-center gap-3 p-4 text-right ${goal === g.id ? "border-neon" : ""}`}
               >
-                <span>
+                <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl border ${goal === g.id ? "border-neon/40 bg-neon/12 text-neon" : "border-line bg-white/[0.04] text-muted"}`}>
+                  <Icon name={g.icon} size={19} />
+                </span>
+                <span className="min-w-0 flex-1">
                   <span className="block font-extrabold">{g.label}</span>
                   <span className="label-muted">{g.desc}</span>
                 </span>
-                {goal === g.id && <Icon name="check" size={16} className="text-neon" />}
+                {goal === g.id && <Icon name="check" size={16} className="shrink-0 text-neon" />}
               </button>
             ))}
           </div>

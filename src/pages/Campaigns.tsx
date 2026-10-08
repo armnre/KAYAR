@@ -61,6 +61,27 @@ function Board() {
                     />
                   </div>
                 </div>
+                {row && (
+                  <div className="flex items-center gap-1" dir="rtl" aria-label="چک‌این‌های ۷ روز اخیر">
+                    {Array.from({ length: 7 }, (_, i) => {
+                      const d = new Date(Date.now() - (6 - i) * 864e5);
+                      const key = d.toISOString().slice(0, 10);
+                      const hit = row.checkins.includes(key);
+                      const last = i === 6;
+                      return (
+                        <span
+                          key={key}
+                          title={d.toLocaleDateString("fa-IR")}
+                          className={`grid h-7 flex-1 place-items-center rounded-md border text-[0.58rem] font-bold ${
+                            hit ? "border-transparent bg-gold text-black" : last ? "border-dashed border-gold/40 text-gold" : "border-line text-muted/60"
+                          }`}
+                        >
+                          {hit ? "✓" : d.toLocaleDateString("fa-IR", { weekday: "narrow" })}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
                 {!row && (
                   <button type="button" className="btn btn-neon mt-auto" onClick={() => k.join(c.id)}>
                     عضویت در کمپین

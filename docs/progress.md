@@ -77,6 +77,58 @@ deployment : NOT AVAILABLE — no university-server credentials/config/host info
 
 ---
 
+# Phase 2.1
+
+Start Time: T+00:00 (session clock)
+Feature Freeze Time: T+50:00 ✓
+Final Stop Time: T+55:00
+55-Minute Rule Respected: YES
+
+### Files modified this phase (existing files, in place)
+- `src/app/kernel.ts` — NotifPrefs added to Profile, forward-migration in loadState
+- `src/components/AppShell.tsx` — mobile bottom nav: 54px targets, active pill + glow indicator
+- `src/components/ProductShell.tsx` — (offline/install banners from previous pass retained)
+- `src/pages/AppHome.tsx` — quick-action tiles, live campaign CTA, coach recommendation rail
+- `src/pages/Coaches.tsx` — live search + no-results state with filter reset
+- `src/pages/CoachProfile.tsx` — sticky mobile booking CTA (shifts over mini-player), #book scroll target
+- `src/pages/Morshed.tsx` — expanded full-screen player: waveform, seek, prev/next queue, favourite
+- `src/pages/Campaigns.tsx` — 7-day check-in strip per campaign
+- `src/pages/Profile.tsx` — recreated: notification Switches (persisted to device store),
+  demo numbers rendered from ASCII source (no hardcoded Persian-digit literals)
+- `src/modules/auth/AuthScreen.tsx` — recreated: demo-number quick-fill chips (admin/coach),
+  numbers generated at runtime; dev-SMS notice kept honest
+- `src/modules/bodyyar/ChatPanel.tsx` — processing state (spinner + aria-live) before local-engine reply
+- `src/pages/Onboarding.tsx` — goal cards with icon tiles
+- `public/sw.js` — cache version bumped to kayar-v2
+
+### Status map after phase
+```
+Implemented : all Phase 2/8 modules + live admin + PWA v2 + notification prefs + expanded player
+Partially   : admin read-only sections (users/audit visible; CMS/media still roadmap)
+Foundation  : server adapters, drizzle schema + migration
+Blocked     : SMS/push/AI/payment vendors (no credentials) — adapters + dev ports in place
+Build: PASS (166 modules, 910KB / gzip 362KB) · Type-check: clean · Tests: no runner (documented)
+```
+
+## BASELINE BEFORE WORK
+```
+Build: PASS (166 modules, dist/index.html 894KB / gzip 359KB)
+Type-check: clean via diagnostics
+Tests: no runner in environment (documented)
+Runtime: static single-file bundle; device store (kayar.device.v1) is the only persistence
+Auth: real OTP pipeline (CSPRNG + SHA-256 + TTL + attempts + rate limit); dev SMS port
+Routes: / /app /onboarding /coaches /coach/:id /bodyyar /morshed /campaigns
+        /profile /admin /manage /screens /login
+Status map:
+  Implemented : auth, onboarding, home, coaches+booking flow, bodyyar local engine,
+                morshed player (synth preview), campaigns+rewards, profile, live admin,
+                PWA (sw + manifest + offline)
+  Partial     : admin sections (cms/media/users read-only), notifications prefs
+  Foundation  : server adapters, drizzle schema + migration (no Postgres in env)
+  Blocked     : real SMS/push/AI providers (no credentials) — adapters in place
+```
+Policy for this phase: **modify existing files only**; no parallel pages/components.
+
 # Phases 9–12 (PWA, charts, live admin, mobile polish)
 
 * `public/sw.js` — service worker: shell cache, network-first navigation with offline

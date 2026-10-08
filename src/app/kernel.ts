@@ -20,6 +20,12 @@ export const STORE_KEY = "kayar.device.v1";
 export type Goal = "fatloss" | "muscle" | "fitness" | "flexibility";
 export type Level = "beginner" | "mid" | "advanced";
 
+export interface NotifPrefs {
+  campaigns: boolean;
+  system: boolean;
+  sound: boolean;
+}
+
 export interface Profile {
   displayName: string;
   goal: Goal;
@@ -29,6 +35,7 @@ export interface Profile {
   onboarded: boolean;
   weightKg: number | null;
   sleepHours: number | null;
+  notif: NotifPrefs;
 }
 
 export interface Challenge {
@@ -140,6 +147,16 @@ export function loadState(): KayarState {
     if (!raw) return EMPTY;
     const parsed = JSON.parse(raw) as KayarState;
     if (parsed.session && !isSessionActive(parsed.session, Date.now())) parsed.session = null;
+    // forward-migrate older device states (e.g. missing profile.notif)
+    parsed.users = (parsed.users ?? []).map((u) => ({
+      ...u,
+      profile: {
+        ...u.profile,
+        weightKg: u.profile.weightKg ?? null,
+        sleepHours: u.profile.sleepHours ?? null,
+        notif: u.profile.notif ?? { campaigns: true, system: true, sound: false },
+      },
+    }));
     return { ...EMPTY, ...parsed, play: { ...EMPTY.play, ...parsed.play, playing: false } };
   } catch {
     return EMPTY;
@@ -280,6 +297,7 @@ export async function verifyOtp(
         onboarded: false,
         weightKg: null,
         sleepHours: null,
+        notif: { campaigns: true, system: true, sound: false },
       },
     };
     users = [...users, user];

@@ -5,6 +5,7 @@ import { CAMPAIGNS } from "../app/kernel";
 import { coaches } from "../lib/data";
 import { Icon } from "../components/icons";
 import { Tabs } from "../components/ui/overlay";
+import { Switch } from "../components/ui/field";
 import { toPersianDigits } from "../modules/auth/phone";
 import { can } from "../modules/rbac/permissions";
 import { toActor } from "../app/kernel";
@@ -15,6 +16,8 @@ const tabs = [
   { id: "rewards", label: "پاداش" },
   { id: "settings", label: "تنظیمات" },
 ];
+
+const DEMO = { admin: "09121111111", coach: "09122222222" };
 
 export default function Profile() {
   return (
@@ -118,17 +121,46 @@ function Body() {
           )}
 
           {tab === "settings" && (
-            <div className="flex flex-col gap-3 text-[0.86rem] leading-relaxed text-muted">
-              <p>اعلان درون‌برنامه فعال است. پوش و پیامک به ارائه‌دهنده واقعی وصل نیستند.</p>
-              <p>نشست با خروج یا انقضای ۷ روزه باطل می‌شود. «خروج» همین دستگاه را لغو می‌کند.</p>
-              <p>
-                شماره مدیر آزمایشی: ۰۹۱۲۱۱۱۱۱۱۱ · شماره مربی: ۰۹۱۲۲۲۲۲۲۲۲. کد از کانال توسعه پیامک روی صفحه ورود دیده می‌شود.
-              </p>
-              {admin && (
-                <a href="#/admin" className="btn btn-outline-neon w-fit">
-                  پنل مدیریت
-                </a>
-              )}
+            <div className="flex flex-col gap-4">
+              <div className="panel-flat flex flex-col divide-y divide-line p-2">
+                <Switch
+                  label="اعلان کمپین‌ها و پاداش"
+                  hint="عضویت، چک‌این و کد پاداش"
+                  checked={user.profile.notif.campaigns}
+                  onChange={(v) => k.saveProfile({ notif: { ...user.profile.notif, campaigns: v } })}
+                />
+                <Switch
+                  label="اعلان سیستم"
+                  hint="ورود، نشست و به‌روزرسانی"
+                  checked={user.profile.notif.system}
+                  onChange={(v) => k.saveProfile({ notif: { ...user.profile.notif, system: v } })}
+                />
+                <Switch
+                  label="صدای اعلان"
+                  hint="فقط درون‌برنامه؛ پوش در فاز سرور فعال می‌شود"
+                  checked={user.profile.notif.sound}
+                  onChange={(v) => k.saveProfile({ notif: { ...user.profile.notif, sound: v } })}
+                />
+              </div>
+              <div className="text-[0.8rem] leading-relaxed text-muted">
+                <p>پوش و پیامک از طریق adapter سمت سرور می‌روند؛ در این بیلد کانال توسعه درون‌برنامه است.</p>
+                <p>نشست با خروج یا انقضای ۷ روزه باطل می‌شود. «خروج» همین دستگاه را لغو می‌کند.</p>
+                <p>
+                  شماره مدیر آزمایشی: <span className="num">{toPersianDigits(DEMO.admin)}</span> · شماره مربی:{" "}
+                  <span className="num">{toPersianDigits(DEMO.coach)}</span>
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button type="button" className="btn btn-ghost" onClick={k.signOut}>
+                  <Icon name="logout" size={15} />
+                  خروج از دستگاه
+                </button>
+                {admin && (
+                  <a href="#/admin" className="btn btn-outline-neon">
+                    پنل مدیریت
+                  </a>
+                )}
+              </div>
             </div>
           )}
         </div>

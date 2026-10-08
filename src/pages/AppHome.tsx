@@ -85,6 +85,48 @@ function Dashboard() {
         </div>
       </section>
 
+      {/* quick actions */}
+      <nav aria-label="دسترسی سریع" className="grid grid-cols-4 gap-2 sm:gap-3">
+        {[
+          { href: "#/bodyyar", icon: "brain" as const, t: "بدن‌یار", tone: "text-neon border-neon/25 bg-neon/8" },
+          { href: "#/coaches", icon: "dumbbell" as const, t: "مربی‌ها", tone: "text-cyan border-cyan/25 bg-cyan/8" },
+          { href: "#/morshed", icon: "mic" as const, t: "مرشد", tone: "text-violet-2 border-violet/30 bg-violet/10" },
+          { href: "#/campaigns", icon: "trophy" as const, t: "کمپین", tone: "text-gold border-gold/25 bg-gold/8" },
+        ].map((q) => (
+          <a
+            key={q.t}
+            href={q.href}
+            className="panel card-hover flex min-h-[74px] flex-col items-center justify-center gap-2"
+          >
+            <span className={`grid h-11 w-11 place-items-center rounded-2xl border ${q.tone}`}>
+              <Icon name={q.icon} size={19} />
+            </span>
+            <span className="text-[0.72rem] font-bold">{q.t}</span>
+          </a>
+        ))}
+      </nav>
+
+      {/* campaign CTA */}
+      {(() => {
+        const spec = CAMPAIGNS[0];
+        const row = joined.find((j) => j.campaignId === spec.id);
+        return (
+          <section className="panel relative flex flex-col gap-3 overflow-hidden p-5 sm:flex-row sm:items-center sm:justify-between">
+            <img src={spec.image} alt="" width={220} height={140} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+            <div className="relative">
+              <p className="t-label text-gold">کمپین فعال · {spec.brand}</p>
+              <h2 className="t-h3 mt-1">{spec.title}</h2>
+              <p className="mt-1 max-w-md text-[0.8rem] text-muted">{spec.desc}</p>
+            </div>
+            <a href="#/campaigns" className="btn btn-neon relative w-fit overflow-hidden">
+              <span className="sweep" />
+              {row ? (row.claimedAtMs ? "پاداش شما" : "ادامه چک‌این") : "عضویت"}
+              <Icon name="arrowLeft" size={15} />
+            </a>
+          </section>
+        );
+      })()}
+
       <section className="panel flex flex-col gap-2 p-5">
         <div className="flex items-center justify-between">
           <h2 className="t-h3">برنامه امروز — از پروفایل شما</h2>
@@ -113,6 +155,28 @@ function Dashboard() {
           </a>
         ))}
       </div>
+
+      {/* coach recommendation */}
+      <section>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="t-h3">مربی پیشنهادی</h2>
+          <a href="#/coaches" className="text-[0.78rem] font-bold text-neon">همه مربیان</a>
+        </div>
+        <a href="#/coach/ali-rezaei" className="panel card-hover relative flex items-center gap-4 overflow-hidden p-3">
+          <img src={coaches[1].image} alt="" width={84} height={84} className="h-[84px] w-[84px] shrink-0 rounded-2xl object-cover" />
+          <div className="min-w-0 flex-1">
+            <p className="flex items-center gap-1.5 font-extrabold">
+              {coaches[1].name}
+              <Icon name="check" size={13} className="rounded-full bg-cyan p-0.5 text-black" />
+            </p>
+            <p className="label-muted truncate">{coaches[1].title}</p>
+            <p className="num mt-1 text-[0.72rem] text-neon">
+              {coaches[1].rating.toLocaleString("fa-IR")} ({coaches[1].reviews.toLocaleString("fa-IR")} نظر)
+            </p>
+          </div>
+          <span className="btn btn-outline-neon shrink-0 !min-h-9 !text-[0.75rem]">مشاهده</span>
+        </a>
+      </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
         <article className="panel p-5">

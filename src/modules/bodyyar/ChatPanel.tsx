@@ -1,19 +1,28 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useKayar } from "../../app/store";
 import { Icon } from "../../components/icons";
+import { Spinner } from "../../components/ui/feedback";
 
 const prompts = ["برنامه چربی‌سوزی این هفته", "برای عضله‌سازی از کجا شروع کنم؟", "خوابم کم است، ریکاوری چطور باشد؟"];
 
 export function ChatPanel() {
   const k = useKayar();
   const [text, setText] = useState("");
+  const [pending, setPending] = useState(false);
+  const timer = useRef<number | null>(null);
   const thread = k.user ? k.state.chats[k.user.id] ?? [] : [];
 
   const send = (value: string) => {
     const q = value.trim();
-    if (!q) return;
-    k.askBodyyar(q);
-    setText("");
+    if (!q || pending) return;
+    setPending(true);
+    // local engine: short deterministic processing window, then the rule-based answer
+    if (timer.current) window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      k.askBodyyar(q);
+      setPending(false);
+      setText("");
+    }, 550);
   };
 
   return (
@@ -41,6 +50,12 @@ export function ChatPanel() {
             {m.text}
           </div>
         ))}
+        {pending && (
+          <div className="flex items-center gap-2 self-end rounded-2xl border border-line bg-white/[0.03] px-3 py-2 text-[0.78rem] text-muted" aria-live="polite">
+            <Spinner size={14} className="text-neon" />
+            بدن‌یار پاسخ شما را از پروفایل و هدف‌تان می‌سازد…
+          </div>
+        )}
       </div>
       <div className="flex flex-wrap gap-2 px-4 pb-2">
         {prompts.map((p) => (
@@ -61,10 +76,11 @@ export function ChatPanel() {
           onChange={(e) => setText(e.target.value)}
           placeholder="سوالت را بنویس..."
           aria-label="پیام به بدن‌یار"
+          disabled={pending}
           className="field flex-1"
         />
-        <button type="submit" className="btn btn-neon !px-4" aria-label="ارسال">
-          <Icon name="send" size={16} />
+        <button type="submit" className="btn btn-neon !px-4" aria-label="ارسال" disabled={pending || !text.trim()}>
+          {pending ? <Spinner size={16} /> : <Icon name="send" size={16} />}
         </button>
       </form>
     </section>

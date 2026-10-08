@@ -1,7 +1,7 @@
 /* KAYAR service worker — installable shell, offline-first for app assets.
    NEVER cache authenticated API mutations: all network traffic is same-origin
    static assets only; navigation is network-first with cache fallback. */
-const VERSION = "kayar-v1";
+const VERSION = "kayar-v2";
 const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon.svg", "/icons/icon-maskable.svg"];
 
 self.addEventListener("install", (event) => {

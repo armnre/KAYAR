@@ -41,8 +41,34 @@ export default function CoachProfile() {
   const loved = k.user ? (k.state.favorites[k.user.id] ?? []).includes(coach.id) : false;
   useRevealOnScroll(tab);
 
+  const playerUp = !!k.state.play.trackId;
   return (
     <ProductShell active="coaches" search="جستجو در مربیان...">
+      {/* sticky mobile CTA */}
+      <div
+        className={`fixed inset-x-3 z-30 flex gap-2 transition-all duration-300 lg:hidden ${
+          playerUp ? "bottom-[112px]" : "bottom-[76px]"
+        }`}
+      >
+        <button
+          type="button"
+          className="btn btn-ghost glass flex-1 !border-line-2 !bg-surface/90"
+          onClick={() => k.toggleFav(coach.id)}
+        >
+          <Icon name="heart" size={16} className={loved ? "fill-neon" : ""} />
+          {loved ? "ذخیره شد" : "ذخیره"}
+        </button>
+        <button
+          type="button"
+          className="btn btn-neon glass flex-[1.6] overflow-hidden"
+          onClick={() => document.getElementById("book")?.scrollIntoView({ behavior: "smooth", block: "center" })}
+        >
+          <span className="sweep" />
+          درخواست جلسه
+          <Icon name="calendar" size={15} />
+        </button>
+      </div>
+
       <a
         href="#/coaches"
         className="mb-4 inline-flex items-center gap-2 text-[0.82rem] font-bold text-muted transition hover:text-neon"
@@ -53,7 +79,7 @@ export default function CoachProfile() {
 
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
         {/* ============ booking rail (right on desktop) ============ */}
-        <div className="order-2 flex flex-col gap-4 xl:order-1 xl:w-[300px] xl:shrink-0">
+        <div id="book" className="order-2 flex flex-col gap-4 xl:order-1 xl:w-[300px] xl:shrink-0">
           <div className="panel reveal flex flex-col gap-3 p-4">
             <StatusDot />
             <button

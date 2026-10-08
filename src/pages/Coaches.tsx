@@ -132,6 +132,18 @@ export default function Coaches() {
           </div>
 
           {/* cards */}
+          {list.length === 0 && (
+            <div className="panel flex flex-col items-center gap-3 p-10 text-center">
+              <Icon name="search" size={26} className="text-muted" />
+              <p className="t-h3">مربی‌ای با این فیلتر پیدا نشد</p>
+              <p className="t-body-sm text-muted">نام یا تخصص دیگری را امتحان کنید.</p>
+              <button type="button" className="btn btn-ghost !min-h-9 !text-[0.78rem]" onClick={() => { setQuery(""); setTab(0); }}>
+                پاک کردن فیلترها
+              </button>
+            </div>
+          )}
+
+          {list.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {list.map((c, i) => (
               <div key={c.id} style={delay(i % 6)} className="reveal">
@@ -139,6 +151,7 @@ export default function Coaches() {
               </div>
             ))}
           </div>
+          )}
 
           {/* pagination */}
           <nav aria-label="صفحه‌بندی" className="mt-6 flex items-center justify-center gap-1.5">

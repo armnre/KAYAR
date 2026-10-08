@@ -6,20 +6,8 @@ import { ErrorState, Spinner } from "../../components/ui/feedback";
 import { AppError, toUserMessage } from "../../lib/errors";
 import { createLogger } from "../../lib/logger";
 import { parseOrThrow } from "../../lib/validation";
-import {
-  maskPhoneDisplay,
-  normalizePhone,
-  isValidIranMobile,
-} from "./phone";
-import {
-  OTP_MAX_ATTEMPTS,
-  OTP_TTL_SECONDS,
-  canResend,
-  otpRemainingSeconds,
-  resendWaitSeconds,
-  sanitizeOtpInput,
-} from "./otp";
-import { toPersianDigits } from "./phone";
+import { maskPhoneDisplay, normalizePhone, isValidIranMobile, toPersianDigits, toNational } from "./phone";
+import { OTP_MAX_ATTEMPTS, OTP_TTL_SECONDS, canResend, otpRemainingSeconds, resendWaitSeconds, sanitizeOtpInput } from "./otp";
 import { phoneSchema, otpCodeSchema, type AuthGateway, type RequestOtpResult } from "./contracts";
 import { UnavailableAuthGateway } from "./contracts";
 
@@ -29,6 +17,11 @@ type Step = "phone" | "otp" | "done";
 
 const PICTURE =
   "کایار برای ورود از رمز یک‌بارمصرف استفاده می‌کند؛ بدون رمز عبور و بدون نشت اطلاعات.";
+
+const DEMO_PHONES: { n: string; r: string }[] = [
+  { n: "09121111111", r: "مدیر" },
+  { n: "09122222222", r: "مربی" },
+];
 
 export interface AuthScreenProps {
   /** injected in production by the app composition root */
@@ -116,9 +109,7 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
     }
   }, [challenge, gateway]);
 
-  const resendIn = challenge
-    ? resendWaitSeconds(requestedAtMs, now, challenge.resendAfterSeconds)
-    : 0;
+  const resendIn = challenge ? resendWaitSeconds(requestedAtMs, now, challenge.resendAfterSeconds) : 0;
   const canResendNow = challenge ? canResend(requestedAtMs, now, challenge.resendAfterSeconds) : false;
   const otpExpiresIn = challenge ? otpRemainingSeconds(requestedAtMs, now) : 0;
 
@@ -170,13 +161,7 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
             >
               <p className="t-body-sm text-muted">{PICTURE}</p>
 
-              <PhoneInput
-                value={phone}
-                onChange={setPhone}
-                error={phoneError}
-                disabled={busy}
-                loading={busy}
-              />
+              <PhoneInput value={phone} onChange={setPhone} error={phoneError} disabled={busy} loading={busy} />
 
               <Checkbox label="قوانین و حریم خصوصی کایار را می‌پذیرم" checked={consent} onChange={setConsent} />
 
@@ -198,6 +183,16 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
                   </li>
                 ))}
               </ul>
+
+              <div className="flex flex-wrap justify-center gap-2 border-t border-line pt-3">
+                <span className="w-full text-center text-[0.68rem] text-muted">شماره‌های آزمایشی:</span>
+                {DEMO_PHONES.map((d) => (
+                  <button key={d.n} type="button" onClick={() => setPhone(d.n)} className="chip !min-h-8 !text-[0.7rem]">
+                    <Icon name="user" size={12} />
+                    {d.r} · <span className="num">{toPersianDigits(toNational(`98${d.n.slice(1)}`))}</span>
+                  </button>
+                ))}
+              </div>
             </form>
           )}
 
@@ -224,9 +219,7 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
                   </button>
                   <span className="num inline-flex items-center gap-1.5 text-[0.75rem] text-muted">
                     <Icon name="clock" size={13} />
-                    {canResendNow
-                      ? "ارسال مجدد آماده است"
-                      : `ارسال مجدد تا ${toPersianDigits(resendIn)} ثانیه`}
+                    {canResendNow ? "ارسال مجدد آماده است" : `ارسال مجدد تا ${toPersianDigits(resendIn)} ثانیه`}
                     <span className="text-line-2">·</span>
                     <span className={otpExpiresIn <= 20 ? "text-gold" : ""}>
                       اعتبار کد: {toPersianDigits(otpExpiresIn)} ثانیه
@@ -250,7 +243,6 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
                 </Button>
               </div>
 
-              {/* Honest preview affordance: the UI can be reviewed without a server. */}
               {deliveredCode && (
                 <p className="rounded-xl border border-gold/30 bg-gold/10 px-3 py-2 text-[0.78rem] leading-relaxed text-gold">
                   کانال پیامک توسعه (سرویس کاوه‌نگار وصل نیست): کد{" "}
@@ -278,7 +270,8 @@ export function AuthScreen({ gateway = new UnavailableAuthGateway(), onAuthentic
           <Icon name="bolt" size={16} className="mt-0.5 shrink-0 text-gold" />
           <p className="text-[0.76rem] leading-relaxed text-muted">
             <strong className="text-gold">نشست دستگاه:</strong> کد واقعاً ساخته، هش و منقضی می‌شود. چون
-            پیامک تجاری وصل نیست، کد از کانال توسعه نشان داده می‌شود. مدیر: ۰۹۱۲۱۱۱۱۱۱۱ · مربی: ۰۹۱۲۲۲۲۲۲۲۲.
+            پیامک تجاری وصل نیست، کد از کانال توسعه نشان داده می‌شود.{" "}
+            {DEMO_PHONES.map((d) => `${d.r}: ${toPersianDigits(d.n)}`).join(" · ")}
           </p>
         </div>
 
