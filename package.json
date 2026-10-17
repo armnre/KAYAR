@@ -1,0 +1,51 @@
+{
+  "name": "kayar",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build:shared && npm run build:web && npm run build:api && next build",
+    "build:shared": "npm run build -w @kayar/shared",
+    "build:web": "npm run build -w @project/kayar-1",
+    "build:api": "npm run build -w @kayar/api",
+    "start": "node scripts/start.mjs",
+    "start:web": "next start",
+    "start:api": "node apps/api/dist/main.js",
+    "dev": "node scripts/dev.mjs",
+    "dev:web": "npm run dev -w @project/kayar-1",
+    "dev:api": "npm run dev -w @kayar/api",
+    "typecheck": "npm run typecheck -w @kayar/shared && npm run typecheck -w @kayar/api && npm run typecheck -w @project/kayar-1 && tsc --noEmit",
+    "db:push": "drizzle-kit push --config drizzle.config.json",
+    "db:generate": "drizzle-kit generate --config apps/api/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config apps/api/drizzle.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.config.json",
+    "seed": "node apps/api/dist/seed.js",
+    "import:zite": "node apps/api/dist/import-zite.js",
+    "test": "npm run test -w @kayar/api"
+  },
+  "dependencies": {
+    "dotenv": "17.3.1",
+    "drizzle-orm": "0.45.2",
+    "next": "16.2.6",
+    "pg": "8.20.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.17",
+    "@types/node": "22.19.15",
+    "@types/pg": "8.18.0",
+    "@types/react": "18.3.20",
+    "@types/react-dom": "18.3.5",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "postcss": "8.5.8",
+    "tailwindcss": "4.1.17",
+    "typescript": "5.9.3"
+  }
+}
+

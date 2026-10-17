@@ -1,0 +1,29 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@app": [
+        "./src/App.tsx"
+      ],
+      "zitejs/api": [
+        "./src/lib/api-client.ts"
+      ],
+      "zitejs/upload": [
+        "./src/lib/upload.ts"
+      ],
+      "@project/components/*": [
+        "../../packages/components/*"
+      ]
+    },
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  }
+}
