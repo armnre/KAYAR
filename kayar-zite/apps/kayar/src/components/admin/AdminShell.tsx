@@ -19,7 +19,7 @@ export const adminNav = [
   { to: '/admin/morshed', label: 'مرشد', icon: Music, perm: 'morshed.manage' },
   { to: '/admin/announcements', label: 'اعلان‌ها', icon: Megaphone, perm: 'announcements.manage' },
   { to: '/admin/campaigns', label: 'پیشنهادات کایار', icon: Sparkles, perm: 'shop.manage' },
-  { to: '/admin/shop', label: 'فروشگاه', icon: ShoppingBag, perm: 'shop.manage' },
+  { to: '/admin/shop', label: 'پیشنهادات · محصولات فروشگاه', icon: ShoppingBag, perm: 'shop.manage' },
   { to: '/admin/sms', label: 'پنل پیامک', icon: MessageSquareText, perm: 'sms.manage' },
   { to: '/admin/settings', label: 'تنظیمات', icon: Settings, perm: 'settings.manage' },
   { to: '/admin/audit', label: 'گزارش فعالیت', icon: History, perm: 'audit.read' },

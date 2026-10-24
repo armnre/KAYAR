@@ -6,6 +6,7 @@ import { ArrowLeft, Copy, ExternalLink, Sparkles, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@project/components/lib/utils';
 import { Skeleton } from '@project/components/ui/skeleton';
+import { KapooshShop } from './KapooshShop';
 
 type C = AppCampaignsOutputType['items'][0];
 export const THEMES: Record<string, string> = {
@@ -15,7 +16,7 @@ export const THEMES: Record<string, string> = {
   royal: 'from-[hsl(45_100%_60%)] via-[hsl(30_70%_38%)] to-[hsl(20_40%_10%)]',
   mono: 'from-[hsl(0_0%_45%)] via-[hsl(0_0%_18%)] to-[hsl(0_0%_5%)]',
 };
-export const KIND: Record<string, string> = { campaign: 'کمپین', product: 'محصول', brand: 'برند', offer: 'تخفیف', event: 'رویداد' };
+export const KIND: Record<string, string> = { campaign: 'کمپین اجتماعی', product: 'محصول اسپانسری', brand: 'اسپانسر', offer: 'تخفیف ویژه', event: 'رویداد' };
 const seen = new Set<string>();
 const track = (id: string, event: 'view' | 'click') => appCampaigns({ action: 'track', id, event }).catch(() => {});
 
@@ -60,23 +61,36 @@ export function CampaignCard({ c, big }: { c: C; big?: boolean }) {
   );
 }
 
-/** "پیشنهادات کایار" — admin-managed campaigns, ads and promoted products for a placement. */
+const FILTERS: [string, string][] = [['all', 'همه'], ['campaign', 'کمپین‌ها'], ['product', 'محصولات'], ['offer', 'تخفیف‌ها'], ['brand', 'اسپانسرها']];
+
+/** "پیشنهادات کایار" — one place for sponsored products, social campaigns, offers and the shop. Fully admin-managed. */
 export function KayarSuggestions({ placement = 'home' }: { placement?: 'home' | 'morshed' | 'bodyyar' }) {
   const [items, setItems] = useState<C[] | null>(null);
+  const [f, setF] = useState('all');
   useEffect(() => { appCampaigns({ action: 'list', placement }).then((r) => setItems(r.items)).catch(() => setItems([])); }, [placement]);
-  if (items === null) return <div className="-mx-4 mt-3 flex gap-3 overflow-hidden px-4"><Skeleton className="h-[300px] w-[86%] shrink-0 rounded-[30px]" /></div>;
-  if (!items.length) return null;
-  const heroes = items.filter((c) => c.kind !== 'product'); const products = items.filter((c) => c.kind === 'product');
+  const list = (items ?? []).filter((c) => f === 'all' || c.kind === f || (f === 'campaign' && c.kind === 'event'));
+  const heroes = list.filter((c) => c.kind === 'campaign' || c.kind === 'event' || c.kind === 'brand');
+  const small = list.filter((c) => !heroes.includes(c));
+  const showShop = placement === 'home' && (f === 'all' || f === 'product');
   return (
-    <section className="mt-9">
-      <div className="mb-3 flex items-end justify-between">
-        <h2 className="flex items-center gap-2 text-lg font-black tracking-tight"><Sparkles className="h-5 w-5 text-primary" />پیشنهادات کایار</h2>
-        <span className="text-xs font-bold text-muted-foreground">ترند این هفته</span>
+    <section className="relative mt-10">
+      <div className="pointer-events-none absolute -top-10 start-1/2 h-40 w-[120%] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+      <div className="relative flex items-end justify-between">
+        <div><p className="font-latin text-[10px] font-black tracking-[.3em] text-primary">KAYAR PICKS</p>
+          <h2 className="flex items-center gap-2 text-xl font-black tracking-tight"><Sparkles className="h-5 w-5 text-primary" />پیشنهادات کایار</h2>
+          <p className="text-xs text-muted-foreground">کمپین‌ها، اسپانسرها و محصولات منتخب</p></div>
       </div>
-      {heroes.length > 0 && <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
-        {heroes.map((c, i) => <motion.div key={c.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }} className="contents"><CampaignCard c={c} big /></motion.div>)}
-      </div>}
-      {products.length > 0 && <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">{products.map((c) => <CampaignCard key={c.id} c={c} />)}</div>}
+      <div className="relative -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+        {FILTERS.map(([k, l]) => <button key={k} onClick={() => setF(k)} className={cn('press h-9 shrink-0 rounded-full border px-4 text-xs font-black transition', f === k ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground')}>{l}</button>)}
+      </div>
+      {items === null ? <div className="-mx-4 mt-3 flex gap-3 overflow-hidden px-4"><Skeleton className="h-[300px] w-[86%] shrink-0 rounded-[30px]" /></div> : <>
+        {heroes.length > 0 && <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
+          {heroes.map((c, i) => <motion.div key={c.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }} className="contents"><CampaignCard c={c} big /></motion.div>)}
+        </div>}
+        {small.length > 0 && <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">{small.map((c) => <CampaignCard key={c.id} c={c} />)}</div>}
+        {showShop && <div className="mt-4"><div className="mb-2 text-sm font-black">محصولات منتخب</div><KapooshShop /></div>}
+        {!heroes.length && !small.length && !showShop && <p className="mt-4 rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">فعلاً موردی در این دسته نیست.</p>}
+      </>}
     </section>
   );
 }

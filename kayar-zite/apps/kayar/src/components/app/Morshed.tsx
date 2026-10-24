@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { appLibrary, type AppLibraryOutputType } from 'zitejs/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Heart, SearchX, RefreshCw, Music2, Mic2, Play, Pause, Zap, Dumbbell, HeartPulse, Leaf, X, Waves, ArrowLeft, Flame, Disc3, PartyPopper, Guitar } from 'lucide-react';
-import { KayarSuggestions } from './KayarSuggestions';
 import { cn } from '@project/components/lib/utils';
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform, StateView } from '../kit';
@@ -131,7 +130,6 @@ function Music() {
       </div>}
       {lib.err ? <Failed err={lib.err} retry={lib.retry} /> : !lib.data ? <div className="mt-5"><Loading /></div> : <>
         {!dq && !cat && featured.length > 0 && <Featured list={featured} />}
-        {!dq && !cat && lang === 'all' && <KayarSuggestions placement="morshed" />}
         {!dq && !cat && lib.data.artists.length > 0 && <><H t="خواننده‌های محبوب" /><Artists list={lib.data.artists} onPick={setQ} /></>}
         {!dq && !cat && lang === 'all' && lib.data.collections.map((c) => <div key={c.id}><H t={c.title} />{c.description && <p className="-mt-2 mb-2 text-sm text-muted-foreground">{c.description}</p>}<Rows list={c.tracks} /></div>)}
         {!dq && !cat && lib.data.sections.map((sec) => (

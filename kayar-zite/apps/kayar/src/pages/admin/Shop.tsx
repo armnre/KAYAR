@@ -85,7 +85,7 @@ export function AdminShop() {
   const toggle = async (p: P) => { const { id, ...data } = p; setD((x) => x && { ...x, products: x.products.map((q) => q.id === id ? { ...q, active: !q.active } : q) }); try { await adminShop({ token, action: 'save', id, data: { ...data, active: !p.active } }); } catch (e) { toast.error(errMsg(e)); load(); } };
   return (
     <div>
-      <PageHead title="فروشگاه کاپوش" sub="محصولاتی که در اپ و سایت پیشنهاد می‌شوند" action={tab === 'products' && <KButton onClick={() => setEdit('new')}><Plus className="h-4 w-4" />محصول جدید</KButton>} />
+      <PageHead title="پیشنهادات کایار · محصولات" sub="محصولاتی که در اپ و سایت پیشنهاد می‌شوند" action={tab === 'products' && <KButton onClick={() => setEdit('new')}><Plus className="h-4 w-4" />محصول جدید</KButton>} />
       <Glass className={cn('mb-4 flex items-center gap-3 rounded-2xl p-4', d?.gateway ? 'border-primary/30' : 'border-gold/30')}>
         <CreditCard className={cn('h-5 w-5', d?.gateway ? 'text-primary' : 'text-gold')} />
         <div className="text-sm">{d?.gateway ? <>درگاه پرداخت <b>{d.gateway}</b> فعال است؛ مشتریان می‌توانند مستقیم خرید کنند.</> : <>درگاه پرداخت هنوز وصل نیست. با افزودن کلید <b dir="ltr">ZITE_ZARINPAL_MERCHANT_ID</b> در تنظیمات، پرداخت آنلاین فعال می‌شود. تا آن موقع دکمه‌ی خرید به لینک خارجی محصول می‌رود.</>}</div>

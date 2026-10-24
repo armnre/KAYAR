@@ -1,3 +1,5 @@
+> KAYAR Suggestions (پیشنهادات کایار): admin-managed campaigns, ads, brands and promoted products shown on Home, Morshed and BodyYar, with scheduling and view/click stats. Morshed music is organised by language and style (Persian pop/rap/classic/traditional/dance/rock; English pop/hip-hop/EDM/rock/R&B/classics) plus global trending charts; religious content is never imported.
+
 # KAYAR
 
 KAYAR is the companion app for athletes who buy KAPOUSH sportswear. It's Persian (RTL) and mobile-first, and uses the "Neon Athletic" dark look.

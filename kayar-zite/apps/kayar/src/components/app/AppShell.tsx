@@ -21,7 +21,7 @@ function PlayBtn({ big }: { big?: boolean }) {
   const { playing, toggle, buffering, error } = usePreview();
   const sz = big ? 'h-8 w-8' : 'h-5 w-5';
   return (
-    <button className={big ? 'press grid h-20 w-20 place-items-center rounded-full bg-violet text-white shadow-[0_0_32px_hsl(254_100%_62%/.5)]' : 'tap grid place-items-center rounded-full'} onClick={toggle} aria-label={error ? 'تلاش دوباره' : playing ? 'توقف' : 'پخش'}>
+    <button className={big ? 'press grid h-20 w-20 place-items-center rounded-full bg-primary text-primary-foreground shadow-[0_0_40px_hsl(var(--primary)/.55)]' : 'tap grid place-items-center rounded-full'} onClick={toggle} aria-label={error ? 'تلاش دوباره' : playing ? 'توقف' : 'پخش'}>
       {error ? <RotateCw className={sz} /> : buffering ? <Loader2 className={cn(sz, 'animate-spin')} /> : playing ? <Pause className={cn(sz, 'fill-current')} /> : <Play className={cn(sz, 'fill-current')} />}
     </button>
   );
@@ -39,7 +39,7 @@ function MiniPlayer() {
       <PlayBtn />
       <button className="tap grid place-items-center rounded-full" onClick={() => next()} aria-label="بعدی"><SkipForward className="h-5 w-5 -scale-x-100 fill-current" /></button>
       <button className="tap grid place-items-center rounded-full text-muted-foreground hover:text-foreground" onClick={stop} aria-label="بستن پلیر"><X className="h-5 w-5" /></button>
-      <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/10"><span className="block h-full bg-violet" style={{ width: `${duration ? (progress / duration) * 100 : 0}%` }} /></span>
+      <span className="absolute inset-x-0 bottom-0 h-0.5 bg-white/10"><span className="block h-full bg-primary" style={{ width: `${duration ? (progress / duration) * 100 : 0}%` }} /></span>
     </div>
   );
 }
@@ -54,43 +54,68 @@ function QueueList({ close }: { close: () => void }) {
   );
 }
 
+function UpNext() {
+  const { queue, track, play } = usePreview();
+  const i = queue.findIndex((t) => t.id === track?.id);
+  const n = i >= 0 ? queue[i + 1] : undefined;
+  if (!n) return null;
+  return (
+    <button onClick={() => play(n)} className="press mt-5 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[.06] p-2.5 text-start backdrop-blur-xl">
+      <Cover hue={n.hue} image={n.image} className="h-10 w-10 shrink-0 rounded-xl" />
+      <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold text-primary">بعدی</span><span className="block truncate text-sm font-bold" dir="auto">{n.title}</span></span>
+      <span className="truncate text-xs text-white/50" dir="auto">{n.artist}</span>
+    </button>
+  );
+}
+
 function FullPlayer() {
   const { track, playing, next, progress, duration, setProgress, fullPlayer, setFullPlayer, favs, toggleFav, volume, setVolume, sleepAt, setSleep, error, retry } = usePreview();
   const [showQueue, setShowQueue] = useState(false);
+  const pct = duration ? (progress / duration) * 100 : 0;
   return (
     <AnimatePresence>
       {fullPlayer && track && (
         <motion.div role="dialog" aria-modal aria-label="پلیر" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-background px-6 pb-[calc(24px+var(--safe-b))] pt-[calc(12px+var(--safe-t))]">
-          <div className="absolute inset-0 -z-10 opacity-60" style={{ background: `radial-gradient(80% 50% at 50% 20%, hsl(${track.hue} 80% 45% / .5), transparent)` }} />
+          drag="y" dragConstraints={{ top: 0, bottom: 0 }} dragElastic={{ top: 0, bottom: 0.6 }} onDragEnd={(_, i) => { if (i.offset.y > 140) setFullPlayer(false); }}
+          className="fixed inset-0 z-[60] flex flex-col overflow-hidden bg-black px-6 pb-[calc(24px+var(--safe-b))] pt-[calc(12px+var(--safe-t))] text-white">
+          {track.image && <img src={track.image} alt="" className="absolute inset-0 -z-20 h-full w-full scale-125 object-cover opacity-60 blur-3xl" />}
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/30 via-black/60 to-black" style={track.image ? undefined : { background: `radial-gradient(80% 50% at 50% 20%, hsl(${track.hue} 80% 45% / .6), #000)` }} />
           <div className="mx-auto flex w-full max-w-md items-center justify-between">
-            <button className="tap grid place-items-center rounded-full hover:bg-white/5" onClick={() => setFullPlayer(false)} aria-label="بستن پلیر"><ChevronDown className="h-7 w-7" /></button>
-            <span className="text-sm text-muted-foreground">{track.source === 'podcast' ? 'پادکست' : 'منتخب کایار'}</span>
-            <button className="tap grid place-items-center rounded-full" onClick={() => setShowQueue((v) => !v)} aria-label="صف پخش" aria-pressed={showQueue}><ListMusic className="h-6 w-6" /></button>
+            <button className="tap grid place-items-center rounded-full bg-white/10 backdrop-blur" onClick={() => setFullPlayer(false)} aria-label="بستن پلیر"><ChevronDown className="h-6 w-6" /></button>
+            <div className="text-center"><div className="font-latin text-[10px] font-black tracking-[.3em] text-primary">{track.source === 'podcast' ? 'PODCAST' : 'NOW PLAYING'}</div><div className="text-xs text-white/60">{track.source === 'podcast' ? 'پادکست' : 'مرشد کایار'}</div></div>
+            <button className={cn('tap grid place-items-center rounded-full backdrop-blur', showQueue ? 'bg-primary text-primary-foreground' : 'bg-white/10')} onClick={() => setShowQueue((v) => !v)} aria-label="صف پخش" aria-pressed={showQueue}><ListMusic className="h-5 w-5" /></button>
           </div>
-          <div className="mx-auto mt-6 flex w-full max-w-md flex-1 flex-col justify-center">
-            {showQueue ? <QueueList close={() => setShowQueue(false)} /> : <Cover hue={track.hue} image={track.image} className="aspect-square w-full rounded-[32px] shadow-xl" />}
-            <div className="mt-6 flex items-center gap-3">
-              <div className="min-w-0 flex-1"><h2 className="truncate text-2xl font-black">{track.title}</h2><p className="truncate text-muted-foreground">{track.artist}{track.album ? ` · ${track.album}` : ''}</p></div>
-              <button className="tap grid place-items-center rounded-full" onClick={() => toggleFav(track.id)} aria-label="علاقه‌مندی" aria-pressed={favs.has(track.id)}><Heart className={cn('h-6 w-6', favs.has(track.id) && 'fill-violet text-violet')} /></button>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
-              {track.licenseUrl && <a href={track.licenseUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 underline">مجوز {track.license}<ExternalLink className="h-3 w-3" /></a>}
-              {track.shareUrl && <a href={track.shareUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 underline">منبع اصلی<ExternalLink className="h-3 w-3" /></a>}
+          <div className="mx-auto mt-4 flex w-full max-w-md flex-1 flex-col justify-center overflow-y-auto">
+            {showQueue ? <QueueList close={() => setShowQueue(false)} /> : (
+              <div className="relative">
+                <motion.div className="absolute inset-6 rounded-[40px] bg-primary/40 blur-3xl" animate={{ opacity: playing ? [0.4, 0.8, 0.4] : 0.2, scale: playing ? [0.95, 1.05, 0.95] : 0.9 }} transition={{ duration: 3, repeat: Infinity }} />
+                <motion.div key={track.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: playing ? 1 : 0.88 }} transition={{ type: 'spring', stiffness: 180, damping: 20 }}>
+                  <Cover hue={track.hue} image={track.image} className="relative aspect-square w-full rounded-[36px] shadow-[0_30px_80px_-20px_rgba(0,0,0,.9)] ring-1 ring-white/10" />
+                </motion.div>
+              </div>
+            )}
+            <div className="mt-7 flex items-center gap-3">
+              <motion.div key={track.id + 't'} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="min-w-0 flex-1"><h2 className="truncate text-[26px] font-black leading-tight" dir="auto">{track.title}</h2><p className="truncate text-white/60" dir="auto">{track.artist}{track.album ? ` · ${track.album}` : ''}</p></motion.div>
+              <motion.button whileTap={{ scale: 1.4 }} className="tap grid place-items-center rounded-full bg-white/10" onClick={() => toggleFav(track.id)} aria-label="علاقه‌مندی" aria-pressed={favs.has(track.id)}><Heart className={cn('h-6 w-6', favs.has(track.id) && 'fill-primary text-primary')} /></motion.button>
             </div>
             {error ? <button onClick={retry} className="mt-5 flex h-11 items-center justify-center gap-2 rounded-2xl border border-destructive/40 text-sm text-destructive"><RotateCw className="h-4 w-4" />پخش ممکن نشد؛ تلاش دوباره</button>
-              : <Waveform bars={44} playing={playing} className="mt-5 h-10 w-full justify-between" color="bg-[hsl(254_100%_75%)]" />}
-            <input type="range" min={0} max={Math.max(1, Math.floor(duration))} value={Math.floor(progress)} onChange={(e) => setProgress(Number(e.target.value))} aria-label="پیشرفت" className="mt-3 h-11 w-full cursor-pointer accent-[hsl(254_100%_62%)]" dir="ltr" />
-            <div className="flex justify-between text-xs text-muted-foreground" dir="ltr"><span>{fmt(progress)}</span><span>{fmt(duration)}</span></div>
-            <div className="mt-4 flex items-center justify-between">
-              <DropdownMenu><DropdownMenuTrigger className={cn('tap grid place-items-center rounded-full', sleepAt ? 'text-violet' : 'text-muted-foreground')} aria-label="تایمر خواب"><Timer className="h-6 w-6" /></DropdownMenuTrigger>
-                <DropdownMenuContent>{[15, 30, 45, 60].map((m) => <DropdownMenuItem key={m} onClick={() => setSleep(m)}>{fa(m)} دقیقه</DropdownMenuItem>)}{sleepAt && <DropdownMenuItem onClick={() => setSleep(null)}>لغو تایمر</DropdownMenuItem>}</DropdownMenuContent></DropdownMenu>
-              <button className="tap grid h-14 w-14 place-items-center rounded-full" onClick={() => next(-1)} aria-label="قبلی"><SkipBack className="h-7 w-7 -scale-x-100 fill-current" /></button>
-              <PlayBtn big />
-              <button className="tap grid h-14 w-14 place-items-center rounded-full" onClick={() => next()} aria-label="بعدی"><SkipForward className="h-7 w-7 -scale-x-100 fill-current" /></button>
-              <span className="w-11" />
+              : <Waveform bars={48} playing={playing} className="mt-5 h-8 w-full justify-between opacity-80" color="bg-primary" />}
+            <div className="relative mt-3 h-11" dir="ltr">
+              <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-white/15"><div className="h-full rounded-full bg-gradient-to-r from-primary/70 to-primary shadow-[0_0_12px_hsl(var(--primary))]" style={{ width: `${pct}%` }} /></div>
+              <div className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg" style={{ left: `${pct}%` }} />
+              <input type="range" min={0} max={Math.max(1, Math.floor(duration))} value={Math.floor(progress)} onChange={(e) => setProgress(Number(e.target.value))} aria-label="پیشرفت" className="absolute inset-0 w-full cursor-pointer opacity-0" />
             </div>
-            <label className="mt-4 hidden items-center gap-3 text-muted-foreground sm:flex"><Volume2 className="h-5 w-5" /><input type="range" min={0} max={1} step={0.05} value={volume} onChange={(e) => setVolume(Number(e.target.value))} aria-label="صدا" className="w-full accent-[hsl(254_100%_62%)]" dir="ltr" /></label>
+            <div className="flex justify-between text-xs tabular-nums text-white/50" dir="ltr"><span>{fmt(progress)}</span><span>{fmt(duration)}</span></div>
+            <div className="mt-4 flex items-center justify-between">
+              <DropdownMenu><DropdownMenuTrigger className={cn('tap grid place-items-center rounded-full', sleepAt ? 'text-primary' : 'text-white/60')} aria-label="تایمر خواب"><Timer className="h-6 w-6" /></DropdownMenuTrigger>
+                <DropdownMenuContent>{[15, 30, 45, 60].map((m) => <DropdownMenuItem key={m} onClick={() => setSleep(m)}>{fa(m)} دقیقه</DropdownMenuItem>)}{sleepAt && <DropdownMenuItem onClick={() => setSleep(null)}>لغو تایمر</DropdownMenuItem>}</DropdownMenuContent></DropdownMenu>
+              <button className="tap grid h-14 w-14 place-items-center rounded-full" onClick={() => next(-1)} aria-label="قبلی"><SkipBack className="h-8 w-8 -scale-x-100 fill-current" /></button>
+              <PlayBtn big />
+              <button className="tap grid h-14 w-14 place-items-center rounded-full" onClick={() => next()} aria-label="بعدی"><SkipForward className="h-8 w-8 -scale-x-100 fill-current" /></button>
+              {track.shareUrl ? <a href={track.shareUrl} target="_blank" rel="noopener noreferrer" className="tap grid place-items-center rounded-full text-white/60" aria-label="آهنگ کامل در منبع"><ExternalLink className="h-5 w-5" /></a> : <span className="w-11" />}
+            </div>
+            <label className="mt-3 flex items-center gap-3 text-white/50"><Volume2 className="h-4 w-4" /><input type="range" min={0} max={1} step={0.05} value={volume} onChange={(e) => setVolume(Number(e.target.value))} aria-label="صدا" className="h-1 w-full accent-[hsl(var(--primary))]" dir="ltr" /></label>
+            {!showQueue && <UpNext />}
           </div>
         </motion.div>
       )}
