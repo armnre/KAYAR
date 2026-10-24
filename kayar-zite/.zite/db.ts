@@ -947,6 +947,63 @@ export type SmsMessagesRecordInput = {
   error: string | null;
 };
 
+/** A record in the "Campaigns" table, as it is read back. */
+export type CampaignsRecordType = {
+  id: string;
+  /** Primary field. "Title" */
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  kind?: "campaign" | "product" | "brand" | "offer" | "event" | string;
+  brand?: string;
+  imageUrl?: string;
+  badge?: string;
+  ctaLabel?: string;
+  link?: string;
+  price?: string;
+  oldPrice?: string;
+  discountCode?: string;
+  theme?: "lime" | "sunset" | "ocean" | "royal" | "mono" | string;
+  placements?: ("home" | "morshed" | "bodyyar" | string)[];
+  status?: "draft" | "active" | "paused" | "ended" | string;
+  /** "Priority". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  priority?: number;
+  /** "Starts At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
+  startsAt?: string;
+  /** "Ends At". Date+time field (ISO 8601 timestamp), null when unset, date: "local" format, time: 12h */
+  endsAt?: string;
+  /** "Impressions". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  impressions?: number;
+  /** "Clicks". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  clicks?: number;
+  /** Read-only. "Created". Auto-set when record was created (ISO 8601) */
+  created?: string;
+};
+
+/** What you may write when creating or updating a record in the "Campaigns" table. */
+export type CampaignsRecordInput = {
+  title: string | null;
+  subtitle: string | null;
+  body: string | null;
+  kind: "campaign" | "product" | "brand" | "offer" | "event" | string | null;
+  brand: string | null;
+  imageUrl: string | null;
+  badge: string | null;
+  ctaLabel: string | null;
+  link: string | null;
+  price: string | null;
+  oldPrice: string | null;
+  discountCode: string | null;
+  theme: "lime" | "sunset" | "ocean" | "royal" | "mono" | string | null;
+  placements: "home" | "morshed" | "bodyyar" | string | ("home" | "morshed" | "bodyyar" | string)[] | null;
+  status: "draft" | "active" | "paused" | "ended" | string | null;
+  priority: string | number | null;
+  startsAt: string | Date | null;
+  endsAt: string | Date | null;
+  impressions: string | number | null;
+  clicks: string | number | null;
+};
+
 export interface ZiteAuthUser {
   id: string;
   name: string;
@@ -985,6 +1042,7 @@ export const zite = {
   products: createTableClient<ProductsRecordType, ProductsRecordInput>('Products'), // "Products"
   orders: createTableClient<OrdersRecordType, OrdersRecordInput>('Orders'), // "Orders"
   smsMessages: createTableClient<SmsMessagesRecordType, SmsMessagesRecordInput>('SmsMessages'), // "Sms Messages"
+  campaigns: createTableClient<CampaignsRecordType, CampaignsRecordInput>('Campaigns'), // "Campaigns"
   sql: createSqlClient(),
   auth: createAuthClient<ZiteAuthUser>(),
 };

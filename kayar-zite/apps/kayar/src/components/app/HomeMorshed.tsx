@@ -7,6 +7,7 @@ import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform } from '../kit';
 import { HomeBody } from './HomeBody';
 import { KapooshShop } from './KapooshShop';
+import { KayarSuggestions } from './KayarSuggestions';
 
 import { usePreview } from '../../lib/preview';
 import { useSession, errMsg } from '../../lib/session';
@@ -17,9 +18,9 @@ const up = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity:
 type MorshedData = MorshedTracksOutputType;
 /** Loads Morshed data (library / home) with a short per-session cache. */
 const cache = new Map<string, MorshedData>();
-export function useMorshed(mode: 'library' | 'home', q?: string, cat?: string) {
+export function useMorshed(mode: 'library' | 'home', q?: string, cat?: string, lang: 'all' | 'fa' | 'en' | 'trending' = 'all') {
   const { token } = useSession('app');
-  const key = `${mode}|${cat ?? ''}|${q ?? ''}`;
+  const key = `${mode}|${lang}|${cat ?? ''}|${q ?? ''}`;
   const [data, setData] = useState<MorshedData | null>(cache.get(key) ?? null);
   const [err, setErr] = useState<string>();
   const [n, setN] = useState(0);
@@ -27,7 +28,7 @@ export function useMorshed(mode: 'library' | 'home', q?: string, cat?: string) {
     if (!token) return;
     if (cache.has(key)) { setData(cache.get(key)!); setErr(undefined); return; }
     let on = true; setData(null); setErr(undefined);
-    morshedTracks({ token, mode, q, cat }).then((r) => { cache.set(key, r); on && setData(r); }).catch((e) => on && setErr(errMsg(e)));
+    morshedTracks({ token, mode, q, cat, lang }).then((r) => { cache.set(key, r); on && setData(r); }).catch((e) => on && setErr(errMsg(e)));
     return () => { on = false; };
   }, [key, n, token]); // eslint-disable-line react-hooks/exhaustive-deps
   return { data, list: data?.tracks ?? null, err, retry: () => { cache.delete(key); setN((x) => x + 1); } };
@@ -90,7 +91,8 @@ export function AppHome() {
         </div>
       ))}
       {!data && <div className="-mx-4 mt-9 flex gap-3 overflow-hidden px-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="aspect-square w-36 shrink-0 rounded-2xl" />)}</div>}
-      <H t="پیشنهاد کاپوش" />
+      <KayarSuggestions placement="home" />
+      <H t="فروشگاه کایار" />
       <KapooshShop />
     </div>
   );

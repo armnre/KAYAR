@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { appLibrary, type AppLibraryOutputType } from 'zitejs/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Heart, SearchX, RefreshCw, Music2, Mic2, Play, Pause, Zap, Dumbbell, HeartPulse, Leaf, Brain, X, Waves, Footprints, ArrowLeft } from 'lucide-react';
+import { Search, Heart, SearchX, RefreshCw, Music2, Mic2, Play, Pause, Zap, Dumbbell, HeartPulse, Leaf, X, Waves, ArrowLeft, Flame, Disc3, PartyPopper, Guitar } from 'lucide-react';
+import { KayarSuggestions } from './KayarSuggestions';
 import { cn } from '@project/components/lib/utils';
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform, StateView } from '../kit';
@@ -13,17 +14,18 @@ import { usePreview } from '../../lib/preview';
 import type { Track } from '../../data/sample';
 import { fa } from '../../lib/config';
 
-const GENRES: { k: string; l: string; i: typeof Zap; g: string }[] = [
-  { k: 'fa', l: 'فارسی', i: Music2, g: 'from-[hsl(71_100%_56%)] to-[hsl(90_80%_30%)] text-primary-foreground' },
-  { k: 'workout', l: 'قدرتی', i: Dumbbell, g: 'from-[hsl(14_90%_55%)] to-[hsl(0_60%_22%)] text-white' },
-  { k: 'running', l: 'کاردیو', i: HeartPulse, g: 'from-[hsl(340_80%_55%)] to-[hsl(320_50%_20%)] text-white' },
-  { k: 'instrumental', l: 'بی‌کلام', i: Waves, g: 'from-[hsl(190_80%_45%)] to-[hsl(210_50%_16%)] text-white' },
-  { k: 'walking', l: 'پیاده‌روی', i: Footprints, g: 'from-[hsl(45_100%_55%)] to-[hsl(30_70%_25%)] text-black' },
-  { k: 'focus', l: 'تمرکز', i: Brain, g: 'from-[hsl(220_60%_55%)] to-[hsl(225_40%_16%)] text-white' },
-  { k: 'recovery', l: 'آرامش', i: Leaf, g: 'from-[hsl(155_55%_40%)] to-[hsl(170_40%_12%)] text-white' },
-  { k: 'en', l: 'انگلیسی', i: Zap, g: 'from-[hsl(0_0%_30%)] to-[hsl(0_0%_8%)] text-white' },
-];
-
+type Lang = 'all' | 'fa' | 'en' | 'trending';
+const LANGS: { k: Lang; l: string; i: typeof Zap }[] = [{ k: 'all', l: 'همه', i: Waves }, { k: 'fa', l: 'فارسی', i: Music2 }, { k: 'en', l: 'خارجی', i: Zap }, { k: 'trending', l: 'ترند', i: Flame }];
+const STYLE_G: Record<string, { g: string; i: typeof Zap }> = {
+  trending: { g: 'from-[hsl(14_95%_55%)] to-[hsl(340_70%_25%)]', i: Flame },
+  'fa-pop': { g: 'from-[hsl(71_100%_50%)] to-[hsl(100_60%_22%)]', i: Music2 }, 'fa-rap': { g: 'from-[hsl(0_0%_32%)] to-[hsl(0_0%_6%)]', i: Mic2 },
+  'fa-classic': { g: 'from-[hsl(40_90%_55%)] to-[hsl(20_60%_20%)]', i: Disc3 }, 'fa-traditional': { g: 'from-[hsl(160_50%_40%)] to-[hsl(180_40%_12%)]', i: Leaf },
+  'fa-dance': { g: 'from-[hsl(320_80%_58%)] to-[hsl(280_50%_20%)]', i: PartyPopper }, 'fa-rock': { g: 'from-[hsl(0_70%_45%)] to-[hsl(0_40%_12%)]', i: Guitar },
+  'en-pop': { g: 'from-[hsl(300_70%_60%)] to-[hsl(260_50%_22%)]', i: Music2 }, 'en-hiphop': { g: 'from-[hsl(45_90%_50%)] to-[hsl(30_50%_12%)]', i: Mic2 },
+  'en-edm': { g: 'from-[hsl(190_90%_50%)] to-[hsl(220_60%_16%)]', i: HeartPulse }, 'en-rock': { g: 'from-[hsl(10_80%_48%)] to-[hsl(0_0%_8%)]', i: Guitar },
+  'en-rnb': { g: 'from-[hsl(270_60%_55%)] to-[hsl(240_40%_15%)]', i: Heart }, 'en-classic': { g: 'from-[hsl(200_50%_55%)] to-[hsl(210_40%_15%)]', i: Disc3 },
+};
+const sg = (k: string) => STYLE_G[k] ?? { g: 'from-[hsl(0_0%_30%)] to-[hsl(0_0%_8%)]', i: Dumbbell };
 
 export function TrackRow({ t, i, list }: { t: Track; i: number; list: Track[] }) {
   const { play, toggle, track, playing, favs, toggleFav } = usePreview();
@@ -92,31 +94,53 @@ const Loading = () => <div className="space-y-2">{Array.from({ length: 6 }).map(
 const Failed = ({ err, retry }: { err: string; retry: () => void }) => <StateView icon={RefreshCw} tone="lime" title="موزیک‌ها بارگذاری نشد" text={err} action={<button onClick={retry} className="tap rounded-full bg-primary px-5 font-bold text-primary-foreground">تلاش دوباره</button>} />;
 const Rows = ({ list }: { list: Track[] }) => <ul className="space-y-1">{list.map((t, i) => <TrackRow key={t.id} t={t} i={i} list={list} />)}</ul>;
 
+function Artists({ list, onPick }: { list: { name: string; image: string; count: number }[]; onPick: (n: string) => void }) {
+  return (
+    <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+      {list.map((a) => (
+        <button key={a.name} onClick={() => onPick(a.name)} className="press w-[84px] shrink-0 text-center">
+          <span className="block aspect-square overflow-hidden rounded-full bg-card ring-2 ring-border transition hover:ring-primary">{a.image && <img src={a.image} alt="" loading="lazy" className="h-full w-full object-cover" />}</span>
+          <span className="mt-2 block truncate text-xs font-bold" dir="auto">{a.name}</span><span className="block text-[10px] text-muted-foreground">{fa(a.count)} آهنگ</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function Music() {
+  const [lang, setLang] = useState<Lang>('all');
   const [cat, setCat] = useState('');
   const [q, setQ] = useState(''); const dq = useDebounced(q);
-  const lib = useMorshed('library', dq || undefined, cat || undefined);
+  const lib = useMorshed('library', dq || undefined, cat || undefined, lang);
+  const browse = useMorshed('library', undefined, undefined, lang);
   const libTracks = lib.data?.tracks ?? [];
   const featured = libTracks.filter((t) => t.featured);
+  const styles = browse.data?.sections ?? [];
+  const catTitle = styles.find((x) => x.key === cat)?.title ?? '';
   return (
     <>
-      <SearchBox q={q} setQ={setQ} placeholder="آهنگ، هنرمند یا حس‌وحال…" />
-      {!dq && <div className="-mx-4 mt-4 grid grid-flow-col grid-rows-2 auto-cols-[30%] gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:auto-cols-[18%]">
-        {GENRES.map((m) => { const on = cat === m.k; return (
-          <button key={m.k} onClick={() => setCat(on ? '' : m.k)} className={cn('press relative h-[68px] overflow-hidden rounded-[20px] bg-gradient-to-br p-3 text-start shadow-lg transition', m.g, on ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : cat ? 'opacity-50' : '')}>
-            <m.i className="absolute -bottom-2 -end-2 h-12 w-12 rotate-12 opacity-30" /><span className="relative text-sm font-black">{m.l}</span>
+      <SearchBox q={q} setQ={setQ} placeholder="آهنگ، خواننده یا سبک…" />
+      <div className="mt-4 flex gap-2 overflow-x-auto [scrollbar-width:none]">
+        {LANGS.map((l) => <button key={l.k} onClick={() => { setLang(l.k); setCat(''); }} className={cn('press flex h-10 shrink-0 items-center gap-1.5 rounded-full border px-4 text-sm font-black transition', lang === l.k ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground')}><l.i className="h-4 w-4" />{l.l}</button>)}
+      </div>
+      {!dq && styles.length > 0 && <div className="-mx-4 mt-3 grid grid-flow-col grid-rows-2 auto-cols-[40%] gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:auto-cols-[22%]">
+        {styles.map((m) => { const on = cat === m.key; const st = sg(m.key); return (
+          <button key={m.key} onClick={() => setCat(on ? '' : m.key)} className={cn('press relative h-[72px] overflow-hidden rounded-[20px] bg-gradient-to-br p-3 text-start text-white shadow-lg transition', st.g, on ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : cat ? 'opacity-50' : '')}>
+            <st.i className="absolute -bottom-2 -end-2 h-12 w-12 rotate-12 opacity-30" /><span className="relative block text-sm font-black">{m.title}</span><span className="relative text-[10px] font-bold text-white/70">{fa(m.count)} آهنگ</span>
           </button>); })}
       </div>}
       {lib.err ? <Failed err={lib.err} retry={lib.retry} /> : !lib.data ? <div className="mt-5"><Loading /></div> : <>
-        {!dq && featured.length > 0 && <Featured list={featured} />}
-        {!dq && lib.data.collections.map((c) => <div key={c.id}><H t={c.title} />{c.description && <p className="-mt-2 mb-2 text-sm text-muted-foreground">{c.description}</p>}<Rows list={c.tracks} /></div>)}
+        {!dq && !cat && featured.length > 0 && <Featured list={featured} />}
+        {!dq && !cat && lang === 'all' && <KayarSuggestions placement="morshed" />}
+        {!dq && !cat && lib.data.artists.length > 0 && <><H t="خواننده‌های محبوب" /><Artists list={lib.data.artists} onPick={setQ} /></>}
+        {!dq && !cat && lang === 'all' && lib.data.collections.map((c) => <div key={c.id}><H t={c.title} />{c.description && <p className="-mt-2 mb-2 text-sm text-muted-foreground">{c.description}</p>}<Rows list={c.tracks} /></div>)}
         {!dq && !cat && lib.data.sections.map((sec) => (
           <section key={sec.key}>
             <H t={sec.title} s={<button onClick={() => setCat(sec.key)} className="flex items-center gap-1 text-xs font-bold text-primary">همه {fa(sec.count)}<ArrowLeft className="h-3.5 w-3.5" /></button>} />
             <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">{sec.tracks.map((t) => <TrackTile key={t.id} t={t} list={sec.tracks} />)}</div>
           </section>
         ))}
-        {(dq || cat) && (libTracks.length > 0 ? <><H t={dq ? 'نتایج جست‌وجو' : `${GENRES.find((g) => g.k === cat)?.l ?? ''} · ${fa(libTracks.length)} آهنگ`} /><Rows list={libTracks} /></> : <StateView icon={SearchX} tone="lime" title="چیزی پیدا نشد" text="عبارت یا ژانر دیگری را امتحان کن." />)}
+        {(dq || cat) && (libTracks.length > 0 ? <><H t={dq ? `نتایج «${dq}» · ${fa(libTracks.length)}` : `${catTitle} · ${fa(libTracks.length)} آهنگ`} /><Rows list={libTracks} /></> : <StateView icon={SearchX} tone="lime" title="چیزی پیدا نشد" text="عبارت یا سبک دیگری را امتحان کن." />)}
       </>}
     </>
   );

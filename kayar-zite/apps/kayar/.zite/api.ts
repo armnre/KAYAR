@@ -4,6 +4,7 @@ import { createCaller, createStreamingCaller } from 'zitejs/caller';
 
 import type { default as _AdminAnnouncementsEp } from '../src/api/adminAnnouncements';
 import type { default as _AdminAuditEp } from '../src/api/adminAudit';
+import type { default as _AdminCampaignsEp } from '../src/api/adminCampaigns';
 import type { default as _AdminCmsEp } from '../src/api/adminCms';
 import type { default as _AdminCollectionsEp } from '../src/api/adminCollections';
 import type { default as _AdminDashboardEp } from '../src/api/adminDashboard';
@@ -20,6 +21,7 @@ import type { default as _AdminShopEp } from '../src/api/adminShop';
 import type { default as _AdminShowsEp } from '../src/api/adminShows';
 import type { default as _AdminSmsEp } from '../src/api/adminSms';
 import type { default as _AdminTracksEp } from '../src/api/adminTracks';
+import type { default as _AppCampaignsEp } from '../src/api/appCampaigns';
 import type { default as _AppLibraryEp } from '../src/api/appLibrary';
 import type { default as _AppNotificationsEp } from '../src/api/appNotifications';
 import type { default as _AuthChangePasswordEp } from '../src/api/authChangePassword';
@@ -56,6 +58,11 @@ type _AdminAuditCfg = typeof _AdminAuditEp;
 export type AdminAuditInputType = NonNullable<_AdminAuditCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminAuditCfg['execute']>[0]['input'];
 export type AdminAuditOutputType = Awaited<ReturnType<_AdminAuditCfg['execute']>>;
 export const adminAudit = createCaller<AdminAuditInputType, AdminAuditOutputType>('adminAudit');
+
+type _AdminCampaignsCfg = typeof _AdminCampaignsEp;
+export type AdminCampaignsInputType = NonNullable<_AdminCampaignsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminCampaignsCfg['execute']>[0]['input'];
+export type AdminCampaignsOutputType = Awaited<ReturnType<_AdminCampaignsCfg['execute']>>;
+export const adminCampaigns = createCaller<AdminCampaignsInputType, AdminCampaignsOutputType>('adminCampaigns');
 
 type _AdminCmsCfg = typeof _AdminCmsEp;
 export type AdminCmsInputType = NonNullable<_AdminCmsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminCmsCfg['execute']>[0]['input'];
@@ -136,6 +143,11 @@ type _AdminTracksCfg = typeof _AdminTracksEp;
 export type AdminTracksInputType = NonNullable<_AdminTracksCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminTracksCfg['execute']>[0]['input'];
 export type AdminTracksOutputType = Awaited<ReturnType<_AdminTracksCfg['execute']>>;
 export const adminTracks = createCaller<AdminTracksInputType, AdminTracksOutputType>('adminTracks');
+
+type _AppCampaignsCfg = typeof _AppCampaignsEp;
+export type AppCampaignsInputType = NonNullable<_AppCampaignsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AppCampaignsCfg['execute']>[0]['input'];
+export type AppCampaignsOutputType = Awaited<ReturnType<_AppCampaignsCfg['execute']>>;
+export const appCampaigns = createCaller<AppCampaignsInputType, AppCampaignsOutputType>('appCampaigns');
 
 type _AppLibraryCfg = typeof _AppLibraryEp;
 export type AppLibraryInputType = NonNullable<_AppLibraryCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AppLibraryCfg['execute']>[0]['input'];
@@ -271,6 +283,7 @@ export const weightLog = createCaller<WeightLogInputType, WeightLogOutputType>('
 export const api = {
   adminAnnouncements,
   adminAudit,
+  adminCampaigns,
   adminCms,
   adminCollections,
   adminDashboard,
@@ -287,6 +300,7 @@ export const api = {
   adminShows,
   adminSms,
   adminTracks,
+  appCampaigns,
   appLibrary,
   appNotifications,
   authChangePassword,

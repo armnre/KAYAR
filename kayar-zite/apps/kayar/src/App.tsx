@@ -22,6 +22,7 @@ import Coach from './pages/bodyyar/Coach';
 import AdminShell, { AdminLogin } from './components/admin/AdminShell';
 import { ShopCallback } from './components/app/KapooshShop';
 import { AdminShop } from './pages/admin/Shop';
+import { AdminCampaigns } from './pages/admin/Campaigns';
 import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
 import { NotFound, Styleguide } from './pages/Misc';
@@ -69,6 +70,7 @@ export default function App() {
             <Route path="media" element={<AdminMedia />} />
             <Route path="morshed" element={<AdminMorshed />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
+            <Route path="campaigns" element={<AdminCampaigns />} />
             <Route path="shop" element={<AdminShop />} />
             <Route path="sms" element={<AdminSms />} />
             <Route path="settings" element={<AdminSettings />} />
