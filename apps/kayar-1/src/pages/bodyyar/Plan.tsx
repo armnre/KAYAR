@@ -131,13 +131,31 @@ export default function PlanPage() {
   );
 }
 
+const GEN_STEPS = ['تحلیل هدف، سطح و محدودیت‌ها', 'انتخاب تقسیم‌بندی هفتگی', 'چیدن حرکات و ست‌ها از کتابخانه', 'تنظیم استراحت و نکات تکنیکی', 'محاسبه کالری و ماکروها', 'طراحی وعده‌های روز تمرین و استراحت'];
+const GEN_TIPS = ['گرم‌کردن ۵ دقیقه‌ای خطر آسیب را کم می‌کند.', 'پروتئین کافی کلید ریکاوری عضلات است.', 'خواب ۷–۹ ساعت به اندازه تمرین مهم است.', 'افزایش تدریجی وزنه = پیشرفت پایدار.'];
 function GeneratingCard() {
+  const [t, setT] = useState(0);
+  useEffect(() => { const id = setInterval(() => setT((x) => x + 1), 1000); return () => clearInterval(id); }, []);
+  const step = Math.min(GEN_STEPS.length - 1, Math.floor(t / 7));
+  const pct = Math.min(95, Math.round((1 - Math.exp(-t / 22)) * 100));
   return (
-    <div className="relative overflow-hidden rounded-[32px] border border-primary/30 bg-card p-6 text-center">
-      <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-primary/15 animate-pulse-glow"><Sparkles className="h-7 w-7 text-primary" /></div>
-      <h3 className="mt-4 font-black">مربی در حال طراحی برنامه‌ات است</h3>
-      <p className="mt-1 text-sm text-muted-foreground">انتخاب حرکات، ست‌ها و استراحت… (تا یک دقیقه)</p>
-      <div className="mx-auto mt-4 h-1.5 w-40 overflow-hidden rounded-full bg-secondary"><div className="skeleton h-full w-full" /></div>
+    <div className="relative overflow-hidden rounded-[32px] border border-primary/30 bg-card p-6">
+      <div className="pointer-events-none absolute -top-20 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
+      <div className="relative flex items-center gap-4">
+        <div className="relative grid h-16 w-16 shrink-0 place-items-center">
+          <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90"><circle cx="18" cy="18" r="16" fill="none" className="stroke-secondary" strokeWidth="3" /><circle cx="18" cy="18" r="16" fill="none" className="stroke-primary transition-all duration-1000" strokeWidth="3" strokeLinecap="round" strokeDasharray={`${pct} 100`} pathLength={100} /></svg>
+          <span className="text-sm font-black">{faNum(pct)}٪</span>
+        </div>
+        <div><h3 className="font-black">مربی هوشمند در حال طراحی…</h3><p className="text-xs text-muted-foreground">برنامه تمرین + رژیم هماهنگ · معمولاً کمتر از یک دقیقه</p></div>
+      </div>
+      <ul className="relative mt-5 space-y-2.5">
+        {GEN_STEPS.map((x, i) => (
+          <li key={x} className={`flex items-center gap-3 text-sm transition-opacity ${i > step ? 'opacity-35' : ''}`}>
+            <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-black ${i < step ? 'bg-primary text-primary-foreground' : i === step ? 'border-2 border-primary text-primary' : 'border border-border'}`}>{i < step ? '✓' : i === step ? <Loader2 className="h-3 w-3 animate-spin" /> : faNum(i + 1)}</span>{x}
+          </li>
+        ))}
+      </ul>
+      <p className="relative mt-5 rounded-2xl bg-secondary/60 p-3 text-xs leading-6 text-muted-foreground">💡 {GEN_TIPS[Math.floor(t / 6) % GEN_TIPS.length]}</p>
     </div>
   );
 }

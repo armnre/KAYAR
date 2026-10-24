@@ -24,6 +24,16 @@ export const MUSIC_QUERIES: { q: string; genre: Genre; tag: string }[] = [
   { q: 'persian OR iranian OR farsi', genre: 'walking', tag: 'fa' },
   { q: 'santur OR setar OR "persian traditional" OR ney', genre: 'recovery', tag: 'fa' },
   { q: 'persian pop OR iranian pop', genre: 'running', tag: 'fa' },
+  { q: 'persian electronic OR tehran OR "iranian rock"', genre: 'workout', tag: 'fa' },
+  { q: 'kamancheh OR daf OR tombak OR "persian classical"', genre: 'focus', tag: 'fa' },
+  { q: 'afghan OR kurdish OR tajik music', genre: 'walking', tag: 'fa' },
+  { q: 'synthwave OR retrowave OR "epic music"', genre: 'workout', tag: 'instrumental' },
+  { q: 'dubstep OR breakbeat OR "hard rock"', genre: 'workout', tag: 'en' },
+  { q: 'jazz OR soul OR acoustic', genre: 'walking', tag: 'en' },
+  { q: 'guitar instrumental OR "post rock" OR orchestral', genre: 'focus', tag: 'instrumental' },
+  { q: 'nature sounds OR "rain sounds" OR "calm piano"', genre: 'recovery', tag: 'instrumental' },
+  { q: 'world music OR "middle eastern" OR oud', genre: 'walking', tag: 'instrumental' },
+  { q: 'motivational OR energetic OR "power music"', genre: 'running', tag: 'en' },
 ];
 
 const LICENSE = '(licenseurl:*creativecommons.org* OR licenseurl:*publicdomain*)';
@@ -87,6 +97,13 @@ export const PODCAST_TERMS: { term: string; country: string; category: 'fitness'
   { term: 'پادکست فارسی', country: 'ir', category: 'focus' }, { term: 'رادیو', country: 'ir', category: 'focus' },
 ];
 
+/** Rejects Arabic-only, German, explicit and kids' shows that the directories return for Persian/English terms. */
+export function acceptableShow(title: string, lang: 'fa' | 'en') {
+  if (/سکس|\+18|explicit|kids|کودک|children|bedtime/i.test(title)) return false;
+  if (lang === 'fa') return /[پچژگکی]/.test(title) && !/[ةىأإؤ]/.test(title);
+  return !/[\u0600-\u06FF]/.test(title) && !/\b(der|die|das|und|deine?|mit|für|laufen)\b/i.test(title);
+}
+
 /** Finds public podcast RSS feeds via the Apple directory and adds + syncs new ones. */
 export async function importPodcasts(terms = PODCAST_TERMS, perTerm = 6) {
   const { rows } = await zite.sql({ query: `SELECT "feedUrl" FROM "PodcastShows"` });
@@ -105,9 +122,9 @@ export async function importPodcasts(terms = PODCAST_TERMS, perTerm = 6) {
     let n = 0;
     for (const p of results) {
       if (n >= perTerm) break;
-      if (!p.feedUrl || known.has(p.feedUrl)) continue;
+      if (!p.feedUrl || known.has(p.feedUrl) || !acceptableShow(p.collectionName ?? '', t.country === 'ir' ? 'fa' : 'en')) continue;
       known.add(p.feedUrl);
-      const show = await zite.podcastShows.create({ record: { title: p.collectionName ?? 'پادکست', feedUrl: p.feedUrl, artwork: p.artworkUrl600 ?? null, author: p.artistName ?? '', category: t.category } as never });
+      const show = await zite.podcastShows.create({ record: { title: p.collectionName ?? 'پادکست', feedUrl: p.feedUrl, artwork: p.artworkUrl600 ?? null, author: p.artistName ?? '', category: t.category, language: t.country === 'ir' ? 'fa' : 'en' } as never });
       const res = await syncShow(show.id);
       if (res.error || res.added === 0) { failed.push(p.collectionName ?? p.feedUrl); await zite.podcastShows.delete({ id: show.id }); } else { added++; n++; }
     }

@@ -35,6 +35,11 @@ export default createEndpoint({
 ${catalogText}`;
     const user = `هدف: ${profile.goal}\nسطح: ${profile.level}\nروز در هفته: ${profile.daysPerWeek}\nمکان: ${profile.place}\nتجهیزات: ${profile.equipment}\nمدت هر جلسه: ${profile.sessionMinutes} دقیقه\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nسن: ${profile.age ?? '-'}`;
 
+    const nutritionP: Promise<Nutrition | null> = generateNutrition({
+      goal: profile.goal, level: profile.level ?? '', daysPerWeek: profile.daysPerWeek ?? 3, place: profile.place ?? '', equipment: profile.equipment ?? '',
+      sessionMinutes: profile.sessionMinutes ?? 45, diet: profile.diet ?? '', limitations: profile.limitations ?? '', age: profile.age ?? null,
+      heightCm: profile.heightCm ?? null, weightKg: profile.weightKg ?? null, sex: (profile.sex as 'male' | 'female' | undefined) ?? null,
+    }).catch((e) => { console.error('nutrition generation failed', (e as Error).message); return null; });
     const plan = await aiChat<Plan>([{ role: 'system', content: system }, { role: 'user', content: user }], (text) => {
       const raw = extractJson(text) as { title?: string; notes?: string[]; days?: { name?: string; focus?: string; exercises?: { slug?: string; sets?: number; reps?: unknown; restSec?: number; note?: string }[] }[] } | null;
       if (!raw?.days) return null;
@@ -61,15 +66,8 @@ ${catalogText}`;
     const { records: old } = await zite.workoutPlans.findAll({ filters: { memberId: uid, active: true }, limit: 50 });
     await Promise.all(old.map((p) => zite.workoutPlans.update({ id: p.id, record: { active: false } })));
     const created = await zite.workoutPlans.create({ record: { memberId: uid, title: plan.title, planJson: JSON.stringify(plan), active: true } });
-    let nutrition: Nutrition | null = null;
-    try {
-      nutrition = await generateNutrition({
-        goal: profile.goal, level: profile.level ?? '', daysPerWeek: profile.daysPerWeek ?? 3, place: profile.place ?? '', equipment: profile.equipment ?? '',
-        sessionMinutes: profile.sessionMinutes ?? 45, diet: profile.diet ?? '', limitations: profile.limitations ?? '', age: profile.age ?? null,
-        heightCm: profile.heightCm ?? null, weightKg: profile.weightKg ?? null, sex: (profile.sex as 'male' | 'female' | undefined) ?? null,
-      }, plan);
-      await zite.workoutPlans.update({ id: created.id, record: { nutritionJson: JSON.stringify(nutrition) } });
-    } catch (e) { console.error('nutrition generation failed', (e as Error).message); }
+    const nutrition = await nutritionP;
+    if (nutrition) await zite.workoutPlans.update({ id: created.id, record: { nutritionJson: JSON.stringify(nutrition) } });
     return { id: created.id, plan, nutrition };
   },
 });

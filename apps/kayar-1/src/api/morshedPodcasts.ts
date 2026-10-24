@@ -7,7 +7,7 @@ import { syncShow } from '../server/podcasts';
 import { trackDto, epToDto, episodesForShow } from '../server/tracks';
 
 const STALE_MS = 6 * 3600 * 1000;
-const showOut = z.object({ id: z.string(), title: z.string(), author: z.string(), artwork: z.string(), category: z.string(), description: z.string(), episodeCount: z.number(), syncError: z.string() });
+const showOut = z.object({ id: z.string(), title: z.string(), author: z.string(), artwork: z.string(), category: z.string(), language: z.string(), description: z.string(), episodeCount: z.number(), syncError: z.string() });
 
 export default createEndpoint({
   description: 'Morshed podcasts for signed-in members: show list, or one show with its episodes (refreshes stale RSS)',
@@ -23,16 +23,16 @@ export default createEndpoint({
       const eps = await episodesForShow(show.id);
       return {
         shows: [], episodes: eps.map(epToDto),
-        show: { id: show.id, title: show.title ?? '', author: show.author ?? '', artwork: show.artwork ?? '', category: show.category ?? '', description: show.description ?? '', episodeCount: eps.length, syncError: show.syncError ?? '' },
+        show: { id: show.id, title: show.title ?? '', author: show.author ?? '', artwork: show.artwork ?? '', category: show.category ?? '', language: show.language ?? 'en', description: show.description ?? '', episodeCount: eps.length, syncError: show.syncError ?? '' },
       };
     }
     const { rows } = await zite.sql({
-      query: `SELECT s.id, s."title", s."author", s."artwork", s."category", s."description", s."syncError", COUNT(l."podcastEpisodesId")::int AS n
-              FROM "PodcastShows" s LEFT JOIN "PodcastEpisodesPodcastShows" l ON l."podcastShowsId" = s.id GROUP BY s.id ORDER BY s.created_at`,
+      query: `SELECT s.id, s."title", s."author", s."artwork", s."category", s."language", s."description", s."syncError", COUNT(l."podcastEpisodesId")::int AS n
+              FROM "PodcastShows" s LEFT JOIN "PodcastEpisodesPodcastShows" l ON l."podcastShowsId" = s.id WHERE s."syncError" IS NULL OR s."syncError" = '' OR EXISTS (SELECT 1 FROM "PodcastEpisodesPodcastShows" x WHERE x."podcastShowsId" = s.id) GROUP BY s.id ORDER BY n DESC`,
     });
     return {
       show: null, episodes: [],
-      shows: rows.map((r) => ({ id: String(r.id), title: String(r.title ?? ''), author: String(r.author ?? ''), artwork: String(r.artwork ?? ''), category: String(r.category ?? ''), description: String(r.description ?? ''), episodeCount: Number(r.n ?? 0), syncError: String(r.syncError ?? '') })),
+      shows: rows.map((r) => ({ id: String(r.id), title: String(r.title ?? ''), author: String(r.author ?? ''), artwork: String(r.artwork ?? ''), category: String(r.category ?? ''), language: String(r.language ?? 'en'), description: String(r.description ?? ''), episodeCount: Number(r.n ?? 0), syncError: String(r.syncError ?? '') })),
     };
   },
 });

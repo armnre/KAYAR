@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { appLibrary, type AppLibraryOutputType } from 'zitejs/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Heart, SearchX, RefreshCw, Music2, Mic2, Play, Pause, Zap, Dumbbell, HeartPulse, Leaf, Brain, X } from 'lucide-react';
+import { Search, Heart, SearchX, RefreshCw, Music2, Mic2, Play, Pause, Zap, Dumbbell, HeartPulse, Leaf, Brain, X, Waves, Footprints, ArrowLeft } from 'lucide-react';
 import { cn } from '@project/components/lib/utils';
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform, StateView } from '../kit';
@@ -10,16 +10,20 @@ import { H, useMorshed } from './HomeMorshed';
 import { useSession, errMsg } from '../../lib/session';
 import { Podcasts } from './Podcasts';
 import { usePreview } from '../../lib/preview';
-import { categories, type Track } from '../../data/sample';
+import type { Track } from '../../data/sample';
 import { fa } from '../../lib/config';
 
-const catMeta: Record<string, { i: typeof Zap; g: string }> = {
-  'شروع قدرتی': { i: Dumbbell, g: 'from-[hsl(71_100%_56%)] to-[hsl(90_80%_32%)] text-primary-foreground' },
-  'کاردیو': { i: HeartPulse, g: 'from-[hsl(210_10%_18%)] to-[hsl(218_18%_9%)] text-white' },
-  'ریکاوری': { i: Leaf, g: 'from-[hsl(160_40%_20%)] to-[hsl(218_18%_9%)] text-white' },
-  'تمرکز': { i: Brain, g: 'from-[hsl(200_30%_20%)] to-[hsl(218_18%_9%)] text-white' },
-  'انرژی': { i: Zap, g: 'from-[hsl(71_100%_56%)] to-[hsl(50_100%_50%)] text-primary-foreground' },
-};
+const GENRES: { k: string; l: string; i: typeof Zap; g: string }[] = [
+  { k: 'fa', l: 'فارسی', i: Music2, g: 'from-[hsl(71_100%_56%)] to-[hsl(90_80%_30%)] text-primary-foreground' },
+  { k: 'workout', l: 'قدرتی', i: Dumbbell, g: 'from-[hsl(14_90%_55%)] to-[hsl(0_60%_22%)] text-white' },
+  { k: 'running', l: 'کاردیو', i: HeartPulse, g: 'from-[hsl(340_80%_55%)] to-[hsl(320_50%_20%)] text-white' },
+  { k: 'instrumental', l: 'بی‌کلام', i: Waves, g: 'from-[hsl(190_80%_45%)] to-[hsl(210_50%_16%)] text-white' },
+  { k: 'walking', l: 'پیاده‌روی', i: Footprints, g: 'from-[hsl(45_100%_55%)] to-[hsl(30_70%_25%)] text-black' },
+  { k: 'focus', l: 'تمرکز', i: Brain, g: 'from-[hsl(220_60%_55%)] to-[hsl(225_40%_16%)] text-white' },
+  { k: 'recovery', l: 'آرامش', i: Leaf, g: 'from-[hsl(155_55%_40%)] to-[hsl(170_40%_12%)] text-white' },
+  { k: 'en', l: 'انگلیسی', i: Zap, g: 'from-[hsl(0_0%_30%)] to-[hsl(0_0%_8%)] text-white' },
+];
+
 
 export function TrackRow({ t, i, list }: { t: Track; i: number; list: Track[] }) {
   const { play, toggle, track, playing, favs, toggleFav } = usePreview();
@@ -61,6 +65,20 @@ function Featured({ list }: { list: Track[] }) {
   );
 }
 
+function TrackTile({ t, list }: { t: Track; list: Track[] }) {
+  const { play, track, playing } = usePreview();
+  const on = track?.id === t.id;
+  return (
+    <button onClick={() => play(t, list)} className="press group w-[132px] shrink-0 snap-start text-start">
+      <Cover hue={t.hue} image={t.image} className="relative aspect-square w-full rounded-[20px] shadow-lg">
+        <span className={cn('absolute bottom-2 end-2 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition', on ? 'scale-100' : 'scale-90 opacity-90 group-hover:scale-100')}>{on && playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}</span>
+      </Cover>
+      <div className={cn('mt-2 truncate text-sm font-bold', on && 'text-primary')} dir="auto">{t.title}</div>
+      <div className="truncate text-[11px] text-muted-foreground" dir="auto">{t.artist}</div>
+    </button>
+  );
+}
+
 function SearchBox({ q, setQ, placeholder }: { q: string; setQ: (v: string) => void; placeholder: string }) {
   return (
     <div className="relative mt-5"><Search className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -83,16 +101,22 @@ function Music() {
   return (
     <>
       <SearchBox q={q} setQ={setQ} placeholder="آهنگ، هنرمند یا حس‌وحال…" />
-      {!dq && <div className="-mx-4 mt-4 grid grid-flow-col auto-cols-[42%] gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:auto-cols-[24%]">
-        {categories.map((c) => { const m = catMeta[c]; const on = cat === c; return (
-          <button key={c} onClick={() => setCat(on ? '' : c)} className={cn('press relative h-20 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br p-3 text-start transition', m.g, on ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : cat ? 'opacity-60' : '')}>
-            <m.i className="absolute -bottom-2 -end-2 h-14 w-14 rotate-12 opacity-30" /><span className="relative text-sm font-black">{c}</span>
+      {!dq && <div className="-mx-4 mt-4 grid grid-flow-col grid-rows-2 auto-cols-[30%] gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:auto-cols-[18%]">
+        {GENRES.map((m) => { const on = cat === m.k; return (
+          <button key={m.k} onClick={() => setCat(on ? '' : m.k)} className={cn('press relative h-[68px] overflow-hidden rounded-[20px] bg-gradient-to-br p-3 text-start shadow-lg transition', m.g, on ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : cat ? 'opacity-50' : '')}>
+            <m.i className="absolute -bottom-2 -end-2 h-12 w-12 rotate-12 opacity-30" /><span className="relative text-sm font-black">{m.l}</span>
           </button>); })}
       </div>}
       {lib.err ? <Failed err={lib.err} retry={lib.retry} /> : !lib.data ? <div className="mt-5"><Loading /></div> : <>
         {!dq && featured.length > 0 && <Featured list={featured} />}
         {!dq && lib.data.collections.map((c) => <div key={c.id}><H t={c.title} />{c.description && <p className="-mt-2 mb-2 text-sm text-muted-foreground">{c.description}</p>}<Rows list={c.tracks} /></div>)}
-        {(dq ? libTracks.length > 0 : libTracks.length > 0 && !lib.data.collections.length) && <><H t={dq ? 'منتخب کایار' : 'منتخب کایار'} /><Rows list={libTracks} /></>}
+        {!dq && !cat && lib.data.sections.map((sec) => (
+          <section key={sec.key}>
+            <H t={sec.title} s={<button onClick={() => setCat(sec.key)} className="flex items-center gap-1 text-xs font-bold text-primary">همه {fa(sec.count)}<ArrowLeft className="h-3.5 w-3.5" /></button>} />
+            <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">{sec.tracks.map((t) => <TrackTile key={t.id} t={t} list={sec.tracks} />)}</div>
+          </section>
+        ))}
+        {(dq || cat) && (libTracks.length > 0 ? <><H t={dq ? 'نتایج جست‌وجو' : `${GENRES.find((g) => g.k === cat)?.l ?? ''} · ${fa(libTracks.length)} آهنگ`} /><Rows list={libTracks} /></> : <StateView icon={SearchX} tone="lime" title="چیزی پیدا نشد" text="عبارت یا ژانر دیگری را امتحان کن." />)}
       </>}
     </>
   );

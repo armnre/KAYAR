@@ -45,29 +45,66 @@ function ShowView({ id, onBack }: { id: string; onBack: () => void }) {
   );
 }
 
-/** Podcast shows managed from the admin panel (RSS feeds), played through the shared player. */
+const CATS: Record<string, string> = { fitness: 'ورزش و بدنسازی', nutrition: 'تغذیه و سلامت', running: 'دویدن', recovery: 'آرامش و خواب', focus: 'انگیزه و رشد فردی' };
+const LANGS = [['all', 'همه'], ['fa', 'فارسی'], ['en', 'English']] as const;
+
+function ShowCard({ s, onOpen, wide }: { s: Show; onOpen: () => void; wide?: boolean }) {
+  return (
+    <button onClick={onOpen} className={wide ? 'press group text-start' : 'press group w-[132px] shrink-0 snap-start text-start'}>
+      <div className="relative overflow-hidden rounded-[22px] ring-1 ring-white/10">
+        <Cover hue={hue(s.id)} image={s.artwork} className="aspect-square w-full rounded-[22px] transition duration-500 group-hover:scale-105" />
+        <span className="absolute bottom-1.5 start-1.5 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold text-primary backdrop-blur">{fa(s.episodeCount)} قسمت</span>
+      </div>
+      <div className="mt-2 line-clamp-1 text-sm font-bold" dir="auto">{s.title}</div>
+      <div className="truncate text-[11px] text-muted-foreground" dir="auto">{s.author || 'پادکست'}</div>
+    </button>
+  );
+}
+
+/** Podcast shows organized by language and topic; rows are short carousels instead of one long grid. */
 export function Podcasts() {
   const { token } = useSession('app');
   const [shows, setShows] = useState<Show[] | null>(null); const [err, setErr] = useState<string>(); const [open, setOpen] = useState<string | null>(null);
+  const [lang, setLang] = useState<'all' | 'fa' | 'en'>('all'); const [cat, setCat] = useState<string | null>(null);
   const load = useCallback(() => { if (!token) return; setErr(undefined); morshedPodcasts({ token }).then((r) => setShows(r.shows)).catch((e) => setErr(errMsg(e))); }, [token]);
   useEffect(load, [load]);
   if (open) return <ShowView id={open} onBack={() => setOpen(null)} />;
   if (err) return <div className="mt-6"><StateView icon={RefreshCw} tone="lime" title="پادکست‌ها بارگذاری نشد" text={err} action={<button onClick={load} className="tap rounded-full bg-primary px-5 font-bold text-primary-foreground">تلاش دوباره</button>} /></div>;
   if (!shows) return <Loading />;
   if (!shows.length) return <div className="mt-6"><StateView icon={Mic2} tone="lime" title="هنوز پادکستی منتشر نشده" text="به‌زودی پادکست‌های ورزشی اینجا اضافه می‌شوند." /></div>;
+  const pool = shows.filter((s) => lang === 'all' || s.language === lang);
+  const cats = Object.keys(CATS).filter((c) => pool.some((s) => s.category === c));
+  const featured = pool[0];
   return (
-    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {shows.map((s, i) => (
-        <motion.button key={s.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} onClick={() => setOpen(s.id)} className="press group text-start">
-          <div className="relative overflow-hidden rounded-3xl ring-1 ring-white/10">
-            <Cover hue={hue(s.id)} image={s.artwork} className="aspect-square w-full rounded-3xl transition duration-500 group-hover:scale-105" />
-            <span className="absolute bottom-2 start-2 rounded-full bg-black/70 px-2 py-0.5 text-[10px] font-bold text-primary backdrop-blur">{fa(s.episodeCount)} قسمت</span>
-            <span className="absolute bottom-2 end-2 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground opacity-90 shadow-lg"><Play className="h-4 w-4 fill-current" /></span>
-          </div>
-          <div className="mt-2 line-clamp-1 font-bold">{s.title}</div>
-          <div className="truncate text-xs text-muted-foreground">{s.author || 'پادکست'}</div>
-        </motion.button>
-      ))}
+    <div className="mt-5">
+      <div className="flex rounded-full border border-border bg-card p-1 text-xs font-bold">
+        {LANGS.map(([k, l]) => <button key={k} onClick={() => { setLang(k); setCat(null); }} className={`h-9 flex-1 rounded-full transition ${lang === k ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>{l}</button>)}
+      </div>
+      <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
+        <button onClick={() => setCat(null)} className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold ${!cat ? 'border-primary bg-primary/15 text-primary' : 'border-border text-muted-foreground'}`}>همه موضوع‌ها</button>
+        {cats.map((c) => <button key={c} onClick={() => setCat(c)} className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold ${cat === c ? 'border-primary bg-primary/15 text-primary' : 'border-border text-muted-foreground'}`}>{CATS[c]}</button>)}
+      </div>
+      {cat ? (
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">{pool.filter((s) => s.category === cat).map((s) => <ShowCard key={s.id} s={s} wide onOpen={() => setOpen(s.id)} />)}</div>
+      ) : (<>
+        {featured && (
+          <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} onClick={() => setOpen(featured.id)} className="press relative mt-4 flex w-full items-center gap-4 overflow-hidden rounded-[28px] border border-border p-4 text-start">
+            {featured.artwork && <img src={featured.artwork} alt="" className="absolute inset-0 h-full w-full scale-125 object-cover opacity-30 blur-2xl" />}
+            <Cover hue={hue(featured.id)} image={featured.artwork} className="relative h-20 w-20 shrink-0 rounded-2xl shadow-xl" />
+            <div className="relative min-w-0 flex-1"><span className="text-[10px] font-bold text-primary">پیشنهاد ویژه</span><div className="line-clamp-1 font-black" dir="auto">{featured.title}</div><div className="line-clamp-1 text-xs text-muted-foreground" dir="auto">{featured.author}</div></div>
+            <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground"><Play className="h-4 w-4 fill-current" /></span>
+          </motion.button>
+        )}
+        {cats.map((c) => {
+          const list = pool.filter((s) => s.category === c);
+          return (
+            <section key={c} className="mt-6">
+              <div className="mb-2.5 flex items-center justify-between"><h3 className="font-black">{CATS[c]}</h3>{list.length > 3 && <button onClick={() => setCat(c)} className="text-xs font-bold text-primary">همه ({fa(list.length)})</button>}</div>
+              <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1">{list.slice(0, 10).map((s) => <ShowCard key={s.id} s={s} onOpen={() => setOpen(s.id)} />)}</div>
+            </section>
+          );
+        })}
+      </>)}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { Headphones, ArrowLeft, Play, Pause, Megaphone, ExternalLink } from 'luc
 import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform } from '../kit';
 import { HomeBody } from './HomeBody';
-import { ShopSection } from '../site/Sections';
+import { KapooshShop } from './KapooshShop';
 
 import { usePreview } from '../../lib/preview';
 import { useSession, errMsg } from '../../lib/session';
@@ -91,7 +91,7 @@ export function AppHome() {
       ))}
       {!data && <div className="-mx-4 mt-9 flex gap-3 overflow-hidden px-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="aspect-square w-36 shrink-0 rounded-2xl" />)}</div>}
       <H t="پیشنهاد کاپوش" />
-      <ShopSection compact />
+      <KapooshShop />
     </div>
   );
 }

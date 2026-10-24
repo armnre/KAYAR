@@ -19,6 +19,7 @@ export default createEndpoint({
   }),
   outputSchema: z.object({
     tracks: z.array(trackDto), collections: z.array(collection), hasMore: z.boolean(),
+    sections: z.array(z.object({ key: z.string(), title: z.string(), count: z.number(), tracks: z.array(trackDto) })),
   }),
   execute: async ({ input }) => {
     await requireSession(input.token);
@@ -36,7 +37,15 @@ export default createEndpoint({
     let list = pub;
     const q = input.q?.trim().toLowerCase();
     if (q) list = list.filter((r) => `${r.title} ${r.artist} ${r.album} ${r.tags}`.toLowerCase().includes(q));
-    if (input.cat) list = list.filter((r) => splitTags(r.categories).includes(input.cat!) || splitTags(r.tags).includes(input.cat!));
-    return { tracks: list.slice(0, input.mode === 'home' ? 12 : 200).map(libToDto), collections, hasMore: false };
+    const has = (r: (typeof pub)[0], k: string) => r.genre === k || splitTags(r.categories).includes(k) || splitTags(r.tags).includes(k);
+    if (input.cat) list = list.filter((r) => has(r, input.cat!));
+    // Shuffle-by-day so rows feel fresh but stable within a day
+    const seed = Math.floor(Date.now() / 864e5);
+    const mix = <T extends { id: string }>(a: T[]) => [...a].sort((x, y) => ((x.id.charCodeAt(3) * seed) % 97) - ((y.id.charCodeAt(3) * seed) % 97));
+    const SECTIONS: [string, string][] = [['fa', 'موزیک فارسی'], ['workout', 'تمرین قدرتی'], ['running', 'دویدن و کاردیو'], ['instrumental', 'بی‌کلام'], ['walking', 'پیاده‌روی'], ['focus', 'تمرکز'], ['recovery', 'ریکاوری و آرامش'], ['en', 'انگلیسی']];
+    const sections = input.mode === 'library' && !q && !input.cat
+      ? SECTIONS.map(([key, title]) => { const all = pub.filter((r) => has(r, key)); return { key, title, count: all.length, tracks: mix(all).slice(0, 12).map(libToDto) }; }).filter((x) => x.count > 0)
+      : [];
+    return { tracks: list.slice(0, input.mode === 'home' ? 12 : 300).map(libToDto), collections, hasMore: false, sections };
   },
 });

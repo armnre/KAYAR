@@ -20,6 +20,9 @@ import Nutrition from './pages/bodyyar/Nutrition';
 import Progress from './pages/bodyyar/Progress';
 import Coach from './pages/bodyyar/Coach';
 import AdminShell, { AdminLogin } from './components/admin/AdminShell';
+import { ShopCallback } from './components/app/KapooshShop';
+import { AdminShop } from './pages/admin/Shop';
+import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
 import { NotFound, Styleguide } from './pages/Misc';
 
@@ -38,6 +41,7 @@ export default function App() {
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/p/:slug" element={<StaticPage />} />
+          <Route path="/shop/callback" element={<ShopCallback />} />
           <Route path="/app/login" element={<Login />} />
           <Route path="/app/change-password" element={<ChangePassword />} />
           <Route path="/app" element={<AppShell />}>
@@ -65,6 +69,8 @@ export default function App() {
             <Route path="media" element={<AdminMedia />} />
             <Route path="morshed" element={<AdminMorshed />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
+            <Route path="shop" element={<AdminShop />} />
+            <Route path="sms" element={<AdminSms />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit" element={<AdminAudit />} />
           </Route>

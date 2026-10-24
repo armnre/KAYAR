@@ -6,13 +6,13 @@ export type Role = 'member' | 'coach' | 'support' | 'editor' | 'admin' | 'supera
 export type Permission =
   | 'dashboard.read' | 'customers.read' | 'customers.write' | 'customers.reset' | 'customers.suspend'
   | 'staff.manage' | 'content.manage' | 'morshed.manage' | 'announcements.manage'
-  | 'settings.manage' | 'audit.read';
+  | 'settings.manage' | 'audit.read' | 'shop.manage' | 'sms.manage';
 
 export const STAFF_ROLES: Role[] = ['support', 'editor', 'admin', 'superadmin'];
-const ALL: Permission[] = ['dashboard.read', 'customers.read', 'customers.write', 'customers.reset', 'customers.suspend', 'staff.manage', 'content.manage', 'morshed.manage', 'announcements.manage', 'settings.manage', 'audit.read'];
+const ALL: Permission[] = ['dashboard.read', 'customers.read', 'customers.write', 'customers.reset', 'customers.suspend', 'staff.manage', 'content.manage', 'morshed.manage', 'announcements.manage', 'settings.manage', 'audit.read', 'shop.manage', 'sms.manage'];
 export const MATRIX: Record<Role, Permission[]> = {
   superadmin: ALL,
-  admin: ['dashboard.read', 'customers.read', 'customers.write', 'customers.reset', 'customers.suspend', 'content.manage', 'morshed.manage', 'announcements.manage', 'audit.read'],
+  admin: ['dashboard.read', 'customers.read', 'customers.write', 'customers.reset', 'customers.suspend', 'content.manage', 'morshed.manage', 'announcements.manage', 'audit.read', 'shop.manage', 'sms.manage'],
   editor: ['dashboard.read', 'content.manage', 'morshed.manage'],
   support: ['dashboard.read', 'customers.read', 'customers.reset', 'customers.suspend'],
   coach: [],

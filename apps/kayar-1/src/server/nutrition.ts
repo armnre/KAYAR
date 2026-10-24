@@ -5,7 +5,7 @@ import { nutritionSchema, type Nutrition, type Plan, type Profile } from './sche
 const n = (v: unknown) => Math.max(0, Math.round(Number(v) || 0));
 
 /** AI meal plan bound to the workout plan: fixed macro targets, training vs rest day, pre/post workout timing. */
-export async function generateNutrition(profile: Profile, plan: Plan): Promise<Nutrition> {
+export async function generateNutrition(profile: Profile, plan?: Plan): Promise<Nutrition> {
   const t = computeTargets(profile);
   const system = `تو متخصص تغذیه ورزشی دقیق و محتاط هستی (نه پزشک). فقط JSON معتبر برگردان.
 ساختار: {"trainingDay": Meal[], "restDay": Meal[], "preWorkout": string, "postWorkout": string, "tips": string[]}
@@ -15,7 +15,7 @@ Meal = {"name": string, "time": string, "items": string[], "calories": number, "
 روز تمرین شامل وعده قبل و بعد از تمرین باشد. رژیم/محدودیت‌های کاربر را رعایت کن. متن‌ها فارسی و کوتاه.`;
   const user = `هدف: ${profile.goal}\nرژیم غذایی: ${profile.diet || 'معمولی'}\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nوزن: ${profile.weightKg ?? '-'}kg\n` +
     `هدف روز تمرین: ${JSON.stringify(t.training)}\nهدف روز استراحت: ${JSON.stringify(t.rest)}\n` +
-    `برنامه تمرینی (${plan.days.length} روز در هفته): ${plan.days.map((d) => `${d.name} (${d.focus})`).join('، ')}\nمدت جلسه: ${profile.sessionMinutes} دقیقه`;
+    `برنامه تمرینی: ${plan ? `${plan.days.length} روز — ${plan.days.map((d) => `${d.name} (${d.focus})`).join('، ')}` : `${profile.daysPerWeek} روز در هفته`}\nمدت جلسه: ${profile.sessionMinutes} دقیقه`;
   return aiChat<Nutrition>([{ role: 'system', content: system }, { role: 'user', content: user }], (text) => {
     const raw = extractJson(text) as Record<string, unknown> | null;
     if (!raw) return null;

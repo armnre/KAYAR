@@ -9,6 +9,9 @@ export type AiMessage = { role: 'system' | 'user' | 'assistant'; content: string
 const BASE = 'https://router.bynara.id/v1';
 // Strongest first; credit/availability errors fall through to the next one.
 const MODELS = ['claude-sonnet-5.5', 'gpt-6.1-sol', 'deepseek-v4-pro', 'qwen3.8-max', 'agnes-2.5-flash', 'laguna-s-2.1'];
+const skipUntil = new Map<string, number>();
+const live = () => { const l = MODELS.filter((m) => (skipUntil.get(m) ?? 0) < Date.now()); return l.length ? l : MODELS; };
+const park = (m: string) => skipUntil.set(m, Date.now() + 10 * 60_000);
 const FRIENDLY = 'دستیار هوشمند الان در دسترس نیست؛ کمی بعد دوباره امتحان کن.';
 
 async function callModel(model: string, messages: AiMessage[], json: boolean): Promise<string> {
@@ -37,7 +40,7 @@ export async function aiChat<T = string>(messages: AiMessage[], validate?: (text
     throw new ZiteError({ code: 'INTERNAL_ERROR', message: 'NARAROUTER key missing', userFacingMessage: 'دستیار هوشمند هنوز پیکربندی نشده است.' });
   }
   let lastErr: unknown;
-  for (const model of MODELS) {
+  for (const model of live()) {
     try {
       const text = await callModel(model, messages, Boolean(validate));
       if (!validate) { if (text) return text as T; continue; }
@@ -46,6 +49,7 @@ export async function aiChat<T = string>(messages: AiMessage[], validate?: (text
       lastErr = new Error(`invalid output from ${model}`);
     } catch (e) {
       if (e instanceof ZiteError && e.code === 'RATE_LIMITED') throw e;
+      if ((e as Error).message === 'AI_NO_CREDIT') park(model);
       lastErr = e;
       console.error(JSON.stringify({ msg: 'ai call failed', model, error: (e as Error).message }));
     }
@@ -65,7 +69,7 @@ export function extractJson(text: string): unknown {
 export async function* aiStream(messages: AiMessage[]): AsyncGenerator<string> {
   if (!process.env.ZITE_NARAROUTER_API_KEY) throw new ZiteError({ code: 'INTERNAL_ERROR', message: 'NARAROUTER key missing', userFacingMessage: 'دستیار هوشمند هنوز پیکربندی نشده است.' });
   let res: Response | null = null;
-  for (const model of MODELS) {
+  for (const model of live()) {
     try {
       const r = await fetch(`${BASE}/chat/completions`, {
         method: 'POST',
@@ -73,6 +77,7 @@ export async function* aiStream(messages: AiMessage[]): AsyncGenerator<string> {
         body: JSON.stringify({ model, messages, temperature: 0.5, stream: true }),
       });
       if (r.ok && r.body) { res = r; break; }
+      if (r.status === 402 || r.status === 429) park(model);
       console.error(JSON.stringify({ msg: 'ai stream failed', model, status: r.status }));
     } catch (e) { console.error('ai stream error', model, (e as Error).message); }
   }
