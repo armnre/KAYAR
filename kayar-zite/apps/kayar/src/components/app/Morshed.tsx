@@ -33,7 +33,7 @@ export function TrackRow({ t, i, list }: { t: Track; i: number; list: Track[] })
     <motion.li layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i, 10) * 0.03 }}
       className={cn('group flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-white/[.04]', active && 'bg-primary/10 ring-1 ring-primary/30')}>
       <button onClick={() => (active ? toggle() : play(t, list))} className="flex min-w-0 flex-1 items-center gap-3 text-start" aria-label={`پخش ${t.title}`}>
-        <Cover hue={t.hue} image={t.image} className="relative h-14 w-14 shrink-0 rounded-xl">
+        <Cover hue={t.hue} image={t.image} title={t.title} className="relative h-14 w-14 shrink-0 rounded-xl">
           <span className={cn('absolute inset-0 grid place-items-center rounded-xl bg-black/45 transition-opacity', active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100')}>
             {active && playing ? <Waveform bars={3} playing className="h-4" color="bg-white" /> : <Play className="h-5 w-5 fill-white text-white" />}
           </span>
@@ -53,7 +53,7 @@ function Featured({ list }: { list: Track[] }) {
       {list.slice(0, 5).map((t, i) => { const active = track?.id === t.id; return (
         <motion.div key={t.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.06 }}
           className="relative h-64 w-[82%] shrink-0 snap-center overflow-hidden rounded-[30px] sm:w-[60%]">
-          <Cover hue={t.hue} image={t.image} className="absolute inset-0 h-full w-full rounded-none" />
+          <Cover hue={t.hue} image={t.image} title={t.title} className="absolute inset-0 h-full w-full rounded-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
           <span className="absolute start-4 top-4 rounded-full bg-black/40 px-3 py-1 text-[11px] font-black text-white backdrop-blur">{i === 0 ? '⭐ پیشنهاد ویژه' : `#${fa(i + 1)}`}</span>
           <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4">
@@ -71,7 +71,7 @@ function TrackTile({ t, list }: { t: Track; list: Track[] }) {
   const on = track?.id === t.id;
   return (
     <button onClick={() => play(t, list)} className="press group w-[132px] shrink-0 snap-start text-start">
-      <Cover hue={t.hue} image={t.image} className="relative aspect-square w-full rounded-[20px] shadow-lg">
+      <Cover hue={t.hue} image={t.image} title={t.title} className="relative aspect-square w-full rounded-[20px] shadow-lg">
         <span className={cn('absolute bottom-2 end-2 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition', on ? 'scale-100' : 'scale-90 opacity-90 group-hover:scale-100')}>{on && playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}</span>
       </Cover>
       <div className={cn('mt-2 truncate text-sm font-bold', on && 'text-primary')} dir="auto">{t.title}</div>
@@ -98,7 +98,7 @@ function Artists({ list, onPick }: { list: { name: string; image: string; count:
     <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
       {list.map((a) => (
         <button key={a.name} onClick={() => onPick(a.name)} className="press w-[84px] shrink-0 text-center">
-          <span className="block aspect-square overflow-hidden rounded-full bg-card ring-2 ring-border transition hover:ring-primary">{a.image && <img src={a.image} alt="" loading="lazy" className="h-full w-full object-cover" />}</span>
+          <Cover hue={[...a.name].reduce((x, c) => (x * 31 + c.charCodeAt(0)) % 360, 11)} image={a.image || undefined} title={a.name} className="block aspect-square rounded-full text-[11px] ring-2 ring-border transition hover:ring-primary" />
           <span className="mt-2 block truncate text-xs font-bold" dir="auto">{a.name}</span><span className="block text-[10px] text-muted-foreground">{fa(a.count)} آهنگ</span>
         </button>
       ))}

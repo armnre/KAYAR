@@ -1,149 +1,115 @@
 import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight, Plus, Search, Trash2, Loader2, Info } from 'lucide-react';
-import { getDashboard, listFoods, listMeals, mealLog, type ListFoodsOutputType } from 'zitejs/api';
-import { AiMealPlan, MacroTargets } from '../../components/bodyyar/AiMealPlan';
+import { Plus, Trash2, Loader2, Info } from 'lucide-react';
+import { getDashboard, listFoods, listMeals, mealLog } from 'zitejs/api';
+import { AiMealPlan } from '../../components/bodyyar/AiMealPlan';
+import { AddFoodSheet } from '../../components/bodyyar/AddFoodSheet';
+import { DateStrip, MacroBar, MACRO_COLORS, MEAL_META, WaterTracker, smartInsight, type Totals } from '../../components/bodyyar/nutritionKit';
 import { tok } from '../../lib/session';
-import { Button } from '@project/components/ui/button';
-import { Input } from '@project/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@project/components/ui/dialog';
-import { Card, ErrorState, LoadingBlocks, PageHeader, errMsg, faNum, todayStr } from '../../components/bkit';
-import { ASSETS, MEAL_LABELS } from '../../lib/assets';
+import { Card, ErrorState, LoadingBlocks, PageHeader, Ring, errMsg, faNum, todayStr } from '../../components/bkit';
+import { MEAL_LABELS } from '../../lib/assets';
 import { useLoad } from '../../lib/useLoad';
 import { cn } from '@project/components/lib/utils';
-
-type Food = ListFoodsOutputType['foods'][0];
-const shift = (d: string, n: number) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
-const TAGS: Record<string, string> = { vegetarian: 'گیاهی', vegan: 'وگان', 'gluten-free': 'بدون گلوتن', 'high-protein': 'پرپروتئین' };
 
 export default function Nutrition() {
   const [date, setDate] = useState(todayStr());
   const foods = useLoad(() => listFoods({}));
   const dash = useLoad(() => getDashboard({ token: tok() }));
-  const meals = useLoad(() => listMeals({ token: tok(),  date }), [date]);
+  const meals = useLoad(() => listMeals({ token: tok(), date }), [date]);
   const [adding, setAdding] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const totals = useMemo(() => (meals.data?.entries ?? []).reduce((a, m) => ({ c: a.c + m.calories, p: a.p + m.protein, cb: a.cb + m.carbs, f: a.f + m.fat }), { c: 0, p: 0, cb: 0, f: 0 }), [meals.data]);
+  const entries = meals.data?.entries ?? [];
+  const totals: Totals = useMemo(() => entries.reduce((a, m) => ({ c: a.c + m.calories, p: a.p + m.protein, cb: a.cb + m.carbs, f: a.f + m.fat }), { c: 0, p: 0, cb: 0, f: 0 }), [entries]);
+  const targets = dash.data?.targets ?? null;
+  const insight = smartInsight(totals, targets, entries.length);
   const remove = async (id: string) => {
     setDeleting(id);
-    try { await mealLog({ token: tok(),  action: 'delete', id }); meals.setData((d) => d && { ...d, entries: d.entries.filter((e) => e.id !== id) }); }
+    try { await mealLog({ token: tok(), action: 'delete', id }); meals.setData((d) => d && { ...d, entries: d.entries.filter((e) => e.id !== id) }); }
     catch (e) { toast.error(errMsg(e)); } finally { setDeleting(null); }
   };
+  const left = targets ? targets.calories - totals.c : 0;
 
   return (
     <div className="space-y-5">
       <PageHeader title="تغذیه" subtitle="هماهنگ با برنامه تمرینی‌ات" back="/app/bodyyar" />
-      <div className="relative overflow-hidden rounded-[28px] border border-border">
-        <img src={ASSETS.food} alt="وعده‌های غذایی سالم" className="absolute inset-0 h-full w-full object-cover opacity-30" />
-        <div className="relative p-5">
-          <div className="flex items-center justify-between">
-            <Button size="icon" variant="ghost" onClick={() => setDate(shift(date, -1))} aria-label="روز قبل"><ChevronRight /></Button>
-            <div className="text-center font-bold">{date === todayStr() ? 'امروز' : new Date(date + 'T12:00:00').toLocaleDateString('fa-IR', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
-            <Button size="icon" variant="ghost" disabled={date >= todayStr()} onClick={() => setDate(shift(date, 1))} aria-label="روز بعد"><ChevronLeft /></Button>
-          </div>
-          <div className="mt-4 grid grid-cols-4 gap-2 text-center">
-            {[['کالری', totals.c, 'kcal'], ['پروتئین', totals.p, 'g'], ['کربوهیدرات', totals.cb, 'g'], ['چربی', totals.f, 'g']].map(([l, v, u]) => (
-              <div key={l as string} className="rounded-2xl bg-background/80 p-3"><div className="latin text-lg font-extrabold text-primary">{faNum(Math.round(v as number))}</div><div className="text-[11px] text-muted-foreground">{l} <span className="latin">{u}</span></div></div>
-            ))}
+      <DateStrip date={date} onChange={setDate} />
+
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-[32px] border border-white/[.08] bg-[radial-gradient(120%_120%_at_100%_0%,hsl(var(--primary)/.18),transparent_50%),radial-gradient(100%_100%_at_0%_100%,hsl(var(--violet)/.18),transparent_55%)] p-5">
+        <div className="flex items-center gap-5">
+          <Ring value={totals.c} max={targets?.calories ?? Math.max(1, totals.c)} size={148} stroke={13} color={left < 0 ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'}>
+            <div><div className="text-[10px] text-muted-foreground">{targets ? (left >= 0 ? 'باقی‌مانده' : 'اضافه') : 'دریافتی'}</div>
+              <div className="text-3xl font-black leading-tight">{faNum(Math.abs(Math.round(targets ? left : totals.c)))}</div><div className="font-latin text-[10px] text-muted-foreground">kcal</div></div>
+          </Ring>
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex justify-between text-xs"><span className="text-muted-foreground">خورده‌شده <b className="text-sm text-foreground">{faNum(Math.round(totals.c))}</b></span>{targets && <span className="text-muted-foreground">هدف <b className="text-sm text-foreground">{faNum(targets.calories)}</b></span>}</div>
+            {targets ? <>
+              <MacroBar label="پروتئین" value={totals.p} target={targets.protein} color={MACRO_COLORS.p} />
+              <MacroBar label="کربوهیدرات" value={totals.cb} target={targets.carbs} color={MACRO_COLORS.cb} />
+              <MacroBar label="چربی" value={totals.f} target={targets.fat} color={MACRO_COLORS.f} />
+            </> : <div className="grid grid-cols-3 gap-2 text-center text-xs">{([['P', totals.p], ['C', totals.cb], ['F', totals.f]] as const).map(([l, v]) => <div key={l} className="rounded-xl bg-white/5 p-2"><b>{faNum(Math.round(v))}g</b><div className="text-muted-foreground">{l}</div></div>)}</div>}
           </div>
         </div>
-      </div>
+        {date === todayStr() && (
+          <div className={cn('mt-4 flex items-start gap-2.5 rounded-2xl border p-3 text-xs leading-6', insight.tone === 'destructive' ? 'border-destructive/30 bg-destructive/10' : 'border-white/[.08] bg-black/20')}>
+            <insight.icon className={cn('mt-1 h-4 w-4 shrink-0', insight.tone === 'destructive' ? 'text-destructive' : insight.tone === 'cyan' ? 'text-[hsl(var(--cyan))]' : 'text-primary')} />
+            <span><b className="text-foreground">دستیار بدن‌یار: </b>{insight.text}</span>
+          </div>
+        )}
+      </motion.div>
 
-      {dash.data?.targets && date === todayStr() && <MacroTargets targets={dash.data.targets} totals={totals} />}
-      {dash.data && <AiMealPlan plan={dash.data.nutritionPlan} trainedToday={dash.data.trainedToday} />}
-      <h3 className="pt-2 font-black">ثبت وعده‌ها</h3>
-      {meals.loading ? <LoadingBlocks count={2} /> : meals.error ? <ErrorState message={meals.error} onRetry={meals.reload} /> : (
-        Object.entries(MEAL_LABELS).map(([k, label]) => {
-          const list = meals.data!.entries.filter((e) => e.meal === k);
-          return (
-            <Card key={k} className="p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold">{label} <span className="latin text-xs font-normal text-muted-foreground">{faNum(list.reduce((a, m) => a + m.calories, 0))} kcal</span></h3>
-                <Button size="sm" variant="secondary" className="rounded-full" onClick={() => setAdding(k)}><Plus className="me-1 h-4 w-4" />افزودن</Button>
-              </div>
-              {list.length > 0 && (
-                <ul className="mt-3 space-y-2">
-                  {list.map((m) => (
-                    <li key={m.id} className="flex items-center gap-3 rounded-2xl bg-secondary p-3 text-sm">
-                      <span className="flex-1">{m.foodName} <span className="latin text-xs text-muted-foreground">{faNum(m.grams)}g</span></span>
-                      <span className="latin text-xs">{faNum(m.calories)} kcal · P {faNum(m.protein)}</span>
-                      <Button size="icon" variant="ghost" className="h-8 w-8" disabled={deleting === m.id} onClick={() => remove(m.id)} aria-label="حذف">{deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          );
-        })
+      <WaterTracker date={date} goalL={dash.data?.nutritionPlan?.waterL ?? 2.5} />
+
+      <div className="flex items-center justify-between pt-1"><h3 className="text-lg font-black">وعده‌های {date === todayStr() ? 'امروز' : 'این روز'}</h3><span className="text-xs text-muted-foreground">{faNum(entries.length)} مورد ثبت‌شده</span></div>
+      {meals.loading ? <LoadingBlocks count={3} /> : meals.error ? <ErrorState message={meals.error} onRetry={meals.reload} /> : (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {Object.entries(MEAL_LABELS).map(([k, label], idx) => {
+            const list = entries.filter((e) => e.meal === k);
+            const kcal = list.reduce((a, m) => a + m.calories, 0);
+            const meta = MEAL_META[k] ?? MEAL_META.snack;
+            const goal = targets ? Math.round(targets.calories * meta.share) : 0;
+            return (
+              <motion.div key={k} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} className={cn('overflow-hidden rounded-[28px] border border-white/[.07] bg-gradient-to-br p-4', meta.g)}>
+                <div className="flex items-center gap-3">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-black/25 text-2xl backdrop-blur">{meta.emoji}</span>
+                  <div className="min-w-0 flex-1"><div className="font-black">{label}</div>
+                    <div className="text-xs text-muted-foreground"><b className="text-foreground">{faNum(Math.round(kcal))}</b>{goal ? ` / ${faNum(goal)}` : ''} کالری · {meta.hint}</div></div>
+                  <button onClick={() => setAdding(k)} className="press grid h-11 w-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-8px_hsl(var(--primary))]" aria-label={`افزودن به ${label}`}><Plus className="h-5 w-5" /></button>
+                </div>
+                {goal > 0 && <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/25"><div className="h-full rounded-full bg-foreground/80 transition-all duration-700" style={{ width: `${Math.min(100, (kcal / goal) * 100)}%` }} /></div>}
+                {list.length > 0 ? (
+                  <ul className="mt-3 space-y-1.5">
+                    {list.map((m) => (
+                      <li key={m.id} className="flex items-center gap-2 rounded-2xl bg-black/25 px-3 py-2 text-sm backdrop-blur">
+                        <span className="min-w-0 flex-1 truncate font-bold">{m.foodName} <span className="text-xs font-normal text-muted-foreground">{faNum(m.grams)}g</span></span>
+                        <span className="text-[11px] text-muted-foreground">{faNum(Math.round(m.calories))} kcal</span>
+                        <button className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-destructive/15 hover:text-destructive" disabled={deleting === m.id} onClick={() => remove(m.id)} aria-label="حذف">{deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : <button onClick={() => setAdding(k)} className="mt-3 w-full rounded-2xl border border-dashed border-white/15 py-3 text-xs text-muted-foreground transition hover:border-primary/50 hover:text-foreground">+ یه خوراکی اضافه کن</button>}
+              </motion.div>
+            );
+          })}
+        </div>
       )}
 
+      {dash.data && <AiMealPlan plan={dash.data.nutritionPlan} trainedToday={dash.data.trainedToday} />}
+
       {meals.data && meals.data.history.length > 1 && (
-        <Card><h3 className="mb-3 font-bold">۱۴ روز اخیر</h3>
-          <div className="flex h-24 items-end gap-1" dir="ltr">
-            {meals.data.history.map((h) => { const max = Math.max(...meals.data!.history.map((x) => x.calories), 1); return <div key={h.date} title={`${h.date}: ${h.calories}`} className="flex-1 rounded-t bg-primary/70" style={{ height: `${(h.calories / max) * 100}%` }} />; })}
+        <Card><div className="mb-4 flex items-center justify-between"><h3 className="font-black">روند ۱۴ روز اخیر</h3>{targets && <span className="flex items-center gap-1 text-[11px] text-muted-foreground"><span className="h-0.5 w-4 bg-primary" />هدف</span>}</div>
+          <div className="relative flex h-28 items-end gap-1.5" dir="ltr">
+            {(() => { const max = Math.max(...meals.data.history.map((x) => x.calories), targets?.calories ?? 1, 1); return <>
+              {targets && <div className="absolute inset-x-0 border-t border-dashed border-primary/60" style={{ bottom: `${(targets.calories / max) * 100}%` }} />}
+              {meals.data.history.map((h) => <button key={h.date} onClick={() => setDate(h.date)} title={`${h.date}: ${h.calories}`} className={cn('flex-1 rounded-t-lg transition-all', h.date === date ? 'bg-primary shadow-[0_0_12px_hsl(var(--primary)/.6)]' : 'bg-white/15 hover:bg-white/25')} style={{ height: `${Math.max(3, (h.calories / max) * 100)}%` }} />)}
+            </>; })()}
           </div>
         </Card>
       )}
-      <p className="flex items-start gap-2 text-xs text-muted-foreground"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />مقادیر تقریبی و بر اساس USDA FoodData Central است. برای بیماری، حساسیت یا رژیم درمانی با متخصص مشورت کن.</p>
+      <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground"><Info className="mt-1 h-3.5 w-3.5 shrink-0" />مقادیر تقریبی و بر اساس USDA FoodData Central است. برای بیماری، حساسیت یا رژیم درمانی با متخصص مشورت کن.</p>
 
-      <AddFood open={!!adding} meal={adding ?? 'snack'} date={date} foods={foods.data?.foods ?? []} recent={meals.data?.recentFoodIds ?? []} onClose={() => setAdding(null)} onAdded={() => { setAdding(null); meals.reload(); }} />
+      <AddFoodSheet open={!!adding} meal={adding ?? 'snack'} date={date} foods={foods.data?.foods ?? []} recent={meals.data?.recentFoodIds ?? []} totals={totals} targets={date === todayStr() ? targets : null} onClose={() => setAdding(null)} onAdded={() => { setAdding(null); meals.reload(); }} />
     </div>
-  );
-}
-
-function AddFood({ open, meal, date, foods, recent, onClose, onAdded }: { open: boolean; meal: string; date: string; foods: Food[]; recent: string[]; onClose: () => void; onAdded: () => void }) {
-  const [q, setQ] = useState('');
-  const [tag, setTag] = useState('');
-  const [sel, setSel] = useState<Food | null>(null);
-  const [grams, setGrams] = useState('');
-  const [busy, setBusy] = useState(false);
-  const list = foods.filter((f) => (!q || f.name.includes(q)) && (!tag || f.tags.includes(tag)));
-  const recentFoods = recent.map((id) => foods.find((f) => f.id === id)).filter(Boolean) as Food[];
-  const g = Number(grams);
-  const valid = g >= 1 && g <= 3000;
-  const pick = (f: Food) => { setSel(f); setGrams(String(f.defaultServingG)); };
-  const close = () => { setSel(null); setQ(''); onClose(); };
-  const add = async () => {
-    if (!sel || !valid || busy) return;
-    setBusy(true);
-    try { await mealLog({ token: tok(),  action: 'add', foodId: sel.id, grams: g, meal: meal as 'snack', date }); toast.success(`${sel.name} ثبت شد`); setSel(null); onAdded(); }
-    catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
-  };
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && close()}>
-      <DialogContent className="max-h-[85dvh] overflow-y-auto rounded-[28px]" dir="rtl">
-        <DialogHeader><DialogTitle>{sel ? sel.name : `افزودن به ${MEAL_LABELS[meal]}`}</DialogTitle></DialogHeader>
-        {sel ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-4 gap-2 text-center text-xs">
-              {[['کالری', sel.caloriesPer100g], ['پروتئین', sel.proteinPer100g], ['کربو', sel.carbsPer100g], ['چربی', sel.fatPer100g]].map(([l, v]) => (
-                <div key={l as string} className="rounded-2xl bg-secondary p-2"><div className="latin font-bold">{faNum(Math.round((v as number) * (valid ? g : 0) / 10) / 10)}</div><div className="text-muted-foreground">{l}</div></div>
-              ))}
-            </div>
-            <div>
-              <label className="text-sm" htmlFor="grams">مقدار (گرم) — یک وعده: {sel.servingLabel} ≈ <span className="latin">{sel.defaultServingG}g</span></label>
-              <Input id="grams" inputMode="decimal" value={grams} onChange={(e) => setGrams(e.target.value.replace(/[^\d.]/g, ''))} className="latin mt-2 h-12 rounded-2xl" aria-invalid={!valid} />
-              {!valid && <p className="mt-1 text-xs text-destructive">مقدار بین ۱ تا ۳۰۰۰ گرم</p>}
-              <div className="mt-2 flex gap-2">{[0.5, 1, 1.5, 2].map((m) => <button key={m} onClick={() => setGrams(String(Math.round(sel.defaultServingG * m)))} className="rounded-full bg-secondary px-3 py-1 text-xs">{faNum(m)} وعده</button>)}</div>
-            </div>
-            <p className="text-[11px] text-muted-foreground">منبع: {sel.source}</p>
-            <div className="flex gap-2"><Button variant="outline" className="flex-1 rounded-2xl" onClick={() => setSel(null)}>بازگشت</Button><Button className="flex-1 rounded-2xl" disabled={!valid || busy} onClick={add}>{busy && <Loader2 className="me-2 h-4 w-4 animate-spin" />}ثبت</Button></div>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="relative"><Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" /><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جستجوی خوراکی…" className="h-11 rounded-2xl pr-10" /></div>
-            <div className="flex flex-wrap gap-1.5">{Object.entries(TAGS).map(([k, v]) => <button key={k} onClick={() => setTag(tag === k ? '' : k)} className={cn('rounded-full px-3 py-1 text-xs', tag === k ? 'bg-primary text-primary-foreground' : 'bg-secondary')}>{v}</button>)}</div>
-            {!q && !tag && recentFoods.length > 0 && <div><div className="mb-1 text-xs text-muted-foreground">اخیر</div><div className="flex flex-wrap gap-2">{recentFoods.map((f) => <button key={f.id} onClick={() => pick(f)} className="rounded-2xl border border-primary/40 px-3 py-1.5 text-sm">{f.name}</button>)}</div></div>}
-            <ul className="space-y-1">
-              {list.map((f) => (
-                <li key={f.id}><button onClick={() => pick(f)} className="flex w-full items-center justify-between rounded-2xl p-3 text-start text-sm hover:bg-secondary"><span>{f.name}</span><span className="latin text-xs text-muted-foreground">{f.caloriesPer100g} kcal/100g</span></button></li>
-              ))}
-              {list.length === 0 && <li className="p-4 text-center text-sm text-muted-foreground">موردی پیدا نشد.</li>}
-            </ul>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
   );
 }

@@ -168,11 +168,41 @@ export function useReveal() {
   });
 }
 
-export function Cover({ hue, image, className, children }: { hue: number; image?: string; className?: string; children?: ReactNode }) {
+/** Track artwork. Real cover when present; otherwise a unique generative cover per track (6 styles × hue pairs), so rows never look uniform. */
+export function Cover({ hue, image, title, className, children }: { hue: number; image?: string; title?: string; className?: string; children?: ReactNode }) {
+  const [broken, setBroken] = useState(false);
+  const h2 = (hue + 40 + (hue % 5) * 25) % 360;
+  const v = hue % 6;
+  const letter = (title ?? '').trim().charAt(0);
+  const bg = [
+    `linear-gradient(135deg, hsl(${hue} 85% 58%), hsl(${h2} 75% 30%))`,
+    `radial-gradient(110% 90% at 15% 10%, hsl(${hue} 90% 62%), hsl(${h2} 70% 24%) 60%, hsl(220 20% 7%))`,
+    `conic-gradient(from ${hue}deg at 70% 30%, hsl(${hue} 85% 55%), hsl(${h2} 80% 40%), hsl(${hue} 60% 18%), hsl(${hue} 85% 55%))`,
+    `linear-gradient(200deg, hsl(220 20% 8%), hsl(${hue} 70% 32%) 55%, hsl(${h2} 90% 60%))`,
+    `radial-gradient(80% 80% at 80% 80%, hsl(${h2} 90% 60%), transparent 60%), linear-gradient(160deg, hsl(${hue} 70% 40%), hsl(230 25% 8%))`,
+    `linear-gradient(120deg, hsl(${hue} 80% 50%) 0 50%, hsl(${h2} 70% 28%) 50% 100%)`,
+  ][v];
+  const art = [
+    <g key="0"><circle cx="72" cy="72" r="40" fill="none" stroke="white" strokeOpacity=".35" strokeWidth=".7" /><circle cx="72" cy="72" r="27" fill="none" stroke="white" strokeOpacity=".35" strokeWidth=".7" /><circle cx="72" cy="72" r="14" fill="white" fillOpacity=".15" /></g>,
+    <g key="1">{[0, 1, 2, 3, 4, 5, 6].map((i) => <rect key={i} x={14 + i * 11} y={70 - ((hue * (i + 3)) % 40)} width="6" height={20 + ((hue * (i + 3)) % 40)} rx="3" fill="white" fillOpacity=".28" />)}</g>,
+    <g key="2"><path d="M0 70 Q25 50 50 70 T100 70" fill="none" stroke="white" strokeOpacity=".4" strokeWidth="1.2" /><path d="M0 80 Q25 60 50 80 T100 80" fill="none" stroke="white" strokeOpacity=".25" strokeWidth="1.2" /><path d="M0 60 Q25 40 50 60 T100 60" fill="none" stroke="white" strokeOpacity=".18" strokeWidth="1.2" /></g>,
+    <g key="3"><rect x="58" y="10" width="34" height="34" rx="10" fill="white" fillOpacity=".14" transform="rotate(18 75 27)" /><circle cx="24" cy="78" r="16" fill="white" fillOpacity=".12" /></g>,
+    <g key="4">{Array.from({ length: 25 }).map((_, i) => <circle key={i} cx={12 + (i % 5) * 19} cy={12 + Math.floor(i / 5) * 19} r={1.2 + ((hue + i * 7) % 5) * 0.5} fill="white" fillOpacity=".3" />)}</g>,
+    <g key="5"><path d="M10 90 L50 20 L90 90 Z" fill="none" stroke="white" strokeOpacity=".35" strokeWidth=".9" /><path d="M30 90 L50 55 L70 90 Z" fill="white" fillOpacity=".12" /></g>,
+  ][v];
+  const showImg = image && !broken;
   return (
-    <div className={cn('relative overflow-hidden rounded-2xl', className)} style={{ background: `radial-gradient(120% 90% at 20% 10%, hsl(${hue} 90% 60%), hsl(${hue} 70% 22%) 60%, hsl(210 17% 6%))` }}>
-      <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full opacity-30" aria-hidden><circle cx="70" cy="70" r="40" fill="none" stroke="white" strokeWidth=".6" /><circle cx="70" cy="70" r="28" fill="none" stroke="white" strokeWidth=".6" /></svg>
-      {image ? <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" /> : <svg viewBox="0 0 24 24" className="absolute left-1/2 top-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>}
+    <div className={cn('relative overflow-hidden rounded-2xl', className)} style={{ background: bg }}>
+      {!showImg && (
+        <>
+          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden>{art}</svg>
+          {letter ? <span className="absolute bottom-[8%] start-[10%] text-[2.2em] font-black leading-none text-white/85 drop-shadow-md">{letter}</span>
+            : <svg viewBox="0 0 24 24" className="absolute left-1/2 top-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>}
+          <span className="absolute end-[8%] top-[8%] font-latin text-[9px] font-black tracking-[.2em] text-white/60">KAYAR</span>
+        </>
+      )}
+      {showImg && <img src={image} alt="" loading="lazy" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-cover" />}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
       {children}
     </div>
   );

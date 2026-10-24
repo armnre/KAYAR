@@ -13,7 +13,7 @@ Meal = {"name": string, "time": string, "items": string[], "calories": number, "
 قوانین: غذاهای رایج و در دسترس ایرانی با مقدار دقیق (گرم/عدد/قاشق) در items. ۴ تا ۵ وعده در روز.
 مجموع وعده‌های روز تمرین باید با هدف روز تمرین و روز استراحت با هدف استراحت حداکثر ۵٪ اختلاف داشته باشد.
 روز تمرین شامل وعده قبل و بعد از تمرین باشد. رژیم/محدودیت‌های کاربر را رعایت کن. متن‌ها فارسی و کوتاه.`;
-  const user = `هدف: ${profile.goal}\nرژیم غذایی: ${profile.diet || 'معمولی'}\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nوزن: ${profile.weightKg ?? '-'}kg\n` +
+  const user = `هدف: ${profile.goal}\nرژیم غذایی: ${profile.diet || 'معمولی'}\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nحساسیت/آلرژی غذایی (هرگز استفاده نکن): ${profile.allergies || 'ندارد'}\nسطح فعالیت روزانه: ${profile.activityLevel || '-'}\nخواب: ${profile.sleepHours ?? '-'} ساعت\nوزن هدف: ${profile.targetWeightKg ?? '-'}kg\nوزن: ${profile.weightKg ?? '-'}kg\n` +
     `هدف روز تمرین: ${JSON.stringify(t.training)}\nهدف روز استراحت: ${JSON.stringify(t.rest)}\n` +
     `برنامه تمرینی: ${plan ? `${plan.days.length} روز — ${plan.days.map((d) => `${d.name} (${d.focus})`).join('، ')}` : `${profile.daysPerWeek} روز در هفته`}\nمدت جلسه: ${profile.sessionMinutes} دقیقه`;
   return aiChat<Nutrition>([{ role: 'system', content: system }, { role: 'user', content: user }], (text) => {

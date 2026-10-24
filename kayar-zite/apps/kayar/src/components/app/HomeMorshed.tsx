@@ -84,7 +84,7 @@ export function AppHome() {
           <H t={c.title} s={<button onClick={() => nav('/app/morshed')} className="flex items-center gap-1 text-sm font-bold text-primary">همه <ArrowLeft className="h-4 w-4" /></button>} />
           <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
             {c.tracks.slice(0, 12).map((t) => (
-              <button key={t.id} onClick={() => play(t, c.tracks)} className="press w-36 shrink-0 snap-start text-start"><Cover hue={t.hue} image={t.image} className="aspect-square w-full shadow-lg"><span className="absolute bottom-2 end-2 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-black"><Play className="h-4 w-4 fill-current" /></span></Cover><div className="mt-2 truncate text-sm font-bold">{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist}</div></button>
+              <button key={t.id} onClick={() => play(t, c.tracks)} className="press w-36 shrink-0 snap-start text-start"><Cover hue={t.hue} image={t.image} title={t.title} className="aspect-square w-full shadow-lg"><span className="absolute bottom-2 end-2 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-black"><Play className="h-4 w-4 fill-current" /></span></Cover><div className="mt-2 truncate text-sm font-bold">{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist}</div></button>
             ))}
           </div>
         </div>

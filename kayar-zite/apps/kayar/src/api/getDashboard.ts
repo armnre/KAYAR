@@ -37,6 +37,7 @@ export default createEndpoint({
       goal: profileRow.goal, level: profileRow.level ?? '', daysPerWeek: profileRow.daysPerWeek ?? 3, place: profileRow.place ?? '',
       equipment: profileRow.equipment ?? '', sessionMinutes: profileRow.sessionMinutes ?? 45, diet: profileRow.diet ?? '',
       limitations: profileRow.limitations ?? '', age: profileRow.age ?? null, heightCm: profileRow.heightCm ?? null, weightKg: profileRow.weightKg ?? null,
+      activityLevel: profileRow.activityLevel ?? null, targetWeightKg: profileRow.targetWeightKg ?? null, sleepHours: profileRow.sleepHours ?? null, allergies: profileRow.allergies ?? null, waistCm: profileRow.waistCm ?? null,
       sex: (profileRow.sex === 'female' || profileRow.sex === 'male') ? (profileRow.sex as 'male' | 'female') : null,
     } : null;
     const latest = plans.records.sort((a, b) => (b.created ?? '').localeCompare(a.created ?? ''))[0];

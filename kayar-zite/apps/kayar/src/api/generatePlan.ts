@@ -33,12 +33,13 @@ export default createEndpoint({
 با توجه به محدودیت‌ها حرکات پرخطر را حذف کن و در notes توصیه ایمنی بنویس (در صورت درد یا بیماری با پزشک مشورت شود).
 فهرست حرکات (slug | نام | دسته | سطح | مکان | وسیله):
 ${catalogText}`;
-    const user = `هدف: ${profile.goal}\nسطح: ${profile.level}\nروز در هفته: ${profile.daysPerWeek}\nمکان: ${profile.place}\nتجهیزات: ${profile.equipment}\nمدت هر جلسه: ${profile.sessionMinutes} دقیقه\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nسن: ${profile.age ?? '-'}`;
+    const user = `هدف: ${profile.goal}\nسطح: ${profile.level}\nروز در هفته: ${profile.daysPerWeek}\nمکان: ${profile.place}\nتجهیزات: ${profile.equipment}\nمدت هر جلسه: ${profile.sessionMinutes} دقیقه\nمحدودیت‌ها: ${profile.limitations || 'ندارد'}\nسن: ${profile.age ?? '-'}\nجنسیت: ${profile.sex ?? '-'}\nقد/وزن: ${profile.heightCm ?? '-'}cm / ${profile.weightKg ?? '-'}kg (هدف ${profile.targetWeightKg ?? '-'}kg)\nسطح فعالیت روزانه: ${profile.activityLevel || '-'}\nخواب: ${profile.sleepHours ?? '-'} ساعت (اگر کمتر از ۶ بود حجم تمرین را کمی کمتر کن)`;
 
     const nutritionP: Promise<Nutrition | null> = generateNutrition({
       goal: profile.goal, level: profile.level ?? '', daysPerWeek: profile.daysPerWeek ?? 3, place: profile.place ?? '', equipment: profile.equipment ?? '',
       sessionMinutes: profile.sessionMinutes ?? 45, diet: profile.diet ?? '', limitations: profile.limitations ?? '', age: profile.age ?? null,
       heightCm: profile.heightCm ?? null, weightKg: profile.weightKg ?? null, sex: (profile.sex as 'male' | 'female' | undefined) ?? null,
+      activityLevel: profile.activityLevel ?? null, targetWeightKg: profile.targetWeightKg ?? null, sleepHours: profile.sleepHours ?? null, allergies: profile.allergies ?? null, waistCm: profile.waistCm ?? null,
     }).catch((e) => { console.error('nutrition generation failed', (e as Error).message); return null; });
     const plan = await aiChat<Plan>([{ role: 'system', content: system }, { role: 'user', content: user }], (text) => {
       const raw = extractJson(text) as { title?: string; notes?: string[]; days?: { name?: string; focus?: string; exercises?: { slug?: string; sets?: number; reps?: unknown; restSec?: number; note?: string }[] }[] } | null;

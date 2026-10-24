@@ -19,7 +19,7 @@ export default createEndpoint({
     let profileText = '';
     if (input.useProfile) {
       const p = await zite.bodyProfiles.findOne({ filters: { memberId: uid } });
-      if (p?.goal) profileText = `\nپروفایل کاربر (با اجازه خودش): هدف ${p.goal}، سطح ${p.level ?? '-'}، ${p.daysPerWeek ?? '-'} روز در هفته، مکان ${p.place ?? '-'}، رژیم ${p.diet ?? '-'}، محدودیت‌ها: ${p.limitations || 'ندارد'}، وزن ${p.weightKg ?? '-'}kg.`;
+      if (p?.goal) profileText = `\nپروفایل کاربر (با اجازه خودش): هدف ${p.goal}، سطح ${p.level ?? '-'}، ${p.daysPerWeek ?? '-'} روز در هفته، مکان ${p.place ?? '-'}، رژیم ${p.diet ?? '-'}، محدودیت‌ها: ${p.limitations || 'ندارد'}، وزن ${p.weightKg ?? '-'}kg، وزن هدف ${p.targetWeightKg ?? '-'}kg، فعالیت روزانه ${p.activityLevel ?? '-'}، خواب ${p.sleepHours ?? '-'} ساعت، آلرژی: ${p.allergies || 'ندارد'}.`;
       const { records: plans } = await zite.workoutPlans.findAll({ filters: { memberId: uid, active: true }, limit: 1 });
       const wp = plans[0];
       if (wp?.planJson) { try { const pl = JSON.parse(wp.planJson) as { days: { name: string; exercises: { name: string; sets: number; reps: string }[] }[] }; profileText += `\nبرنامه تمرینی فعلی: ${pl.days.map((d) => `${d.name}: ${d.exercises.map((x) => `${x.name} ${x.sets}×${x.reps}`).join('، ')}`).join(' | ')}`; } catch { /* ignore */ } }

@@ -7,6 +7,8 @@ import { KeyRound, LogOut, ChevronLeft, Heart, Smartphone, Monitor, Headphones, 
 import { Skeleton } from '@project/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@project/components/ui/alert-dialog';
 import { Glass } from '../kit';
+import { KayarAvatar } from '../KayarAvatar';
+import { BodyCard } from './BodyCard';
 import { H } from './HomeMorshed';
 import { useSession, errMsg } from '../../lib/session';
 import { usePreview } from '../../lib/preview';
@@ -34,7 +36,7 @@ export function Profile() {
     <div className="pb-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-[32px] bg-[radial-gradient(120%_140%_at_100%_0%,hsl(var(--primary)/.35),transparent_55%),radial-gradient(120%_140%_at_0%_100%,hsl(254_90%_60%/.35),transparent_55%)] p-6 ring-1 ring-white/10">
         <div className="flex items-center gap-4">
-          <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/pPU42kQMJa3xxtZ4NFtxkq/img_RfxGx8KFDz64FOmX.jpg" alt={member?.displayName ?? 'پروفایل'} className="h-20 w-20 shrink-0 rounded-full object-cover shadow-[0_10px_40px_-10px_hsl(var(--primary)/.8)] ring-4 ring-background" />
+          <KayarAvatar name={member?.displayName} seed={member?.username} size={88} />
           <div className="min-w-0"><div className="truncate text-2xl font-black">{member?.displayName}</div><div className="font-latin text-sm text-muted-foreground" dir="ltr">@{member?.username}</div>
             <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary"><ShieldCheck className="h-3.5 w-3.5" />عضو کایار</span></div>
         </div>
@@ -44,6 +46,8 @@ export function Profile() {
           ))}
         </div>
       </motion.div>
+
+      {token && <BodyCard token={token} />}
 
       <H t="دسترسی سریع" />
       <Glass className="divide-y divide-white/5 overflow-hidden p-0">

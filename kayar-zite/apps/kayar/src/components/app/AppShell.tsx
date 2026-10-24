@@ -7,6 +7,9 @@ import { KayarLogo, Cover, Waveform } from '../kit';
 import { usePreview } from '../../lib/preview';
 import { useSession } from '../../lib/session';
 import { fa } from '../../lib/config';
+import { KayarAvatar } from '../KayarAvatar';
+
+function NavMe() { const { member } = useSession('app'); return <KayarAvatar name={member?.displayName} seed={member?.username} size={26} />; }
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@project/components/ui/dropdown-menu';
 
 const nav = [
@@ -33,7 +36,7 @@ function MiniPlayer() {
   return (
     <div className="relative mx-3 flex items-center gap-2 overflow-hidden rounded-2xl border border-border bg-card p-2 pe-1 shadow-lg lg:mx-0">
       <button className="flex min-w-0 flex-1 items-center gap-3 text-start" onClick={() => setFullPlayer(true)} aria-label="باز کردن پلیر">
-        <Cover hue={track.hue} image={track.image} className="h-11 w-11 shrink-0 rounded-xl" />
+        <Cover hue={track.hue} image={track.image} title={track.title} className="h-11 w-11 shrink-0 rounded-xl" />
         <div className="min-w-0"><div className="truncate text-sm font-bold">{track.title}</div><div className={cn('truncate text-xs', error ? 'text-destructive' : 'text-muted-foreground')}>{error ? 'پخش ممکن نشد؛ دوباره تلاش کن' : track.artist}</div></div>
       </button>
       <PlayBtn />
@@ -49,7 +52,7 @@ function QueueList({ close }: { close: () => void }) {
   return (
     <div className="mt-4 max-h-64 overflow-y-auto rounded-3xl border border-border bg-card p-2">
       <div className="flex items-center justify-between px-2 py-1 text-sm font-bold"><span>صف پخش ({fa(queue.length)})</span><button onClick={close} className="text-xs text-muted-foreground">بستن</button></div>
-      <ul>{queue.map((t) => <li key={t.id}><button onClick={() => play(t)} className={cn('flex w-full items-center gap-3 rounded-2xl p-2 text-start', t.id === track?.id && 'bg-violet/15')}><Cover hue={t.hue} image={t.image} className="h-9 w-9 shrink-0 rounded-lg" /><span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold">{t.title}</span><span className="block truncate text-xs text-muted-foreground">{t.artist}</span></span></button></li>)}</ul>
+      <ul>{queue.map((t) => <li key={t.id}><button onClick={() => play(t)} className={cn('flex w-full items-center gap-3 rounded-2xl p-2 text-start', t.id === track?.id && 'bg-violet/15')}><Cover hue={t.hue} image={t.image} title={t.title} className="h-9 w-9 shrink-0 rounded-lg" /><span className="min-w-0 flex-1"><span className="block truncate text-sm font-bold">{t.title}</span><span className="block truncate text-xs text-muted-foreground">{t.artist}</span></span></button></li>)}</ul>
     </div>
   );
 }
@@ -61,7 +64,7 @@ function UpNext() {
   if (!n) return null;
   return (
     <button onClick={() => play(n)} className="press mt-5 flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/[.06] p-2.5 text-start backdrop-blur-xl">
-      <Cover hue={n.hue} image={n.image} className="h-10 w-10 shrink-0 rounded-xl" />
+      <Cover hue={n.hue} image={n.image} title={n.title} className="h-10 w-10 shrink-0 rounded-xl" />
       <span className="min-w-0 flex-1"><span className="block text-[10px] font-bold text-primary">بعدی</span><span className="block truncate text-sm font-bold" dir="auto">{n.title}</span></span>
       <span className="truncate text-xs text-white/50" dir="auto">{n.artist}</span>
     </button>
@@ -90,7 +93,7 @@ function FullPlayer() {
               <div className="relative">
                 <motion.div className="absolute inset-6 rounded-[40px] bg-primary/40 blur-3xl" animate={{ opacity: playing ? [0.4, 0.8, 0.4] : 0.2, scale: playing ? [0.95, 1.05, 0.95] : 0.9 }} transition={{ duration: 3, repeat: Infinity }} />
                 <motion.div key={track.id} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: playing ? 1 : 0.88 }} transition={{ type: 'spring', stiffness: 180, damping: 20 }}>
-                  <Cover hue={track.hue} image={track.image} className="relative aspect-square w-full rounded-[36px] shadow-[0_30px_80px_-20px_rgba(0,0,0,.9)] ring-1 ring-white/10" />
+                  <Cover hue={track.hue} image={track.image} title={track.title} className="relative aspect-square w-full rounded-[36px] shadow-[0_30px_80px_-20px_rgba(0,0,0,.9)] ring-1 ring-white/10" />
                 </motion.div>
               </div>
             )}
@@ -154,7 +157,7 @@ export default function AppShell() {
           {activeIdx >= 0 && !nav[activeIdx].center && <span className="absolute top-0 h-0.5 w-1/4 rounded-full bg-primary glow transition-transform duration-300" style={{ insetInlineStart: 0, transform: `translateX(${-activeIdx * 100}%)` }} />}
           {nav.map((n) => (
             <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cn('flex flex-col items-center justify-center gap-0.5 text-xs font-bold', isActive ? 'text-primary' : 'text-muted-foreground')}>
-              {n.center ? <span className="-mt-7 grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground animate-pulse-glow"><n.icon className="h-6 w-6" /></span> : n.to === '/app/profile' ? <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/pPU42kQMJa3xxtZ4NFtxkq/img_RfxGx8KFDz64FOmX.jpg" alt="" className="h-6 w-6 rounded-full object-cover ring-1 ring-current" /> : <n.icon className="h-6 w-6" />}
+              {n.center ? <span className="-mt-7 grid h-14 w-14 place-items-center rounded-2xl bg-primary text-primary-foreground animate-pulse-glow"><n.icon className="h-6 w-6" /></span> : n.to === '/app/profile' ? <NavMe /> : <n.icon className="h-6 w-6" />}
               {n.label}
             </NavLink>
           ))}
