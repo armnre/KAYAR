@@ -1,10 +1,12 @@
-# کایار (KAYAR)
+# KAYAR
 
-همراه ورزشی و سلامت برند پوشاک ورزشی «کاپوش». خریداران لباس کاپوش با نام کاربری و رمزی که فروشگاه می‌دهد (بدون ثبت‌نام عمومی) وارد می‌شوند و به دو قابلیت اصلی دسترسی دارند: **مرشد** (موزیک ورزشی) و **بدن‌یار** (برنامه‌ی تمرین و تغذیه‌ی هوشمند).
+KAYAR is the companion app for athletes who buy KAPOUSH sportswear. It's Persian (RTL) and mobile-first, and uses the "Neon Athletic" dark look.
 
-یک اپ با سه بخش:
-- `/` وب‌سایت معرفی و وبلاگ (عموم مردم)
-- `/app` اپ خریدار (QR روی لباس مستقیم به ورود اپ می‌رود)
-- `/admin` پنل مدیریت (CMS) فروشگاه برای ساخت حساب مشتری‌ها و مدیریت محتوا
+- **Public site** (`/`, `/blog`, `/p/...`): a landing page edited through the CMS, a blog, and static pages.
+- **Member app** (`/app`): the store gives each customer a username and password (there's no public sign-up). Inside:
+  - **Morshed:** admin-managed workout music and RSS podcasts, with favorites, history and resume.
+  - **BodyYar:** a fitness profile, a weekly plan made by AI, guided workout sessions, an exercise library, nutrition logging, progress tracking and an AI coach.
+  - **Notifications and profile:** announcements, password change and active sessions.
+- **Admin panel** (`/admin`): staff roles, customer accounts (including bulk create and printable cards), CMS, blog, media, announcements, settings and the audit log. The Morshed admin can add music by upload or public link, add podcast RSS feeds and build collections.
 
-وضعیت: فاز ۱ در جریان است. ورود، مشتری‌ها، کارکنان، داشبورد، CMS صفحه‌ی اصلی، مطالب و وبلاگ، رسانه، اعلان‌ها، تنظیمات، گزارش فعالیت و مرشد (کتابخانه‌ی مدیریت‌شده + Jamendo زنده + پلیر سراسری) به داده‌ی واقعی وصل‌اند. پیش از استفاده‌ی تجاری، مجوز موسیقی باید بررسی شود. جزئیات در `docs/progress.md` است.
+Jamendo isn't used. All music comes from content the admin adds and has the rights to.

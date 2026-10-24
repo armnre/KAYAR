@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import { authLogin, authMe, authLogout, readCookie, type AuthMeOutputType } from 'zitejs/api';
+import { authLogin, authMe, authLogout, type AuthMeOutputType } from 'zitejs/api';
 
 export type Scope = 'app' | 'admin';
 type Member = AuthMeOutputType['member'];
@@ -11,17 +11,20 @@ type Ctx = State & {
   can: (p: string) => boolean;
 };
 
-/**
- * Session handling: the session secret lives in an httpOnly cookie that the
- * browser sends automatically — nothing is kept in localStorage any more.
- * The readable part is only the CSRF token, which is never a credential.
- */
-export function readToken(_scope: Scope) {
-  return readCookie('kayar_csrf');
+// Token storage: Zite endpoints receive no cookies/headers we control, so the opaque session
+// token lives in localStorage with its server-side expiry (see docs/DECISIONS.md). It is never
+// put in a URL, and it is wiped on logout or when the server rejects it.
+const KEY = (s: Scope) => `kayar.session.${s}`;
+export function readToken(scope: Scope) {
+  try {
+    const raw = localStorage.getItem(KEY(scope));
+    if (!raw) return null;
+    const { token, expiresAt } = JSON.parse(raw) as { token: string; expiresAt: string };
+    if (new Date(expiresAt).getTime() < Date.now()) { localStorage.removeItem(KEY(scope)); return null; }
+    return token;
+  } catch { return null; }
 }
-const clear = (_scope: Scope) => {
-  try { document.cookie = 'kayar_csrf=; Max-Age=0; path=/'; } catch { /* ignore */ }
-};
+const clear = (scope: Scope) => localStorage.removeItem(KEY(scope));
 
 /** Turns any thrown error into a friendly Persian message — never shows raw technical text. */
 export function errMsg(e: unknown) {
@@ -44,9 +47,11 @@ const contexts = { app: createContext<Ctx | null>(null), admin: createContext<Ct
 export function SessionProvider({ scope, children }: { scope: Scope; children: ReactNode }) {
   const [s, setS] = useState<State>(() => ({ token: readToken(scope), member: null, permissions: [], loading: true }));
   const refresh = useCallback(async () => {
+    const token = readToken(scope);
+    if (!token) { setS({ token: null, member: null, permissions: [], loading: false }); return; }
     try {
-      const r = await authMe({});
-      setS({ token: readToken(scope), member: r.member, permissions: r.permissions, loading: false });
+      const r = await authMe({ token });
+      setS({ token, member: r.member, permissions: r.permissions, loading: false });
     } catch {
       clear(scope);
       setS({ token: null, member: null, permissions: [], loading: false });
@@ -55,14 +60,18 @@ export function SessionProvider({ scope, children }: { scope: Scope; children: R
   useEffect(() => { void refresh(); }, [refresh]);
 
   const login = async (username: string, password: string) => {
+    const old = readToken(scope);
+    if (old) authLogout({ token: old }).catch(() => {});
     const r = await authLogin({ username, password, scope, userAgent: navigator.userAgent.slice(0, 300) });
-    setS({ token: readToken(scope), member: r.member, permissions: r.permissions, loading: false });
+    localStorage.setItem(KEY(scope), JSON.stringify({ token: r.token, expiresAt: r.expiresAt }));
+    setS({ token: r.token, member: r.member, permissions: r.permissions, loading: false });
     return r.member;
   };
   const logout = async (all?: boolean) => {
-    setS({ token: null, member: null, permissions: [], loading: false });
-    await authLogout({ all }).catch(() => {});
+    const token = readToken(scope);
     clear(scope);
+    setS({ token: null, member: null, permissions: [], loading: false });
+    if (token) await authLogout({ token, all }).catch(() => {});
   };
   const C = contexts[scope];
   return <C.Provider value={{ ...s, login, logout, refresh, can: (p) => s.permissions.includes(p) }}>{children}</C.Provider>;
@@ -72,8 +81,10 @@ export const useSession = (scope: Scope) => {
   if (!c) throw new Error('SessionProvider missing');
   return c;
 };
-/** Admin helper: the session travels in the httpOnly cookie. */
+/** Admin helper: token is guaranteed inside the guarded admin shell. */
 export const useAdmin = () => {
   const s = useSession('admin');
   return { ...s, token: s.token ?? '' };
 };
+/** Current member session token for endpoint calls ('' when signed out). */
+export const tok = () => readToken('app') ?? '';
