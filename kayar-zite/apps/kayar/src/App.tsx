@@ -6,7 +6,8 @@ import { Toaster } from '@project/components/ui/sonner';
 import { PreviewProvider } from './lib/preview';
 import { CmsProvider } from './lib/cms';
 import { SessionProvider } from './lib/session';
-import { Landing, BlogList, BlogPost, StaticPage } from './pages/Site';
+import { Landing, BlogList, BlogPost } from './pages/Site';
+import { StaticPage } from './pages/StaticPages';
 import { Login, ChangePassword } from './pages/AppAuth';
 import AppShell from './components/app/AppShell';
 import { AppHome, Morshed, Profile, Notifications } from './pages/AppPages';
@@ -20,8 +21,7 @@ import Nutrition from './pages/bodyyar/Nutrition';
 import Progress from './pages/bodyyar/Progress';
 import Coach from './pages/bodyyar/Coach';
 import AdminShell, { AdminLogin } from './components/admin/AdminShell';
-import { ShopCallback } from './components/app/KapooshShop';
-import { AdminShop } from './pages/admin/Shop';
+import { PickDetail, PickCallback } from './components/app/PickDetail';
 import { AdminCampaigns } from './pages/admin/Campaigns';
 import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
@@ -42,7 +42,7 @@ export default function App() {
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/p/:slug" element={<StaticPage />} />
-          <Route path="/shop/callback" element={<ShopCallback />} />
+          <Route path="/shop/callback" element={<PickCallback />} />
           <Route path="/app/login" element={<Login />} />
           <Route path="/app/change-password" element={<ChangePassword />} />
           <Route path="/app" element={<AppShell />}>
@@ -57,6 +57,7 @@ export default function App() {
             <Route path="bodyyar/nutrition" element={<Nutrition />} />
             <Route path="bodyyar/progress" element={<Progress />} />
             <Route path="bodyyar/coach" element={<Coach />} />
+            <Route path="picks/:id" element={<PickDetail />} />
             <Route path="profile" element={<Profile />} />
             <Route path="notifications" element={<Notifications />} />
           </Route>
@@ -71,7 +72,6 @@ export default function App() {
             <Route path="morshed" element={<AdminMorshed />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
             <Route path="campaigns" element={<AdminCampaigns />} />
-            <Route path="shop" element={<AdminShop />} />
             <Route path="sms" element={<AdminSms />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit" element={<AdminAudit />} />

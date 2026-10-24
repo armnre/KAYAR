@@ -104,22 +104,3 @@ export function BlogPost() {
   );
 }
 
-const pages: Record<string, { t: string; body: string }> = {
-  about: { t: 'درباره‌ی کایار', body: 'کایار همراه ورزشی و سلامت برند کاپوش است که با هر خرید لباس، یک همراه هوشمند در اختیار ورزشکار می‌گذارد.' },
-  terms: { t: 'قوانین استفاده', body: 'متن کامل قوانین در فاز ۱ از بخش محتوای سایت در پنل ادمین منتشر می‌شود.' },
-  privacy: { t: 'حریم خصوصی', body: 'متن کامل سیاست حریم خصوصی در فاز ۱ از بخش محتوای سایت در پنل ادمین منتشر می‌شود. کایار از ردیاب‌های تبلیغاتی خارجی استفاده نمی‌کند.' },
-};
-export function StaticPage() {
-  const { slug = '' } = useParams();
-  const p = pages[slug];
-  useMeta(p?.t ?? 'صفحه پیدا نشد', p?.body ?? '');
-  return (
-    <div className="min-h-svh depth-bg">
-      <SiteHeader />
-      <main className="mx-auto max-w-[720px] px-4 pb-20 pt-[calc(var(--header-h)+var(--safe-t)+48px)]">
-        {p ? <><h1 className="text-[clamp(2rem,5vw,3rem)] font-black">{p.t}</h1><p className="mt-6 text-[18px] leading-[2] text-muted-foreground">{p.body}</p></> : <StateView icon={FileQuestion} title="صفحه پیدا نشد" action={<KButton to="/">صفحه‌ی اصلی</KButton>} />}
-      </main>
-      <Footer />
-    </div>
-  );
-}

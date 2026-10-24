@@ -7,7 +7,6 @@ import { Button } from '@project/components/ui/button';
 import { EmptyState, ErrorState, LoadingBlocks, faNum, faDate } from '../../components/bkit';
 import { useLoad } from '../../lib/useLoad';
 import { ASSETS } from '../../lib/assets';
-import { KayarSuggestions } from '../../components/app/KayarSuggestions';
 
 const QUICK = [
   { to: '/app/bodyyar/coach', label: 'مربی AI', sub: 'هر سوالی داری بپرس', icon: Bot },
@@ -140,7 +139,6 @@ export default function Dashboard() {
           </ul>
         ) : <div className="flex items-center gap-3 rounded-2xl border border-dashed border-border p-4 text-sm text-muted-foreground"><Flame className="h-5 w-5 shrink-0 text-primary" />اولین جلسه‌ات را شروع کن؛ سابقه تمرین‌ها اینجا ساخته می‌شود.</div>}
       </motion.div>
-      <div className="-mt-5"><KayarSuggestions placement="bodyyar" /></div>
     </div>
   );
 }

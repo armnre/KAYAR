@@ -3,15 +3,13 @@ import { syncShow } from './podcasts';
 
 /**
  * Content discovery engine for Morshed.
- * Music: only real songs by well-known Iranian and English-language artists, plus the
- * current Apple Music charts (trending). Uses the official iTunes catalog, which provides
- * licensed 30-second previews + album art. Religious / recitation content is always rejected.
+ * Music: full-length tracks from Audius, ccMixter and Internet Archive netlabels (see MUSIC_QUERIES).
+ * Religious / recitation content is always rejected.
  * Podcasts: public RSS feeds found via the fyyd directory (Apple directory as fallback).
  */
 
 export type Genre = 'workout' | 'running' | 'walking' | 'focus' | 'recovery';
 type Lang = 'fa' | 'en';
-export type MusicSource = { kind: 'chart'; country: string; lang: Lang } | { kind: 'artist'; name: string; lang: Lang; style: string };
 
 /** Curated style map: every artist is a well-known name, grouped by language and style. */
 export const STYLES: { key: string; lang: Lang; title: string; artists: string[] }[] = [
@@ -29,77 +27,128 @@ export const STYLES: { key: string; lang: Lang; title: string; artists: string[]
   { key: 'en-classic', lang: 'en', title: 'Classics 80s-00s', artists: ['Michael Jackson', 'Whitney Houston', 'Madonna', 'ABBA', 'a-ha', 'George Michael', 'Prince', 'Eurythmics', 'Backstreet Boys', 'Britney Spears', 'Shakira', 'Celine Dion', 'Phil Collins', 'Tina Turner', 'Elton John', 'Bee Gees', 'Modern Talking', 'Survivor'] },
 ];
 export const STYLE_TITLES: Record<string, string> = Object.fromEntries(STYLES.map((s) => [s.key, s.title]));
-export const MUSIC_QUERIES: MusicSource[] = [
-  ...['us', 'gb', 'ca', 'de', 'fr', 'au'].map((country) => ({ kind: 'chart' as const, country, lang: 'en' as Lang })),
-  ...STYLES.flatMap((s) => s.artists.map((name) => ({ kind: 'artist' as const, name, lang: s.lang, style: s.key }))),
-];
 
 /** Words that mark religious recitation / eulogy / non-music content — never imported. */
 export const RELIGIOUS = /quran|qur'an|koran|surah|sura\b|ayat|qari|recit|tilawa|tajweed|azan|adhan|athan|dua\b|du'a|munajat|nasheed|noha|nohe|nowhe|marsiya|madah|maddah|rowze|rawza|sermon|lecture|islamic|allah|muharram|ashura|imam |hussain|hossein|karbala|zikr|dhikr|قرآن|قران|سوره|آیه|تلاوت|قاری|اذان|دعا|مناجات|نوحه|مداحی|مداح|روضه|محرم|عاشورا|امام|حسین|کربلا|ذکر|سخنرانی|موعظه/i;
 export const BLOCKED = new RegExp(RELIGIOUS.source + '|audiobook|podcast|interview|karaoke|instrumental version|tribute|cover version', 'i');
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\u0600-\u06ff]+/g, '');
-type It = { trackId: number; trackName: string; artistName: string; collectionName?: string; previewUrl?: string; artworkUrl100?: string;
-  trackViewUrl?: string; primaryGenreName?: string; trackTimeMillis?: number; kind?: string; trackExplicitness?: string };
 
 async function getJson<T>(url: string): Promise<T | null> {
   for (let a = 0; a < 3; a++) {
-    try { const r = await fetch(url, { headers: { 'user-agent': 'KAYAR-Morshed/2.0' } }); if (r.ok) return (await r.json()) as T; if (r.status !== 429 && r.status < 500) return null; } catch { /* retry */ }
-    await new Promise((res) => setTimeout(res, 1500 * (a + 1)));
+    try { const r = await fetch(url, { headers: { 'user-agent': 'KAYAR-Morshed/3.0', accept: 'application/json' } }); if (r.ok) return (await r.json()) as T; if (r.status !== 429 && r.status < 500) return null; } catch { /* retry */ }
+    await new Promise((res) => setTimeout(res, 1200 * (a + 1)));
   }
   return null;
 }
 
-function styleOf(g = '') { return /hip|rap/i.test(g) ? 'en-hiphop' : /dance|electronic|house/i.test(g) ? 'en-edm' : /rock|metal|alternative/i.test(g) ? 'en-rock' : /r&b|soul/i.test(g) ? 'en-rnb' : 'en-pop'; }
+/**
+ * FULL-LENGTH music sources (no 30-second previews):
+ *  - Audius: open music network — artists publish full tracks for free streaming (global + Persian creators).
+ *  - ccMixter: Creative Commons full tracks (mp3).
+ *  - Internet Archive netlabels: Creative Commons full albums (mp3).
+ * Every track is played in full. Religious / recitation content is always rejected.
+ */
+export type MusicSource =
+  | { kind: 'audius-trending'; genre: string; lang: Lang; style: string }
+  | { kind: 'audius-search'; q: string; lang: Lang; style: string }
+  | { kind: 'ccmixter'; tag: string; style: string }
+  | { kind: 'archive'; subject: string; style: string };
 
-function genreOf(g = '', lang: Lang): Genre {
-  if (/dance|electronic|hip|rap|rock|metal|house|edm/i.test(g)) return 'workout';
-  if (/pop|r&b|latin|reggae/i.test(g)) return lang === 'fa' ? 'running' : 'running';
-  if (/classical|traditional|ambient|new age|soundtrack/i.test(g)) return 'focus';
+export const MUSIC_QUERIES: MusicSource[] = [
+  ...([['Electronic', 'en-edm'], ['Hip-Hop/Rap', 'en-hiphop'], ['Pop', 'en-pop'], ['Rock', 'en-rock'], ['R&B/Soul', 'en-rnb'], ['House', 'en-edm'], ['Techno', 'en-edm'], ['Dance & EDM', 'en-edm'], ['Trap', 'en-hiphop'], ['Drum & Bass', 'en-edm'], ['Alternative', 'en-rock'], ['Lo-Fi', 'en-pop'], ['Ambient', 'en-pop'], ['Latin', 'en-pop'], ['Dubstep', 'en-edm'], ['Funk', 'en-rnb']] as const)
+    .map(([genre, style]) => ({ kind: 'audius-trending' as const, genre, lang: 'en' as Lang, style })),
+  ...([['persian pop', 'fa-pop'], ['farsi', 'fa-pop'], ['iranian', 'fa-pop'], ['persian', 'fa-pop'], ['آهنگ', 'fa-pop'], ['موزیک', 'fa-pop'], ['عاشقانه', 'fa-pop'], ['persian rap', 'fa-rap'], ['farsi rap', 'fa-rap'], ['رپ فارسی', 'fa-rap'], ['رپ', 'fa-rap'], ['iranian hip hop', 'fa-rap'], ['tehran', 'fa-rap'], ['persian classic', 'fa-classic'], ['persian traditional', 'fa-traditional'], ['santoor', 'fa-traditional'], ['setar', 'fa-traditional'], ['tar persian', 'fa-traditional'], ['persian dance', 'fa-dance'], ['bandari', 'fa-dance'], ['شاد', 'fa-dance'], ['persian remix', 'fa-dance'], ['persian rock', 'fa-rock'], ['iranian rock', 'fa-rock']] as const)
+    .map(([q, style]) => ({ kind: 'audius-search' as const, q, lang: 'fa' as Lang, style })),
+  ...([['workout', 'en-edm'], ['gym', 'en-hiphop'], ['running', 'en-edm'], ['motivation', 'en-hiphop'], ['pop', 'en-pop'], ['rock', 'en-rock']] as const)
+    .map(([q, style]) => ({ kind: 'audius-search' as const, q, lang: 'en' as Lang, style })),
+  ...([['dance', 'en-edm'], ['hip_hop', 'en-hiphop'], ['electronica', 'en-edm'], ['rock', 'en-rock'], ['pop', 'en-pop'], ['funky', 'en-rnb'], ['trance', 'en-edm'], ['ambient', 'en-pop']] as const)
+    .map(([tag, style]) => ({ kind: 'ccmixter' as const, tag, style })),
+  ...([['electronic', 'en-edm'], ['hip hop', 'en-hiphop'], ['rock', 'en-rock'], ['pop', 'en-pop']] as const)
+    .map(([subject, style]) => ({ kind: 'archive' as const, subject, style })),
+];
+
+type Row = Record<string, unknown> & { title: string; artist: string; audioUrl: string; sourceId: string };
+export const UNSUITABLE = /\b(sex|sexy|nsfw|porn|nude|naked|fuck|f\*ck|shit|bitch|nigg|hoe|thot|xxx|drug|weed|cocaine|kill|murder|suicide|satan|devil|horny|onlyfans|explicit|18\+)\b|سکس|لخت|مستهجن|فحش|مواد/i;
+const PERSIAN = /[\u0600-\u06FF]|persian|farsi|iran|tehran|shiraz/i;
+
+function genreOf(style: string, g = ''): Genre {
+  if (/edm|hiphop|rock|rap|dance/.test(style) || /electronic|hip|rap|rock|metal|house|techno|trap|dubstep|drum/i.test(g)) return 'workout';
+  if (/traditional|classic/.test(style) || /ambient|lo-?fi|classical|new age/i.test(g)) return 'focus';
+  if (/pop|rnb/.test(style)) return 'running';
   return 'walking';
 }
 
-function toRow(t: It, lang: Lang, trending: boolean, style = '') {
-  const art = (t.artworkUrl100 ?? '').replace('100x100bb', '600x600bb');
+function row(o: { title: string; artist: string; album?: string; art?: string; audioUrl: string; dur: number; style: string; lang: Lang; g?: string; trending?: boolean; license: string; licenseUrl?: string; sourceId: string; sourceUrl: string; source: string }): Row | null {
+  const text = `${o.title} ${o.artist} ${o.album ?? ''} ${o.g ?? ''}`;
+  if (!o.audioUrl.startsWith('https://') || o.dur < 90 || o.dur > 900 || BLOCKED.test(text) || UNSUITABLE.test(text) || /religious|spoken|christian|gospel|devotional|meditation guide/i.test(o.g ?? '')) return null;
+  const lang = o.lang;
+  const g = genreOf(o.style, o.g);
   return {
-    title: t.trackName.slice(0, 140), artist: t.artistName.slice(0, 120), album: (t.collectionName ?? '').slice(0, 140),
-    artwork: art, coverUrl: art, audioUrl: t.previewUrl!, durationSec: 30, durationSeconds: 30,
-    genre: genreOf(t.primaryGenreName, lang), categories: genreOf(t.primaryGenreName, lang),
-    tags: [lang, style || (lang === 'en' ? styleOf(t.primaryGenreName) : ''), trending ? 'trending' : 'top-artist', t.primaryGenreName ?? ''].filter(Boolean).join(','),
-    license: 'Official preview (Apple Music)', licenseUrl: 'https://www.apple.com/legal/internet-services/itunes/',
-    rights: `${t.artistName} — official preview`, source: 'external', sourceId: `itunes:${t.trackId}`, sourceUrl: t.trackViewUrl ?? '',
-    status: 'published', published: true, downloadable: false, featured: trending, isFeatured: trending,
+    title: o.title.slice(0, 140), artist: o.artist.slice(0, 120), album: (o.album ?? '').slice(0, 140), artwork: o.art ?? '', coverUrl: o.art ?? '',
+    audioUrl: o.audioUrl, durationSec: Math.round(o.dur), durationSeconds: Math.round(o.dur), genre: g, categories: g,
+    tags: [lang, o.style, o.trending ? 'trending' : '', 'full', o.source, o.g ?? ''].filter(Boolean).join(','),
+    license: o.license, licenseUrl: o.licenseUrl ?? '', rights: `${o.artist} — ${o.license}`, source: 'external', sourceId: o.sourceId, sourceUrl: o.sourceUrl,
+    status: 'published', published: true, downloadable: false, featured: !!o.trending, isFeatured: !!o.trending,
   };
 }
 
-const okTrack = (t: It) => t.kind === 'song' && !!t.previewUrl?.startsWith('https://') && t.trackExplicitness !== 'explicit'
-  && !BLOCKED.test(`${t.trackName} ${t.artistName} ${t.collectionName ?? ''} ${t.primaryGenreName ?? ''}`)
-  && !/religious|spoken|christian|gospel|devotional/i.test(t.primaryGenreName ?? '');
+type AudiusT = { id: string; title: string; duration: number; genre?: string; mood?: string; tags?: string | null; permalink?: string; is_streamable?: boolean; stream_conditions?: unknown; is_delete?: boolean; artwork?: Record<string, string> | null; user: { name: string; handle: string }; play_count?: number };
+const AUDIUS = 'https://api.audius.co/v1';
+// Audius artwork is community-uploaded and unmoderated, so it is never stored; the app draws a clean generated cover.
+const audiusRow = (t: AudiusT, lang: Lang, style: string, trending: boolean) =>
+  t.is_streamable === false || t.stream_conditions || t.is_delete ? null : row({
+    title: t.title, artist: t.user.name, art: '', audioUrl: `${AUDIUS}/tracks/${t.id}/stream?app_name=KAYAR`,
+    dur: t.duration, style, lang, g: `${t.genre ?? ''} ${t.tags ?? ''}`.trim(), trending, license: 'Audius — full track (artist-published)', licenseUrl: 'https://audius.co/legal/terms-of-use',
+    sourceId: `audius:${t.id}`, sourceUrl: `https://audius.co${t.permalink ?? ''}`, source: 'audius',
+  });
 
-/** Finds tracks for one source; returns rows ready for Tracks.bulkCreate. */
-export async function discoverMusic(src: MusicSource, rows = 20) {
-  if (src.kind === 'chart') {
-    const feed = await getJson<{ feed: { results: { id: string }[] } }>(`https://rss.applemarketingtools.com/api/v2/${src.country}/music/most-played/${Math.min(rows * 2, 100)}/songs.json`);
-    const ids = (feed?.feed.results ?? []).map((r) => r.id);
-    if (!ids.length) return [];
-    const res = await getJson<{ results: It[] }>(`https://itunes.apple.com/lookup?id=${ids.join(',')}&country=${src.country}`);
-    return (res?.results ?? []).filter(okTrack).slice(0, rows).map((t) => toRow(t, src.lang, true));
+type CcT = { upload_id: number; upload_name: string; user_name: string; user_real_name?: string; upload_tags?: string; license_name?: string; license_url?: string; file_page_url: string; files: { download_url: string; file_format_info?: { ps?: string; 'mime_type'?: string } }[] };
+const secs = (ps = '') => ps.split(':').reduce((a, x) => a * 60 + Number(x || 0), 0);
+
+/** Finds full-length tracks for one source; returns rows ready for Tracks.bulkCreate. */
+export async function discoverMusic(src: MusicSource, rows = 20): Promise<Row[]> {
+  const keep = (x: (Row | null)[]) => x.filter((r): r is Row => !!r).slice(0, rows);
+  if (src.kind === 'audius-trending') {
+    const r = await getJson<{ data: AudiusT[] }>(`${AUDIUS}/tracks/trending?app_name=KAYAR&time=month&genre=${encodeURIComponent(src.genre)}&limit=${rows * 2}`);
+    return keep((r?.data ?? []).map((t) => audiusRow(t, src.lang, src.style, true)));
   }
-  const res = await getJson<{ results: It[] }>(`https://itunes.apple.com/search?media=music&entity=song&attribute=artistTerm&limit=${Math.min(rows * 3, 120)}&country=us&term=${encodeURIComponent(src.name)}`);
-  const want = norm(src.name);
-  const seenTitle = new Set<string>();
-  return (res?.results ?? []).filter((t) => okTrack(t) && norm(t.artistName).includes(want))
-    .filter((t) => { const k = norm(t.trackName.replace(/\(.*?\)|\[.*?\]/g, '')); if (seenTitle.has(k)) return false; seenTitle.add(k); return true; })
-    .slice(0, rows).map((t) => toRow(t, src.lang, false, src.style));
+  if (src.kind === 'audius-search') {
+    const r = await getJson<{ data: AudiusT[] }>(`${AUDIUS}/tracks/search?app_name=KAYAR&query=${encodeURIComponent(src.q)}&limit=${rows * 2}`);
+    const list = (r?.data ?? []).filter((t) => src.lang !== 'fa' || (/[\u0600-\u06FF]/.test(`${t.title} ${t.user.name}`) || /persian|farsi|iran/i.test(`${t.title} ${t.user.name} ${t.tags ?? ''}`)));
+    return keep(list.sort((a, b) => (b.play_count ?? 0) - (a.play_count ?? 0)).map((t) => audiusRow(t, src.lang, src.style, false)));
+  }
+  if (src.kind === 'ccmixter') {
+    const r = await getJson<CcT[]>(`https://ccmixter.org/api/query?f=json&tags=${encodeURIComponent(src.tag)}&sort=rank&limit=${rows * 2}`);
+    return keep((r ?? []).map((t) => { const f = t.files.find((x) => x.download_url.endsWith('.mp3')); return f ? row({
+      title: t.upload_name, artist: t.user_real_name || t.user_name, audioUrl: f.download_url.replace(/^http:/, 'https:'), dur: secs(f.file_format_info?.ps), style: src.style, lang: 'en',
+      g: t.upload_tags, license: t.license_name ? `CC — ${t.license_name.trim()}` : 'Creative Commons', licenseUrl: t.license_url, sourceId: `ccmixter:${t.upload_id}`, sourceUrl: t.file_page_url, source: 'ccmixter',
+    }) : null; }));
+  }
+  // Internet Archive netlabels (Creative Commons albums)
+  const s = await getJson<{ response: { docs: { identifier: string }[] } }>(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(`collection:netlabels AND mediatype:audio AND subject:(${src.subject})`)}&fl[]=identifier&rows=8&sort[]=downloads+desc&output=json`);
+  const out: (Row | null)[] = [];
+  for (const d of s?.response.docs ?? []) {
+    if (out.length >= rows) break;
+    const m = await getJson<{ metadata?: { title?: string; creator?: string | string[]; licenseurl?: string; subject?: string | string[] }; files?: { name: string; format?: string; title?: string; length?: string; creator?: string }[] }>(`https://archive.org/metadata/${d.identifier}`);
+    const meta = m?.metadata ?? {}; const creator = Array.isArray(meta.creator) ? meta.creator[0] : meta.creator ?? 'Unknown';
+    for (const f of (m?.files ?? []).filter((x) => /mp3/i.test(x.format ?? '') && x.name.endsWith('.mp3')).slice(0, 4)) {
+      const len = f.length?.includes(':') ? secs(f.length) : Number(f.length ?? 0);
+      out.push(row({ title: f.title || f.name.replace(/\.mp3$/, '').replace(/[_-]+/g, ' '), artist: f.creator || creator, album: meta.title, art: `https://archive.org/services/img/${d.identifier}`,
+        audioUrl: `https://archive.org/download/${d.identifier}/${encodeURIComponent(f.name)}`, dur: len, style: src.style, lang: 'en', g: [meta.subject].flat().join(' '),
+        license: 'Creative Commons (netlabel)', licenseUrl: meta.licenseurl, sourceId: `archive:${d.identifier}/${f.name}`.slice(0, 250), sourceUrl: `https://archive.org/details/${d.identifier}`, source: 'archive' }));
+    }
+  }
+  return keep(out);
 }
 
-/** Runs music discovery and inserts only new tracks (dedupe by sourceId, audioUrl and artist+title). */
+/** Runs full-length discovery, inserts only new tracks, and removes old 30-second previews. */
 export async function importMusic(queries = MUSIC_QUERIES, perQuery = 15) {
   const { rows } = await zite.sql({ query: `SELECT "sourceId","audioUrl","artist","title" FROM "Tracks"` });
   const seen = new Set(rows.flatMap((r) => [String(r.sourceId ?? ''), String(r.audioUrl ?? ''), norm(`${r.artist}${r.title}`)]));
-  const fresh: Record<string, unknown>[] = [];
-  for (let i = 0; i < queries.length; i += 8) {
-    const batch = await Promise.all(queries.slice(i, i + 8).map((q) => discoverMusic(q, perQuery)));
+  const fresh: Row[] = [];
+  for (let i = 0; i < queries.length; i += 6) {
+    const batch = await Promise.all(queries.slice(i, i + 6).map((q) => discoverMusic(q, perQuery).catch(() => [] as Row[])));
     for (const t of batch.flat()) {
       const key = norm(`${t.artist}${t.title}`);
       if (seen.has(t.sourceId) || seen.has(t.audioUrl) || seen.has(key)) continue;
@@ -107,9 +156,17 @@ export async function importMusic(queries = MUSIC_QUERIES, perQuery = 15) {
     }
   }
   for (let i = 0; i < fresh.length; i += 100) await zite.tracks.bulkCreate({ records: fresh.slice(i, i + 100) as never });
-  return { added: fresh.length };
+  const removed = await purgePreviews();
+  return { added: fresh.length, removed };
 }
 
+/** Deletes 30-second preview tracks (old iTunes imports) so only full songs remain. */
+export async function purgePreviews() {
+  const { rows } = await zite.sql({ query: `SELECT id FROM "Tracks" WHERE "sourceId" LIKE 'itunes:%' OR ("durationSec" IS NOT NULL AND "durationSec" <= 35 AND "source" = 'external')` });
+  const ids = rows.map((r) => String(r.id));
+  for (let i = 0; i < ids.length; i += 10) await Promise.all(ids.slice(i, i + 10).map((id) => zite.tracks.delete({ id })));
+  return ids.length;
+}
 
 export const PODCAST_TERMS: { term: string; country: string; category: 'fitness' | 'running' | 'focus' | 'recovery' | 'nutrition' }[] = [
   { term: 'fitness', country: 'us', category: 'fitness' }, { term: 'bodybuilding', country: 'us', category: 'fitness' },
@@ -119,6 +176,14 @@ export const PODCAST_TERMS: { term: string; country: string; category: 'fitness'
   { term: 'تغذیه', country: 'ir', category: 'nutrition' }, { term: 'انگیزشی', country: 'ir', category: 'focus' },
   { term: 'مدیتیشن', country: 'ir', category: 'recovery' }, { term: 'روانشناسی', country: 'ir', category: 'focus' },
   { term: 'پادکست فارسی', country: 'ir', category: 'focus' }, { term: 'رادیو', country: 'ir', category: 'focus' },
+  { term: 'بدنسازی', country: 'ir', category: 'fitness' }, { term: 'تناسب اندام', country: 'ir', category: 'fitness' },
+  { term: 'رژیم غذایی', country: 'ir', category: 'nutrition' }, { term: 'خواب', country: 'ir', category: 'recovery' },
+  { term: 'موفقیت', country: 'ir', category: 'focus' }, { term: 'خودشناسی', country: 'ir', category: 'focus' },
+  { term: 'کتاب صوتی انگیزشی', country: 'ir', category: 'focus' }, { term: 'دویدن', country: 'ir', category: 'running' },
+  { term: 'strength training', country: 'us', category: 'fitness' }, { term: 'marathon training', country: 'us', category: 'running' },
+  { term: 'sports science', country: 'us', category: 'fitness' }, { term: 'sleep science', country: 'us', category: 'recovery' },
+  { term: 'healthy habits', country: 'us', category: 'nutrition' }, { term: 'mental toughness', country: 'us', category: 'focus' },
+  { term: 'yoga', country: 'us', category: 'recovery' }, { term: 'triathlon', country: 'us', category: 'running' },
 ];
 
 /** Rejects Arabic-only, German, explicit and kids' shows that the directories return for Persian/English terms. */

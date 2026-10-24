@@ -51,9 +51,3 @@ export const audit = [
   { who: 'مدیر نمونه', action: 'تغییر تنظیمات پشتیبانی', at: new Date(2026, 9, 8, 9, 15) },
 ];
 
-export const fallbackProducts = [
-  { id: 1, name: 'تیشرت ورزشی Run', price: 890000, image: '', link: 'https://kapoosh.ir' },
-  { id: 2, name: 'تیشرت Power Fit', price: 940000, image: '', link: 'https://kapoosh.ir' },
-  { id: 3, name: 'هودی Flow', price: 1650000, image: '', link: 'https://kapoosh.ir' },
-  { id: 4, name: 'شلوارک Sprint', price: 720000, image: '', link: 'https://kapoosh.ir' },
-];

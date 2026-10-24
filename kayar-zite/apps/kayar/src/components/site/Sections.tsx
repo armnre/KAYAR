@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, KeyRound, QrCode, Play, Pause, ArrowLeft, Shirt } from 'lucide-react';
+import { ShoppingBag, KeyRound, QrCode, Play, Pause, ArrowLeft } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@project/components/ui/accordion';
-import { kapooshProducts, type KapooshProductsOutputType } from 'zitejs/api';
 import { KButton, Glass, IconBox, Waveform, SampleBadge, Cover, ProgressRing, KayarLogo } from '../kit';
-import { tracks, faqs, fallbackProducts } from '../../data/sample';
+import { tracks, faqs } from '../../data/sample';
 import { usePosts, usePublicSettings, type PostCard } from '../../lib/publicData';
-import { fa, faDate, toman } from '../../lib/config';
+import { fa, faDate } from '../../lib/config';
 import { useBlock } from '../../lib/cms';
 
 const Divider = () => <div aria-hidden className="mx-auto h-px max-w-5xl bg-gradient-to-l from-transparent via-primary/40 to-transparent" />;
@@ -120,28 +119,6 @@ export function BodyyarSection() {
   );
 }
 
-export function ShopSection({ compact }: { compact?: boolean }) {
-  const [data, setData] = useState<KapooshProductsOutputType | null>(null);
-  useEffect(() => { kapooshProducts({ limit: 4 }).then(setData).catch(() => setData({ products: [], live: false })); }, []);
-  const live = data?.live && data.products.length > 0;
-  const items = live ? data!.products.slice(0, 4) : fallbackProducts;
-  return (
-    <div className={compact ? '' : 'mx-auto max-w-6xl'}>
-      {!live && data && <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground"><SampleBadge />اتصال به فروشگاه برقرار نشد؛ نمونه نمایش داده می‌شود.</div>}
-      <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
-        {!data ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] w-[62vw] shrink-0 rounded-[28px] md:w-auto" />) : items.map((p) => (
-          <a key={p.id} href={p.link} target="_blank" rel="noreferrer" className="glass press group w-[62vw] max-w-[260px] shrink-0 snap-start overflow-hidden rounded-[28px] md:w-auto md:max-w-none">
-            <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-bg2 to-background">
-              {p.image ? <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <div className="absolute inset-0 grid place-items-center"><div className="absolute h-28 w-28 -rotate-12 rounded-3xl bg-primary/20" /><Shirt className="relative h-16 w-16 text-primary" strokeWidth={1.4} /></div>}
-            </div>
-            <div className="p-4"><div className="truncate font-bold">{p.name}</div><div className="mt-1 text-sm text-primary">{toman(p.price)}</div></div>
-          </a>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function BlogCards({ list }: { list: PostCard[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -215,7 +192,7 @@ export function Footer() {
       <div className="relative mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:justify-between">
         <div><KayarLogo className="text-xl" /><p className="mt-3 max-w-xs text-muted-foreground">{b.tagline}</p></div>
         <nav className="grid grid-cols-2 gap-x-10 gap-y-1 text-[15px]" aria-label="پیوندهای فوتر">
-          {([['/p/about', 'درباره'], ['/p/terms', 'قوانین'], ['/p/privacy', 'حریم خصوصی'], ['/blog', 'وبلاگ'], [st?.shopUrl || 'https://kapoosh.ir', 'فروشگاه کاپوش'], ['/app', 'ورود به کایار'], ...(st?.instagram ? [[st.instagram, 'اینستاگرام']] : []), ...(st?.telegram ? [[st.telegram, 'تلگرام']] : [])] as string[][]).map(([h, l]) => h.startsWith('http') ? <a key={h} href={h} target="_blank" rel="noopener noreferrer" className="tap flex items-center text-muted-foreground hover:text-foreground">{l}</a> : <Link key={h} to={h} className="tap flex items-center text-muted-foreground hover:text-foreground">{l}</Link>)}
+          {([['/p/about', 'درباره'], ['/p/how', 'نحوه‌ی کار'], ['/p/faq', 'سؤالات متداول'], ['/p/contact', 'تماس با ما'], ['/p/terms', 'قوانین'], ['/p/privacy', 'حریم خصوصی'], ['/blog', 'وبلاگ'], ['/app', 'ورود به کایار'], ...(st?.instagram ? [[st.instagram, 'اینستاگرام']] : []), ...(st?.telegram ? [[st.telegram, 'تلگرام']] : [])] as string[][]).map(([h, l]) => h.startsWith('http') ? <a key={h} href={h} target="_blank" rel="noopener noreferrer" className="tap flex items-center text-muted-foreground hover:text-foreground">{l}</a> : <Link key={h} to={h} className="tap flex items-center text-muted-foreground hover:text-foreground">{l}</Link>)}
         </nav>
       </div>
       <div className="relative mx-auto mt-10 flex max-w-6xl flex-wrap justify-between gap-2 text-[13px] text-muted-foreground"><span>{b.copyright}</span>{(st?.supportPhone || st?.supportEmail) && <span dir="ltr">{[st.supportPhone, st.supportEmail].filter(Boolean).join(' · ')}</span>}</div>

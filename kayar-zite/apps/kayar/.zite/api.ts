@@ -17,7 +17,6 @@ import type { default as _AdminMemberCreateEp } from '../src/api/adminMemberCrea
 import type { default as _AdminMembersEp } from '../src/api/adminMembers';
 import type { default as _AdminPostsEp } from '../src/api/adminPosts';
 import type { default as _AdminSettingsEp } from '../src/api/adminSettings';
-import type { default as _AdminShopEp } from '../src/api/adminShop';
 import type { default as _AdminShowsEp } from '../src/api/adminShows';
 import type { default as _AdminSmsEp } from '../src/api/adminSms';
 import type { default as _AdminTracksEp } from '../src/api/adminTracks';
@@ -33,7 +32,6 @@ import type { default as _CoachChatEp } from '../src/api/coachChat';
 import type { default as _GeneratePlanEp } from '../src/api/generatePlan';
 import type { default as _GetDashboardEp } from '../src/api/getDashboard';
 import type { default as _GetProgressEp } from '../src/api/getProgress';
-import type { default as _KapooshProductsEp } from '../src/api/kapooshProducts';
 import type { default as _ListExercisesEp } from '../src/api/listExercises';
 import type { default as _ListFoodsEp } from '../src/api/listFoods';
 import type { default as _ListMealsEp } from '../src/api/listMeals';
@@ -46,7 +44,6 @@ import type { default as _PublicPostsEp } from '../src/api/publicPosts';
 import type { default as _PublicSettingsEp } from '../src/api/publicSettings';
 import type { default as _SaveProfileEp } from '../src/api/saveProfile';
 import type { default as _SaveSessionEp } from '../src/api/saveSession';
-import type { default as _ShopEp } from '../src/api/shop';
 import type { default as _WeightLogEp } from '../src/api/weightLog';
 
 type _AdminAnnouncementsCfg = typeof _AdminAnnouncementsEp;
@@ -124,11 +121,6 @@ export type AdminSettingsInputType = NonNullable<_AdminSettingsCfg['inputSchema'
 export type AdminSettingsOutputType = Awaited<ReturnType<_AdminSettingsCfg['execute']>>;
 export const adminSettings = createCaller<AdminSettingsInputType, AdminSettingsOutputType>('adminSettings');
 
-type _AdminShopCfg = typeof _AdminShopEp;
-export type AdminShopInputType = NonNullable<_AdminShopCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminShopCfg['execute']>[0]['input'];
-export type AdminShopOutputType = Awaited<ReturnType<_AdminShopCfg['execute']>>;
-export const adminShop = createCaller<AdminShopInputType, AdminShopOutputType>('adminShop');
-
 type _AdminShowsCfg = typeof _AdminShowsEp;
 export type AdminShowsInputType = NonNullable<_AdminShowsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminShowsCfg['execute']>[0]['input'];
 export type AdminShowsOutputType = Awaited<ReturnType<_AdminShowsCfg['execute']>>;
@@ -204,11 +196,6 @@ export type GetProgressInputType = NonNullable<_GetProgressCfg['inputSchema']> e
 export type GetProgressOutputType = Awaited<ReturnType<_GetProgressCfg['execute']>>;
 export const getProgress = createCaller<GetProgressInputType, GetProgressOutputType>('getProgress');
 
-type _KapooshProductsCfg = typeof _KapooshProductsEp;
-export type KapooshProductsInputType = NonNullable<_KapooshProductsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_KapooshProductsCfg['execute']>[0]['input'];
-export type KapooshProductsOutputType = Awaited<ReturnType<_KapooshProductsCfg['execute']>>;
-export const kapooshProducts = createCaller<KapooshProductsInputType, KapooshProductsOutputType>('kapooshProducts');
-
 type _ListExercisesCfg = typeof _ListExercisesEp;
 export type ListExercisesInputType = NonNullable<_ListExercisesCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ListExercisesCfg['execute']>[0]['input'];
 export type ListExercisesOutputType = Awaited<ReturnType<_ListExercisesCfg['execute']>>;
@@ -269,11 +256,6 @@ export type SaveSessionInputType = NonNullable<_SaveSessionCfg['inputSchema']> e
 export type SaveSessionOutputType = Awaited<ReturnType<_SaveSessionCfg['execute']>>;
 export const saveSession = createCaller<SaveSessionInputType, SaveSessionOutputType>('saveSession');
 
-type _ShopCfg = typeof _ShopEp;
-export type ShopInputType = NonNullable<_ShopCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_ShopCfg['execute']>[0]['input'];
-export type ShopOutputType = Awaited<ReturnType<_ShopCfg['execute']>>;
-export const shop = createCaller<ShopInputType, ShopOutputType>('shop');
-
 type _WeightLogCfg = typeof _WeightLogEp;
 export type WeightLogInputType = NonNullable<_WeightLogCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_WeightLogCfg['execute']>[0]['input'];
 export type WeightLogOutputType = Awaited<ReturnType<_WeightLogCfg['execute']>>;
@@ -296,7 +278,6 @@ export const api = {
   adminMembers,
   adminPosts,
   adminSettings,
-  adminShop,
   adminShows,
   adminSms,
   adminTracks,
@@ -312,7 +293,6 @@ export const api = {
   generatePlan,
   getDashboard,
   getProgress,
-  kapooshProducts,
   listExercises,
   listFoods,
   listMeals,
@@ -325,6 +305,5 @@ export const api = {
   publicSettings,
   saveProfile,
   saveSession,
-  shop,
   weightLog,
 };

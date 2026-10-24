@@ -172,7 +172,7 @@ export function Cover({ hue, image, className, children }: { hue: number; image?
   return (
     <div className={cn('relative overflow-hidden rounded-2xl', className)} style={{ background: `radial-gradient(120% 90% at 20% 10%, hsl(${hue} 90% 60%), hsl(${hue} 70% 22%) 60%, hsl(210 17% 6%))` }}>
       <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full opacity-30" aria-hidden><circle cx="70" cy="70" r="40" fill="none" stroke="white" strokeWidth=".6" /><circle cx="70" cy="70" r="28" fill="none" stroke="white" strokeWidth=".6" /></svg>
-      {image && <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />}
+      {image ? <img src={image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" /> : <svg viewBox="0 0 24 24" className="absolute left-1/2 top-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>}
       {children}
     </div>
   );

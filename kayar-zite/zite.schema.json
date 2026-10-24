@@ -3786,6 +3786,339 @@
               "displayTimeZone": false
             }
           }
+        },
+        {
+          "id": "f4v9C55hocx",
+          "sdkName": "gallery",
+          "definition": {
+            "name": "Gallery",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fkjhy4hPQPS",
+          "sdkName": "features",
+          "definition": {
+            "name": "Features",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fpjjydRpU8g",
+          "sdkName": "specs",
+          "definition": {
+            "name": "Specs",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f1wDyP3m7Ye",
+          "sdkName": "terms",
+          "definition": {
+            "name": "Terms",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fcHNbYA36ob",
+          "sdkName": "amount",
+          "definition": {
+            "name": "Amount",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 0
+            }
+          }
+        },
+        {
+          "id": "f9RKVmtUbm2",
+          "sdkName": "stock",
+          "definition": {
+            "name": "Stock",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 0
+            }
+          }
+        },
+        {
+          "id": "fgWkL85h9QY",
+          "sdkName": "purchasable",
+          "definition": {
+            "name": "Purchasable",
+            "type": "checkbox",
+            "template": {}
+          }
+        },
+        {
+          "id": "fvLxpE72LFa",
+          "sdkName": "videoUrl",
+          "definition": {
+            "name": "Video Url",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fc1x5t6fSib",
+          "sdkName": "location",
+          "definition": {
+            "name": "Location",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f6PQh6pFoFC",
+          "sdkName": "sponsorLogo",
+          "definition": {
+            "name": "Sponsor Logo",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fwJ2Sr4hu7i",
+          "sdkName": "sponsorWebsite",
+          "definition": {
+            "name": "Sponsor Website",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "ftULVR7a6MN",
+          "sdkName": "sold",
+          "definition": {
+            "name": "Sold",
+            "type": "number",
+            "template": {
+              "numberFormat": "local",
+              "decimalPlaces": 0
+            }
+          }
+        },
+        {
+          "id": "fu4998iREhd",
+          "sdkName": "actionType",
+          "definition": {
+            "name": "Action Type",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "cLam",
+                  "label": "buy",
+                  "color": "purple"
+                },
+                {
+                  "value": "1zCE",
+                  "label": "register",
+                  "color": "orange"
+                },
+                {
+                  "value": "begz",
+                  "label": "code",
+                  "color": "blue"
+                },
+                {
+                  "value": "s3Hy",
+                  "label": "partner",
+                  "color": "gray"
+                },
+                {
+                  "value": "6gxM",
+                  "label": "info",
+                  "color": "red"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fdg1s9yq5Wr",
+          "sdkName": "partnerApiUrl",
+          "definition": {
+            "name": "Partner Api Url",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fwkjcxv1Tda",
+          "sdkName": "partnerName",
+          "definition": {
+            "name": "Partner Name",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fq3Z18KD2aZ",
+          "sdkName": "uniqueCodes",
+          "definition": {
+            "name": "Unique Codes",
+            "type": "checkbox",
+            "template": {}
+          }
+        },
+        {
+          "id": "f5Kk485weez",
+          "sdkName": "campaignRegistrations",
+          "definition": {
+            "name": "Campaign Registrations",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tkoDkB48RfM",
+              "isInverse": true,
+              "allowMultiple": true,
+              "inverseFieldId": "fewjBmLHXpj"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "tkoDkB48RfM",
+      "sdkName": "campaignRegistrations",
+      "name": "Campaign Registrations",
+      "primaryFieldId": "f528CWpZ8Fs",
+      "fields": [
+        {
+          "id": "f528CWpZ8Fs",
+          "sdkName": "fullName",
+          "definition": {
+            "name": "Full Name",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fpUA6EevYCR",
+          "sdkName": "phone",
+          "definition": {
+            "name": "Phone",
+            "type": "phone_number",
+            "template": {}
+          }
+        },
+        {
+          "id": "fewjBmLHXpj",
+          "sdkName": "campaign",
+          "definition": {
+            "name": "Campaign",
+            "type": "linked_record",
+            "template": {
+              "tableId": "tmoRRHGCaA6",
+              "isInverse": false,
+              "allowMultiple": true,
+              "inverseFieldId": "f5Kk485weez"
+            }
+          }
+        },
+        {
+          "id": "f6xwQMwCAjX",
+          "sdkName": "memberId",
+          "definition": {
+            "name": "Member Id",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "f9DMVzQzKX5",
+          "sdkName": "kind",
+          "definition": {
+            "name": "Kind",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "nyD2",
+                  "label": "register",
+                  "color": "purple"
+                },
+                {
+                  "value": "2P75",
+                  "label": "code",
+                  "color": "orange"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "fiCPxcugrdz",
+          "sdkName": "status",
+          "definition": {
+            "name": "Status",
+            "type": "single_select",
+            "template": {
+              "options": [
+                {
+                  "value": "sdeC",
+                  "label": "confirmed",
+                  "color": "purple"
+                },
+                {
+                  "value": "6tw1",
+                  "label": "waitlist",
+                  "color": "orange"
+                },
+                {
+                  "value": "jUQm",
+                  "label": "canceled",
+                  "color": "blue"
+                },
+                {
+                  "value": "ndxN",
+                  "label": "attended",
+                  "color": "gray"
+                }
+              ],
+              "disableColors": false
+            }
+          }
+        },
+        {
+          "id": "f9exuwwP1A8",
+          "sdkName": "code",
+          "definition": {
+            "name": "Code",
+            "type": "single_line_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fjvMJ7Aaktt",
+          "sdkName": "note",
+          "definition": {
+            "name": "Note",
+            "type": "long_text",
+            "template": {}
+          }
+        },
+        {
+          "id": "fnegwz3WeCu",
+          "sdkName": "created",
+          "definition": {
+            "name": "Created",
+            "type": "created_at",
+            "template": {
+              "timezone": "",
+              "dateFormat": "local",
+              "timeFormat": "12h",
+              "displayTimeZone": false
+            }
+          }
         }
       ]
     }

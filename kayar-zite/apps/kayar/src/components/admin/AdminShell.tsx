@@ -2,7 +2,7 @@ import ErrorNotice from '../ErrorNotice';
 import { useEffect, useState, type FormEvent } from 'react';
 import { publicSettings } from 'zitejs/api';
 import { NavLink, Outlet, Navigate, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Users, UserCog, FileText, Newspaper, Image, Music, Megaphone, ShoppingBag, MessageSquareText, Settings, History, Menu, LogOut, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, FileText, Newspaper, Image, Music, Megaphone, MessageSquareText, Settings, History, Menu, LogOut, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle } from '@project/components/ui/sheet';
 import { cn } from '@project/components/lib/utils';
 import { KayarLogo, KButton, FloatInput, PasswordField } from '../kit';
@@ -19,7 +19,6 @@ export const adminNav = [
   { to: '/admin/morshed', label: 'مرشد', icon: Music, perm: 'morshed.manage' },
   { to: '/admin/announcements', label: 'اعلان‌ها', icon: Megaphone, perm: 'announcements.manage' },
   { to: '/admin/campaigns', label: 'پیشنهادات کایار', icon: Sparkles, perm: 'shop.manage' },
-  { to: '/admin/shop', label: 'پیشنهادات · محصولات فروشگاه', icon: ShoppingBag, perm: 'shop.manage' },
   { to: '/admin/sms', label: 'پنل پیامک', icon: MessageSquareText, perm: 'sms.manage' },
   { to: '/admin/settings', label: 'تنظیمات', icon: Settings, perm: 'settings.manage' },
   { to: '/admin/audit', label: 'گزارش فعالیت', icon: History, perm: 'audit.read' },

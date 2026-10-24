@@ -63,6 +63,7 @@
 //
 // Link tables for zite.sql() JOINs (use these exact names):
 //   "PodcastEpisodesPodcastShows" — columns: "podcastEpisodesId", "podcastShowsId" (joins "Podcast Episodes" and "Podcast Shows")
+//   "CampaignRegistrationsCampaigns" — columns: "campaignRegistrationsId", "campaignsId" (joins "Campaign Registrations" and "Campaigns")
 import { createTableClient, createSqlClient, createAuthClient } from 'zitejs/runtime';
 
 /** An attachment as returned when reading a record. */
@@ -978,6 +979,27 @@ export type CampaignsRecordType = {
   clicks?: number;
   /** Read-only. "Created". Auto-set when record was created (ISO 8601) */
   created?: string;
+  gallery?: string;
+  features?: string;
+  specs?: string;
+  terms?: string;
+  /** "Amount". 0 decimal places, format: local (e.g. 1,000,000.50) */
+  amount?: number;
+  /** "Stock". 0 decimal places, format: local (e.g. 1,000,000.50) */
+  stock?: number;
+  purchasable?: boolean;
+  videoUrl?: string;
+  location?: string;
+  sponsorLogo?: string;
+  sponsorWebsite?: string;
+  /** "Sold". 0 decimal places, format: local (e.g. 1,000,000.50) */
+  sold?: number;
+  actionType?: "buy" | "register" | "code" | "partner" | "info" | string;
+  partnerApiUrl?: string;
+  partnerName?: string;
+  uniqueCodes?: boolean;
+  /** Links to campaignRegistrations ("Campaign Registrations"). "Campaign Registrations" */
+  campaignRegistrations?: string | string[];
 };
 
 /** What you may write when creating or updating a record in the "Campaigns" table. */
@@ -1002,6 +1024,52 @@ export type CampaignsRecordInput = {
   endsAt: string | Date | null;
   impressions: string | number | null;
   clicks: string | number | null;
+  gallery: string | null;
+  features: string | null;
+  specs: string | null;
+  terms: string | null;
+  amount: string | number | null;
+  stock: string | number | null;
+  purchasable: string | boolean | null;
+  videoUrl: string | null;
+  location: string | null;
+  sponsorLogo: string | null;
+  sponsorWebsite: string | null;
+  sold: string | number | null;
+  actionType: "buy" | "register" | "code" | "partner" | "info" | string | null;
+  partnerApiUrl: string | null;
+  partnerName: string | null;
+  uniqueCodes: string | boolean | null;
+  campaignRegistrations: string | string[] | null;
+};
+
+/** A record in the "Campaign Registrations" table, as it is read back. */
+export type CampaignRegistrationsRecordType = {
+  id: string;
+  /** Primary field. "Full Name" */
+  fullName?: string;
+  phone?: string;
+  /** Links to campaigns ("Campaigns"). "Campaign" */
+  campaign?: string | string[];
+  memberId?: string;
+  kind?: "register" | "code" | string;
+  status?: "confirmed" | "waitlist" | "canceled" | "attended" | string;
+  code?: string;
+  note?: string;
+  /** Read-only. "Created". Auto-set when record was created (ISO 8601) */
+  created?: string;
+};
+
+/** What you may write when creating or updating a record in the "Campaign Registrations" table. */
+export type CampaignRegistrationsRecordInput = {
+  fullName: string | null;
+  phone: string | null;
+  campaign: string | string[] | null;
+  memberId: string | null;
+  kind: "register" | "code" | string | null;
+  status: "confirmed" | "waitlist" | "canceled" | "attended" | string | null;
+  code: string | null;
+  note: string | null;
 };
 
 export interface ZiteAuthUser {
@@ -1043,6 +1111,7 @@ export const zite = {
   orders: createTableClient<OrdersRecordType, OrdersRecordInput>('Orders'), // "Orders"
   smsMessages: createTableClient<SmsMessagesRecordType, SmsMessagesRecordInput>('SmsMessages'), // "Sms Messages"
   campaigns: createTableClient<CampaignsRecordType, CampaignsRecordInput>('Campaigns'), // "Campaigns"
+  campaignRegistrations: createTableClient<CampaignRegistrationsRecordType, CampaignRegistrationsRecordInput>('CampaignRegistrations'), // "Campaign Registrations"
   sql: createSqlClient(),
   auth: createAuthClient<ZiteAuthUser>(),
 };
