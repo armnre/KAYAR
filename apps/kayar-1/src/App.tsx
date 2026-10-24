@@ -9,7 +9,16 @@ import { SessionProvider } from './lib/session';
 import { Landing, BlogList, BlogPost, StaticPage } from './pages/Site';
 import { Login, ChangePassword } from './pages/AppAuth';
 import AppShell from './components/app/AppShell';
-import { AppHome, Morshed, Bodyyar, Profile, Notifications } from './pages/AppPages';
+import { AppHome, Morshed, Profile, Notifications } from './pages/AppPages';
+import Dashboard from './pages/bodyyar/Dashboard';
+import Onboarding from './pages/bodyyar/Onboarding';
+import Plan from './pages/bodyyar/Plan';
+import Session from './pages/bodyyar/Session';
+import Exercises from './pages/bodyyar/Exercises';
+import ExerciseDetail from './pages/bodyyar/ExerciseDetail';
+import Nutrition from './pages/bodyyar/Nutrition';
+import Progress from './pages/bodyyar/Progress';
+import Coach from './pages/bodyyar/Coach';
 import AdminShell, { AdminLogin } from './components/admin/AdminShell';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
 import { NotFound, Styleguide } from './pages/Misc';
@@ -34,7 +43,15 @@ export default function App() {
           <Route path="/app" element={<AppShell />}>
             <Route index element={<AppHome />} />
             <Route path="morshed" element={<Morshed />} />
-            <Route path="bodyyar" element={<Bodyyar />} />
+            <Route path="bodyyar" element={<Dashboard />} />
+            <Route path="bodyyar/profile" element={<Onboarding />} />
+            <Route path="bodyyar/plan" element={<Plan />} />
+            <Route path="bodyyar/session/:day" element={<Session />} />
+            <Route path="bodyyar/exercises" element={<Exercises />} />
+            <Route path="bodyyar/exercises/:slug" element={<ExerciseDetail />} />
+            <Route path="bodyyar/nutrition" element={<Nutrition />} />
+            <Route path="bodyyar/progress" element={<Progress />} />
+            <Route path="bodyyar/coach" element={<Coach />} />
             <Route path="profile" element={<Profile />} />
             <Route path="notifications" element={<Notifications />} />
           </Route>

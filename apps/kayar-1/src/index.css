@@ -89,6 +89,9 @@
 }
 
 @layer components {
+  .latin { font-family: var(--font-latin); direction: ltr; unicode-bidi: isolate; }
+  .surface { @apply rounded-[28px] bg-card border border-border; }
+  .pb-nav { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 9.5rem); }
   .font-latin { font-family: var(--font-latin); }
   .glass {
     background: linear-gradient(160deg, hsl(0 0% 100% / .07), hsl(0 0% 100% / .02));

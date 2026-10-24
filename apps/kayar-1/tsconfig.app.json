@@ -10,8 +10,6 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    /* only the react 18 types of this app must be visible (the repo root also holds react 19 for the gateway) */
-    "typeRoots": ["./node_modules/@types"],
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -25,6 +23,8 @@
     "incremental": true,
 
     /* Linting - matching typechecker.ts settings */
+    /* We don't want to be too strict, this is mainly focused on whether the app */
+    /* compiles, or if there are explicit type errors like passing wrong props */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
@@ -33,6 +33,6 @@
     "noUncheckedSideEffectImports": true,
     "strictNullChecks": true
   },
-  "include": ["src"],
+  "include": ["src", ".zite", "zite.auth.ts", ".zite/user-extensions.d.ts", ".zite/env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
