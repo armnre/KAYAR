@@ -7,6 +7,7 @@ import { Switch } from '@project/components/ui/switch';
 import { KButton, Glass, IconBox, FloatInput, StateView } from '../../components/kit';
 import { PageHead, ListSkeleton, ErrorState, fmtDate, ResponsiveModal } from '../../components/admin/ui';
 import { useAdmin, errMsg } from '../../lib/session';
+import { SeedCard } from '../../components/admin/SeedCard';
 import { fa, faNum } from '../../lib/config';
 
 export const ACTION_FA: Record<string, string> = {
@@ -82,6 +83,7 @@ export function AdminSettings() {
           <label className="flex min-h-[48px] items-center justify-between gap-3"><span>حالت تعمیر</span><Switch checked={s.maintenance} onCheckedChange={(v) => setS({ ...s, maintenance: v })} /></label>
           {s.maintenance && <FloatInput id="mm" label="پیام حالت تعمیر" value={s.maintenanceMessage} onChange={t('maintenanceMessage')} />}
         </Glass>
+        <SeedCard token={token} />
         <Glass className="space-y-2 p-5"><div className="font-bold">وضعیت رازها</div><p className="text-sm text-muted-foreground">مقادیر هرگز نمایش داده نمی‌شوند؛ از تنظیمات Zite → Secrets ثبت کنید.</p>
           {d.secrets.map((x) => <div key={x.key} className="flex min-h-[44px] items-center justify-between gap-2"><span className="truncate font-latin text-sm" dir="ltr">{x.key}</span>{x.set ? <span className="flex items-center gap-1 text-sm text-primary"><CheckCircle2 className="h-4 w-4" />تنظیم شده</span> : <span className="flex items-center gap-1 text-sm text-muted-foreground"><XCircle className="h-4 w-4" />تنظیم نشده</span>}</div>)}
         </Glass>
