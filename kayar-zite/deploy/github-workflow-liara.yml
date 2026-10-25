@@ -1,12 +1,15 @@
-name: Deploy to Liara
+name: Deploy KAYAR to Liara
 on:
   push:
     branches: [main]
+    paths: ['kayar-zite/**', '.github/workflows/liara.yml']
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: kayar-zite
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

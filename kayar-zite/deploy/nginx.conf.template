@@ -6,7 +6,7 @@ server {
   client_max_body_size 50m;
 
   gzip on;
-  gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+  gzip_types text/plain text/css application/javascript application/json image/svg+xml application/manifest+json;
   gzip_min_length 1024;
 
   add_header X-Content-Type-Options nosniff always;
@@ -26,11 +26,17 @@ server {
     proxy_read_timeout 180s;
   }
 
-  location /assets/ {
+  location ^~ /assets/ {
     expires 1y;
     add_header Cache-Control "public, immutable";
     try_files $uri =404;
   }
+
+  location = /healthz { access_log off; return 200 'ok'; }
+
+  location = /manifest.webmanifest { types { application/manifest+json webmanifest; } add_header Cache-Control "public, max-age=86400"; }
+
+  location ~* \.(png|svg|ico|jpg|webp|woff2?)$ { expires 30d; add_header Cache-Control "public"; try_files $uri =404; }
 
   location / {
     add_header Cache-Control "no-cache";

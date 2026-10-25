@@ -111,9 +111,9 @@ export type BodyProfilesRecordType = {
   weightKg?: number;
   memberId?: string;
   sex?: "male" | "female" | string;
-  activityLevel?: string;
   /** "Target Weight Kg". 1 decimal places, format: local (e.g. 1,000,000.50) */
   targetWeightKg?: number;
+  activityLevel?: string;
   /** "Sleep Hours". 1 decimal places, format: local (e.g. 1,000,000.50) */
   sleepHours?: number;
   allergies?: string;
@@ -137,8 +137,8 @@ export type BodyProfilesRecordInput = {
   weightKg: string | number | null;
   memberId: string | null;
   sex: "male" | "female" | string | null;
-  activityLevel: string | null;
   targetWeightKg: string | number | null;
+  activityLevel: string | null;
   sleepHours: string | number | null;
   allergies: string | null;
   waistCm: string | number | null;
@@ -869,20 +869,20 @@ export type ProductsRecordType = {
   /** Primary field. "Name" */
   name?: string;
   description?: string;
-  /** "Price". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Price". 0 decimal places, format: local (e.g. 1,000,000.50) */
   price?: number;
-  /** "Compare At Price". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Compare At Price". 0 decimal places, format: local (e.g. 1,000,000.50) */
   compareAtPrice?: number;
   image?: string;
   gallery?: string;
   category?: string;
   badge?: string;
-  /** "Stock". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Stock". 0 decimal places, format: local (e.g. 1,000,000.50) */
   stock?: number;
   externalLink?: string;
   active?: boolean;
   featured?: boolean;
-  /** "Sort Order". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Sort Order". 0 decimal places, format: local (e.g. 1,000,000.50) */
   sortOrder?: number;
   /** Read-only. "Created". Auto-set when record was created (ISO 8601) */
   created?: string;
@@ -912,7 +912,7 @@ export type OrdersRecordType = {
   orderNumber?: number;
   memberId?: string;
   itemsJson?: string;
-  /** "Amount". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Amount". 0 decimal places, format: local (e.g. 1,000,000.50) */
   amount?: number;
   status?: "pending" | "paid" | "failed" | "canceled" | "shipped" | string;
   gateway?: string;
@@ -998,16 +998,16 @@ export type CampaignsRecordType = {
   features?: string;
   specs?: string;
   terms?: string;
-  /** "Amount". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Amount". 0 decimal places, format: local (e.g. 1,000,000.50) */
   amount?: number;
-  /** "Stock". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Stock". 0 decimal places, format: local (e.g. 1,000,000.50) */
   stock?: number;
   purchasable?: boolean;
   videoUrl?: string;
   location?: string;
   sponsorLogo?: string;
   sponsorWebsite?: string;
-  /** "Sold". 1 decimal places, format: local (e.g. 1,000,000.50) */
+  /** "Sold". 0 decimal places, format: local (e.g. 1,000,000.50) */
   sold?: number;
   actionType?: "buy" | "register" | "code" | "partner" | "info" | string;
   partnerApiUrl?: string;
@@ -1063,9 +1063,9 @@ export type CampaignRegistrationsRecordType = {
   id: string;
   /** Primary field. "Full Name" */
   fullName?: string;
+  phone?: string;
   /** Links to campaigns ("Campaigns"). "Campaign" */
   campaign?: string | string[];
-  phone?: string;
   memberId?: string;
   kind?: "register" | "code" | string;
   status?: "confirmed" | "waitlist" | "canceled" | "attended" | string;
@@ -1078,8 +1078,8 @@ export type CampaignRegistrationsRecordType = {
 /** What you may write when creating or updating a record in the "Campaign Registrations" table. */
 export type CampaignRegistrationsRecordInput = {
   fullName: string | null;
-  campaign: string | string[] | null;
   phone: string | null;
+  campaign: string | string[] | null;
   memberId: string | null;
   kind: "register" | "code" | string | null;
   status: "confirmed" | "waitlist" | "canceled" | "attended" | string | null;

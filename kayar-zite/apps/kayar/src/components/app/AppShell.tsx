@@ -142,7 +142,7 @@ export default function AppShell() {
           <div className="mt-auto"><MiniPlayer /></div>
         </aside>
         <div className="min-w-0">
-          <header className="sticky top-0 z-30 flex h-[var(--header-h)] items-center justify-between border-b border-border bg-background px-4 lg:hidden">
+          <header className="sticky top-0 z-30 flex h-[calc(var(--header-h)+var(--safe-t))] items-center justify-between border-b border-border bg-background/85 px-4 pt-[var(--safe-t)] backdrop-blur-xl lg:hidden">
             <KayarLogo className="text-base" />
             <Link to="/app/notifications" className="tap grid place-items-center rounded-full" aria-label="اعلان‌ها"><Bell className="h-5 w-5" /></Link>
           </header>

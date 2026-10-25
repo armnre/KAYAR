@@ -26,13 +26,13 @@ import { AdminCampaigns } from './pages/admin/Campaigns';
 import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
 import { NotFound, Styleguide } from './pages/Misc';
+import { applyHeadTags } from './lib/headTags';
 
 export default function App() {
   useEffect(() => {
     const h = document.documentElement;
     h.lang = 'fa'; h.dir = 'rtl'; h.classList.add('dark', 'js');
-    const vp = document.querySelector('meta[name="viewport"]');
-    if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+    applyHeadTags();
   }, []);
   return (
     <SessionProvider scope="app"><SessionProvider scope="admin"><PreviewProvider><CmsProvider>

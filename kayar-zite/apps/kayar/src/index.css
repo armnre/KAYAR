@@ -167,3 +167,21 @@
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
   .ticker-track, .animate-spin-slow, .animate-float { animation: none !important; }
 }
+
+/* Responsive & UX hardening — all devices */
+@layer base {
+  html, body { max-width: 100%; overflow-x: clip; }
+  body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  img, video, svg, canvas { max-width: 100%; }
+  h1, h2, h3, p, li, td { overflow-wrap: anywhere; }
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+  @media (max-width: 767px) {
+    input, select, textarea { font-size: 16px !important; } /* prevents iOS zoom on focus */
+  }
+  @media (pointer: coarse) {
+    button, a, [role="button"] { touch-action: manipulation; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  }
+}
