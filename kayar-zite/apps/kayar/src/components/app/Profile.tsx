@@ -9,6 +9,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Glass } from '../kit';
 import { KayarAvatar } from '../KayarAvatar';
 import { BodyCard } from './BodyCard';
+import { AvatarPicker } from './AvatarPicker';
+import { Pencil } from 'lucide-react';
 import { H } from './HomeMorshed';
 import { useSession, errMsg } from '../../lib/session';
 import { usePreview } from '../../lib/preview';
@@ -23,7 +25,8 @@ const Row = ({ icon: I, t, d, onClick, danger }: { icon: typeof Heart; t: string
 );
 
 export function Profile() {
-  const { member, logout, token } = useSession('app');
+  const { member, logout, token, refresh } = useSession('app');
+  const [pick, setPick] = useState(false);
   const { favs } = usePreview();
   const nav = useNavigate();
   const [sessions, setSessions] = useState<AuthSessionsOutputType['sessions'] | null>(null);
@@ -36,7 +39,11 @@ export function Profile() {
     <div className="pb-6">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-[32px] bg-[radial-gradient(120%_140%_at_100%_0%,hsl(var(--primary)/.35),transparent_55%),radial-gradient(120%_140%_at_0%_100%,hsl(254_90%_60%/.35),transparent_55%)] p-6 ring-1 ring-white/10">
         <div className="flex items-center gap-4">
-          <KayarAvatar name={member?.displayName} seed={member?.username} size={88} />
+          <button onClick={() => setPick(true)} className="press group relative" aria-label="تغییر آواتار">
+            <KayarAvatar name={member?.displayName} avatar={member?.avatar} size={88} />
+            <span className="absolute -bottom-0.5 end-0 grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground ring-4 ring-background"><Pencil className="h-3.5 w-3.5" /></span>
+          </button>
+          {token && <AvatarPicker key={String(pick)} open={pick} onOpenChange={setPick} token={token} current={member?.avatar} onSaved={refresh} />}
           <div className="min-w-0"><div className="truncate text-2xl font-black">{member?.displayName}</div><div className="font-latin text-sm text-muted-foreground" dir="ltr">@{member?.username}</div>
             <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-1 text-[11px] font-bold text-primary"><ShieldCheck className="h-3.5 w-3.5" />عضو کایار</span></div>
         </div>

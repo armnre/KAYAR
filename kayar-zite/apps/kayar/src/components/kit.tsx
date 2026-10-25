@@ -168,6 +168,17 @@ export function useReveal() {
   });
 }
 
+const GEN_COVERS = [
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/qmdMK1o3vEstTkde5fT9UH/img_tdlYlUJllc671jNd.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/pqkVBw6tnDyBpJUi9HCC8H/img_dOFrwvxRIxhSPoP2.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/3F4URT2YpYJ1PdmWXUDjsA/img_YRw32oFok7DDtzPM.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/x68G9FHZRs685JxKqEsWhq/img_BKDdvmayqguR-907.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/vw6zw2z1X1vszeozSSFT8c/img_OmY9BhW7BVEnw9wg.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/hBv9MWmzoMehVQGdzev28p/img_szairvjuFoZs1zUl.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/wec9HYykkErmrAW9VoLKPr/img_hMF4T8_VbKI7rjrd.jpg',
+  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/oghJwRjHe9titUJgwNtyHm/img_peZgD-eX58v4Btxi.jpg',
+];
+
 /** Track artwork. Real cover when present; otherwise a unique generative cover per track (6 styles × hue pairs), so rows never look uniform. */
 export function Cover({ hue, image, title, className, children }: { hue: number; image?: string; title?: string; className?: string; children?: ReactNode }) {
   const [broken, setBroken] = useState(false);
@@ -191,14 +202,18 @@ export function Cover({ hue, image, title, className, children }: { hue: number;
     <g key="5"><path d="M10 90 L50 20 L90 90 Z" fill="none" stroke="white" strokeOpacity=".35" strokeWidth=".9" /><path d="M30 90 L50 55 L70 90 Z" fill="white" fillOpacity=".12" /></g>,
   ][v];
   const showImg = image && !broken;
+  const key = [...(title || String(hue))].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, hue + 7);
+  const art2 = GEN_COVERS[key % GEN_COVERS.length];
+  const tint = (key >> 3) % 70 - 35;
   return (
     <div className={cn('relative overflow-hidden rounded-2xl', className)} style={{ background: bg }}>
       {!showImg && (
         <>
-          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden>{art}</svg>
-          {letter ? <span className="absolute bottom-[8%] start-[10%] text-[2.2em] font-black leading-none text-white/85 drop-shadow-md">{letter}</span>
-            : <svg viewBox="0 0 24 24" className="absolute left-1/2 top-1/2 h-1/3 w-1/3 -translate-x-1/2 -translate-y-1/2 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>}
-          <span className="absolute end-[8%] top-[8%] font-latin text-[9px] font-black tracking-[.2em] text-white/60">KAYAR</span>
+          <img src={art2} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" style={{ filter: `hue-rotate(${tint}deg) saturate(1.15)`, transform: `scale(${1.05 + (key % 4) * 0.08}) rotate(${(key % 3) * 90}deg)` }} />
+          <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full mix-blend-overlay opacity-60" aria-hidden>{art}</svg>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          {letter && <span className="absolute bottom-[7%] start-[9%] text-[2.2em] font-black leading-none text-white drop-shadow-[0_2px_12px_rgba(0,0,0,.6)]">{letter}</span>}
+          <span className="absolute end-[8%] top-[8%] rounded-full bg-black/35 px-1.5 py-0.5 font-latin text-[8px] font-black tracking-[.2em] text-primary backdrop-blur">KAYAR</span>
         </>
       )}
       {showImg && <img src={image} alt="" loading="lazy" onError={() => setBroken(true)} className="absolute inset-0 h-full w-full object-cover" />}

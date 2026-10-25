@@ -21,6 +21,7 @@ export default createEndpoint({
     if (Number(rows[0]?.n ?? 0) >= 5) throw new ZiteError({ code: 'RATE_LIMITED', message: 'plan quota', userFacingMessage: 'امروز به سقف ساخت برنامه رسیدی؛ فردا دوباره امتحان کن.' });
 
     const { records: catalog } = await zite.exercises.findAll({ limit: 500 });
+    if (catalog.length < 10) throw new ZiteError({ code: 'INTERNAL_ERROR', message: 'exercise catalog empty', userFacingMessage: 'کتابخانه حرکات هنوز آماده نیست؛ با پشتیبانی تماس بگیر.' });
     const bySlug = new Map(catalog.map((e) => [e.slug ?? '', e]));
     const catalogText = catalog.map((e) => `${e.slug} | ${e.name} | ${e.category} | ${e.difficulty} | ${e.location} | ${e.equipment}`).join('\n');
 

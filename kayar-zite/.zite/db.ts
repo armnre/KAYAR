@@ -564,6 +564,7 @@ export type MembersRecordType = {
   tags?: ("vip" | string)[];
   /** Read-only. "Created At". Auto-set when record was created (ISO 8601) */
   createdAt?: string;
+  avatar?: string;
 };
 
 /** What you may write when creating or updating a record in the "Members" table. */
@@ -581,6 +582,7 @@ export type MembersRecordInput = {
   note: string | null;
   createdBy: string | null;
   tags: "vip" | string | ("vip" | string)[] | null;
+  avatar: string | null;
 };
 
 /** A record in the "Sessions" table, as it is read back. */

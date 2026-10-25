@@ -44,6 +44,7 @@ import type { default as _PublicPostsEp } from '../src/api/publicPosts';
 import type { default as _PublicSettingsEp } from '../src/api/publicSettings';
 import type { default as _SaveProfileEp } from '../src/api/saveProfile';
 import type { default as _SaveSessionEp } from '../src/api/saveSession';
+import type { default as _SetAvatarEp } from '../src/api/setAvatar';
 import type { default as _WeightLogEp } from '../src/api/weightLog';
 
 type _AdminAnnouncementsCfg = typeof _AdminAnnouncementsEp;
@@ -256,6 +257,11 @@ export type SaveSessionInputType = NonNullable<_SaveSessionCfg['inputSchema']> e
 export type SaveSessionOutputType = Awaited<ReturnType<_SaveSessionCfg['execute']>>;
 export const saveSession = createCaller<SaveSessionInputType, SaveSessionOutputType>('saveSession');
 
+type _SetAvatarCfg = typeof _SetAvatarEp;
+export type SetAvatarInputType = NonNullable<_SetAvatarCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_SetAvatarCfg['execute']>[0]['input'];
+export type SetAvatarOutputType = Awaited<ReturnType<_SetAvatarCfg['execute']>>;
+export const setAvatar = createCaller<SetAvatarInputType, SetAvatarOutputType>('setAvatar');
+
 type _WeightLogCfg = typeof _WeightLogEp;
 export type WeightLogInputType = NonNullable<_WeightLogCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_WeightLogCfg['execute']>[0]['input'];
 export type WeightLogOutputType = Awaited<ReturnType<_WeightLogCfg['execute']>>;
@@ -305,5 +311,6 @@ export const api = {
   publicSettings,
   saveProfile,
   saveSession,
+  setAvatar,
   weightLog,
 };

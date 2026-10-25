@@ -9,7 +9,7 @@ import { useSession } from '../../lib/session';
 import { fa } from '../../lib/config';
 import { KayarAvatar } from '../KayarAvatar';
 
-function NavMe() { const { member } = useSession('app'); return <KayarAvatar name={member?.displayName} seed={member?.username} size={26} />; }
+function NavMe() { const { member } = useSession('app'); return <KayarAvatar name={member?.displayName} avatar={member?.avatar} size={26} />; }
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@project/components/ui/dropdown-menu';
 
 const nav = [

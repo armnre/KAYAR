@@ -1,20 +1,38 @@
 import { cn } from '@project/components/lib/utils';
 
-/** KAYAR-branded avatar: initials on a seeded gradient, wrapped in the signature lime→violet orbit ring. */
-export function KayarAvatar({ name, seed, size = 88, className }: { name?: string | null; seed?: string; size?: number; className?: string }) {
-  const s = seed || name || 'kayar';
-  const hue = [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 17);
-  const initials = (name || 'K').trim().split(/\s+/).map((w) => w.charAt(0)).slice(0, 2).join('');
+export const DEFAULT_AVATAR = 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/tUv967yoEQbf2kXgzJ2QNw/img_5yQQMd9HFJmzE6lD.jpg';
+
+/** Generated KAYAR athlete avatars members can choose from. Keys are stored on the member. */
+export const AVATARS: { key: string; url: string; label: string }[] = [
+  { key: 'a1', label: 'هودی', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/wFDXRTYZrTfrf4ykDqF9Gw/img_NPTC6LKfI-efy95o.jpg' },
+  { key: 'a2', label: 'ورزشکار', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/dYVJPwVCG3Co1jRz3EDbS5/img_IvSGU4Y9EyxWj_EC.jpg' },
+  { key: 'a3', label: 'بوکسور', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/55Z1Dpn5VA3ertaxdCX9ks/img_PmlJOYx89IXH3hXs.jpg' },
+  { key: 'a4', label: 'دونده', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/kxp7FguxujHVkJAcLjPTWV/img_Ijs-MU2y5eutRyai.jpg' },
+  { key: 'a5', label: 'اسپرینتر', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/udeeBdZmJwhkYUEhiv9479/img__M-eXI4LZhYpz6c0.jpg' },
+  { key: 'a6', label: 'فیتنس', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/jmMqRyj4mh6mEeBbbtvkRP/img_YPeP9Lmkbm2z1LxT.jpg' },
+  { key: 'a7', label: 'بدنساز', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/j1dbs5aPHucVDb3L8AKRs1/img_TQzghF2qqQqa0mNm.jpg' },
+  { key: 'a8', label: 'یوگا', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/mGHwdLt3NbTn7SqtPqZL8N/img_OAr7eEgRO29rWKB4.jpg' },
+  { key: 'a9', label: 'دوچرخه‌سوار', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/o9b8HZYhoCPUu4FBti2MRi/img_efKYh_dUxyVXfn3L.jpg' },
+  { key: 'a10', label: 'بوکس بانوان', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/ePw4m9oLu2TRHC6DpaKJMY/img_WZD7MZhtsVRgaQa7.jpg' },
+  { key: 'a11', label: 'کاپیتان', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/2Uhx2rbsKWd7H6EZNpd4bU/img_pkRGKNfX1WL7Ndo_.jpg' },
+  { key: 'a12', label: 'ببر', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/qsTny3Pn7H1PJi4iczp5d3/img_Qeve7KppK8G-DbGe.jpg' },
+  { key: 'a13', label: 'گرگ', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/9dA6Yd6PqxA6McesxushzL/img_zvibJPwz2prY0kek.jpg' },
+  { key: 'a14', label: 'ربات', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/1SvPjxznrBPa1UqdSP6WLC/img_cTJdO1njoiSADeI2.jpg' },
+  { key: 'a15', label: 'شناگر', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/idqc5GrvgFP1YBi5BXqhCF/img_6WagbIWk1YQqrCa_.jpg' },
+  { key: 'a16', label: 'فوتبالیست', url: 'https://images.fillout.com/903696/3gnpsh9aon/generated-images/9NRnzLDEnpnYYUxHJup5Sz/img_YMpBHNGhgisY4h4n.jpg' },
+];
+export const avatarUrl = (key?: string | null) => AVATARS.find((a) => a.key === key)?.url ?? DEFAULT_AVATAR;
+
+/** KAYAR avatar: the member's chosen generated athlete (or the shared default) inside the neon ring. */
+export function KayarAvatar({ avatar, name, size = 88, className }: { avatar?: string | null; name?: string | null; size?: number; className?: string }) {
+  const small = size < 48;
   return (
     <div className={cn('relative shrink-0', className)} style={{ width: size, height: size }}>
-      <div className="absolute inset-0 animate-[spin_8s_linear_infinite] rounded-full bg-[conic-gradient(from_0deg,hsl(var(--primary)),hsl(var(--violet)),hsl(var(--cyan)),hsl(var(--primary)))] p-[3px] shadow-[0_10px_40px_-8px_hsl(var(--primary)/.7)]">
-        <div className="h-full w-full rounded-full bg-background" />
+      {!small && <div className="absolute -inset-1.5 rounded-full bg-[conic-gradient(hsl(var(--primary)),hsl(var(--violet)),hsl(var(--cyan)),hsl(var(--primary)))] opacity-35 blur-lg" />}
+      <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_200deg,hsl(var(--primary)),hsl(var(--violet)),hsl(var(--cyan)),hsl(var(--primary)))]" />
+      <div className={cn('absolute overflow-hidden rounded-full bg-background', small ? 'inset-[2px]' : 'inset-[3px]')}>
+        <img src={avatarUrl(avatar)} alt={name ?? ''} className="h-full w-full scale-110 object-cover" />
       </div>
-      <div className="absolute inset-[6px] overflow-hidden rounded-full" style={{ background: `radial-gradient(120% 100% at 25% 15%, hsl(${hue} 80% 55%), hsl(${(hue + 60) % 360} 70% 25%) 65%, hsl(220 20% 8%))` }}>
-        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full opacity-25" aria-hidden><path d="M30 20 L30 80 M30 50 L70 20 M42 42 L72 80" stroke="white" strokeWidth="9" strokeLinecap="round" fill="none" /></svg>
-        <span className="absolute inset-0 grid place-items-center font-black text-white drop-shadow-lg" style={{ fontSize: size * 0.32 }}>{initials}</span>
-      </div>
-      <span className="absolute -bottom-0.5 end-0 grid place-items-center rounded-full bg-primary font-latin font-black text-primary-foreground ring-4 ring-background" style={{ width: size * 0.3, height: size * 0.3, fontSize: size * 0.13 }}>K</span>
     </div>
   );
 }
