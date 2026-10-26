@@ -1,0 +1,484 @@
+{
+ "BodyProfiles": {
+  "key": "bodyProfiles",
+  "fields": {
+   "goal": "text",
+   "owner": "user",
+   "level": "text",
+   "daysPerWeek": "number",
+   "place": "text",
+   "equipment": "text",
+   "sessionMinutes": "number",
+   "diet": "text",
+   "limitations": "text",
+   "age": "number",
+   "heightCm": "number",
+   "weightKg": "number",
+   "memberId": "text",
+   "sex": "text",
+   "targetWeightKg": "number",
+   "activityLevel": "text",
+   "sleepHours": "number",
+   "allergies": "text",
+   "waistCm": "number"
+  }
+ },
+ "Exercises": {
+  "key": "exercises",
+  "fields": {
+   "name": "text",
+   "slug": "text",
+   "englishName": "text",
+   "category": "text",
+   "muscles": "text",
+   "equipment": "text",
+   "difficulty": "text",
+   "location": "text",
+   "bodyweight": "bool",
+   "instructions": "text",
+   "mistakes": "text",
+   "safety": "text",
+   "alternatives": "text",
+   "mediaFrames": "text"
+  }
+ },
+ "WorkoutPlans": {
+  "key": "workoutPlans",
+  "fields": {
+   "title": "text",
+   "owner": "user",
+   "planJson": "text",
+   "active": "bool",
+   "created": "created",
+   "memberId": "text",
+   "nutritionJson": "text"
+  }
+ },
+ "WorkoutSessions": {
+  "key": "workoutSessions",
+  "fields": {
+   "title": "text",
+   "owner": "user",
+   "clientKey": "text",
+   "startedAt": "ts",
+   "durationSec": "number",
+   "totalSets": "number",
+   "totalVolumeKg": "number",
+   "setsJson": "text",
+   "memberId": "text"
+  }
+ },
+ "WeightLogs": {
+  "key": "weightLogs",
+  "fields": {
+   "date": "date",
+   "owner": "user",
+   "weightKg": "number",
+   "memberId": "text"
+  }
+ },
+ "Foods": {
+  "key": "foods",
+  "fields": {
+   "name": "text",
+   "category": "text",
+   "caloriesPer100g": "number",
+   "proteinPer100g": "number",
+   "carbsPer100g": "number",
+   "fatPer100g": "number",
+   "defaultServingG": "number",
+   "servingLabel": "text",
+   "tags": "multi",
+   "source": "text"
+  }
+ },
+ "MealLogs": {
+  "key": "mealLogs",
+  "fields": {
+   "foodName": "text",
+   "owner": "user",
+   "date": "date",
+   "meal": "text",
+   "foodId": "text",
+   "grams": "number",
+   "calories": "number",
+   "protein": "number",
+   "carbs": "number",
+   "fat": "number",
+   "memberId": "text"
+  }
+ },
+ "PodcastShows": {
+  "key": "podcastShows",
+  "fields": {
+   "title": "text",
+   "feedUrl": "text",
+   "artwork": "text",
+   "description": "text",
+   "author": "text",
+   "category": "text",
+   "lastSynced": "ts",
+   "syncError": "text",
+   "language": "text",
+   "podcastEpisodes": {
+    "link": true,
+    "table": "podcastEpisodes",
+    "inverse": true
+   }
+  }
+ },
+ "PodcastEpisodes": {
+  "key": "podcastEpisodes",
+  "fields": {
+   "title": "text",
+   "show": {
+    "link": true,
+    "table": "podcastShows",
+    "inverse": false
+   },
+   "guid": "text",
+   "audioUrl": "text",
+   "description": "text",
+   "publishedAt": "ts",
+   "durationSec": "number",
+   "artwork": "text",
+   "link": "text"
+  }
+ },
+ "Favorites": {
+  "key": "favorites",
+  "fields": {
+   "title": "text",
+   "owner": "user",
+   "itemKey": "text",
+   "kind": "text",
+   "subtitle": "text",
+   "audioUrl": "text",
+   "artwork": "text",
+   "memberId": "text",
+   "trackId": "text",
+   "createdAt": "created"
+  }
+ },
+ "ListeningHistory": {
+  "key": "listeningHistory",
+  "fields": {
+   "title": "text",
+   "owner": "user",
+   "itemKey": "text",
+   "kind": "text",
+   "subtitle": "text",
+   "audioUrl": "text",
+   "artwork": "text",
+   "positionSec": "number",
+   "durationSec": "number",
+   "lastPlayed": "updated",
+   "memberId": "text",
+   "trackId": "text",
+   "completed": "bool",
+   "playedAt": "ts"
+  }
+ },
+ "Tracks": {
+  "key": "tracks",
+  "fields": {
+   "title": "text",
+   "artist": "text",
+   "album": "text",
+   "artwork": "text",
+   "audioUrl": "text",
+   "durationSec": "number",
+   "genre": "text",
+   "license": "text",
+   "sourceUrl": "text",
+   "downloadable": "bool",
+   "published": "bool",
+   "featured": "bool",
+   "created": "created",
+   "source": "text",
+   "sourceId": "text",
+   "coverUrl": "text",
+   "durationSeconds": "number",
+   "licenseUrl": "text",
+   "shareUrl": "text",
+   "rights": "text",
+   "categories": "text",
+   "tags": "text",
+   "isFeatured": "bool",
+   "status": "text",
+   "sortOrder": "number",
+   "createdAt": "created"
+  }
+ },
+ "Staff": {
+  "key": "staff",
+  "fields": {
+   "note": "text",
+   "member": "user"
+  }
+ },
+ "Members": {
+  "key": "members",
+  "fields": {
+   "username": "text",
+   "phone": "text",
+   "displayName": "text",
+   "role": "text",
+   "status": "text",
+   "passwordHash": "text",
+   "mustChangePassword": "bool",
+   "passwordChangedAt": "ts",
+   "lastLoginAt": "ts",
+   "orderRef": "text",
+   "note": "text",
+   "createdBy": "text",
+   "tags": "multi",
+   "createdAt": "created",
+   "avatar": "text"
+  }
+ },
+ "Sessions": {
+  "key": "sessions",
+  "fields": {
+   "tokenHash": "text",
+   "memberId": "text",
+   "userAgent": "text",
+   "createdAt": "created",
+   "lastSeenAt": "ts",
+   "expiresAt": "ts",
+   "revokedAt": "ts"
+  }
+ },
+ "LoginAttempts": {
+  "key": "loginAttempts",
+  "fields": {
+   "key": "text",
+   "count": "number",
+   "windowStart": "ts",
+   "lockedUntil": "ts"
+  }
+ },
+ "AuditLogs": {
+  "key": "auditLogs",
+  "fields": {
+   "action": "text",
+   "actorId": "text",
+   "targetType": "text",
+   "targetId": "text",
+   "meta": "text",
+   "createdAt": "created"
+  }
+ },
+ "SiteSettings": {
+  "key": "siteSettings",
+  "fields": {
+   "key": "text",
+   "value": "text",
+   "updatedAt": "updated"
+  }
+ },
+ "CmsBlocks": {
+  "key": "cmsBlocks",
+  "fields": {
+   "key": "text",
+   "content": "text",
+   "status": "text",
+   "publishedContent": "text",
+   "version": "number",
+   "updatedBy": "text",
+   "updatedAt": "updated"
+  }
+ },
+ "CmsBlockVersions": {
+  "key": "cmsBlockVersions",
+  "fields": {
+   "blockKey": "text",
+   "version": "number",
+   "content": "text",
+   "savedBy": "text",
+   "createdAt": "created"
+  }
+ },
+ "Posts": {
+  "key": "posts",
+  "fields": {
+   "title": "text",
+   "slug": "text",
+   "excerpt": "text",
+   "body": "text",
+   "coverMediaId": "text",
+   "tags": "text",
+   "status": "text",
+   "publishedAt": "ts",
+   "seoTitle": "text",
+   "seoDescription": "text",
+   "authorId": "text",
+   "createdAt": "created",
+   "updatedAt": "updated"
+  }
+ },
+ "MediaAssets": {
+  "key": "mediaAssets",
+  "fields": {
+   "alt": "text",
+   "fileUrl": "text",
+   "kind": "text",
+   "width": "number",
+   "height": "number",
+   "size": "number",
+   "uploadedBy": "text",
+   "createdAt": "created",
+   "fileName": "text",
+   "mimeType": "text"
+  }
+ },
+ "Collections": {
+  "key": "collections",
+  "fields": {
+   "title": "text",
+   "slug": "text",
+   "description": "text",
+   "coverUrl": "text",
+   "type": "text",
+   "placement": "text",
+   "status": "text",
+   "sortOrder": "number"
+  }
+ },
+ "CollectionItems": {
+  "key": "collectionItems",
+  "fields": {
+   "collectionId": "text",
+   "trackId": "text",
+   "sortOrder": "number"
+  }
+ },
+ "Announcements": {
+  "key": "announcements",
+  "fields": {
+   "title": "text",
+   "body": "text",
+   "link": "text",
+   "startsAt": "ts",
+   "endsAt": "ts",
+   "status": "text",
+   "audience": "text",
+   "updatedAt": "updated",
+   "createdBy": "text",
+   "createdAt": "created"
+  }
+ },
+ "Products": {
+  "key": "products",
+  "fields": {
+   "name": "text",
+   "description": "text",
+   "price": "number",
+   "compareAtPrice": "number",
+   "image": "text",
+   "gallery": "text",
+   "category": "text",
+   "badge": "text",
+   "stock": "number",
+   "externalLink": "text",
+   "active": "bool",
+   "featured": "bool",
+   "sortOrder": "number",
+   "created": "created"
+  }
+ },
+ "Orders": {
+  "key": "orders",
+  "fields": {
+   "orderNumber": "auto",
+   "memberId": "text",
+   "itemsJson": "text",
+   "amount": "number",
+   "status": "text",
+   "gateway": "text",
+   "authority": "text",
+   "refId": "text",
+   "customerName": "text",
+   "phone": "text",
+   "address": "text",
+   "created": "created"
+  }
+ },
+ "SmsMessages": {
+  "key": "smsMessages",
+  "fields": {
+   "to": "text",
+   "body": "text",
+   "status": "text",
+   "provider": "text",
+   "purpose": "text",
+   "error": "text",
+   "created": "created"
+  }
+ },
+ "Campaigns": {
+  "key": "campaigns",
+  "fields": {
+   "title": "text",
+   "subtitle": "text",
+   "body": "text",
+   "kind": "text",
+   "brand": "text",
+   "imageUrl": "text",
+   "badge": "text",
+   "ctaLabel": "text",
+   "link": "text",
+   "price": "text",
+   "oldPrice": "text",
+   "discountCode": "text",
+   "theme": "text",
+   "placements": "multi",
+   "status": "text",
+   "priority": "number",
+   "startsAt": "ts",
+   "endsAt": "ts",
+   "impressions": "number",
+   "clicks": "number",
+   "created": "created",
+   "gallery": "text",
+   "features": "text",
+   "specs": "text",
+   "terms": "text",
+   "amount": "number",
+   "stock": "number",
+   "purchasable": "bool",
+   "videoUrl": "text",
+   "location": "text",
+   "sponsorLogo": "text",
+   "sponsorWebsite": "text",
+   "sold": "number",
+   "actionType": "text",
+   "partnerApiUrl": "text",
+   "partnerName": "text",
+   "uniqueCodes": "bool",
+   "campaignRegistrations": {
+    "link": true,
+    "table": "campaignRegistrations",
+    "inverse": true
+   }
+  }
+ },
+ "CampaignRegistrations": {
+  "key": "campaignRegistrations",
+  "fields": {
+   "fullName": "text",
+   "phone": "text",
+   "campaign": {
+    "link": true,
+    "table": "campaigns",
+    "inverse": false
+   },
+   "memberId": "text",
+   "kind": "text",
+   "status": "text",
+   "code": "text",
+   "note": "text",
+   "created": "created"
+  }
+ }
+}

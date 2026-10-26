@@ -26,4 +26,5 @@ export const isoOrNull = (v?: string | null) => {
   return d.toISOString();
 };
 
-export const ALLOWED_UPLOAD_HOSTS = ['uploads.zite.com', 'eu-uploads.zite.com'];
+// KAYAR_UPLOAD_HOST is set by the standalone (self-hosted) server so its own /uploads/ files are accepted
+export const ALLOWED_UPLOAD_HOSTS = ['uploads.zite.com', 'eu-uploads.zite.com', ...(process.env.KAYAR_UPLOAD_HOST ? [process.env.KAYAR_UPLOAD_HOST] : [])];
