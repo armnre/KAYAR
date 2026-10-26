@@ -47,7 +47,7 @@ function Scene() {
         <div className="shine absolute inset-0" />
       </div>
       <div className="absolute left-1/2 top-[48%] aspect-square w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary/30 animate-spin-slow" aria-hidden />
-      <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/wTN6aHbd87EUvo7p42wpBm/img_cJ6XDK12iHGbiv-o.jpg" alt="ورزشکار با هدفون و گوشی" width={1056} height={1408} fetchPriority="high"
+      <img src="/media/img_cJ6XDK12iHGbiv-o.jpg" alt="ورزشکار با هدفون و گوشی" width={1056} height={1408} fetchPriority="high"
         className="absolute bottom-0 left-1/2 z-20 h-[104%] w-auto max-w-none -translate-x-1/2 object-contain"
         style={{ maskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)' }} />
       <Orbit />

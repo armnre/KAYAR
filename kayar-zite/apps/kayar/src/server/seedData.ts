@@ -10,7 +10,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Star_Jump/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Star_Jump/1.jpg",
+"mediaFrames": "/media/ex/Star_Jump/0.jpg\n/media/ex/Star_Jump/1.jpg",
 "instructions": "پاها را جفت و دست‌ها کنار بدن. با پرش پاها را باز کن و دست‌ها را بالای سر ببر، سپس برگرد.",
 "mistakes": "فرود روی پاشنه؛ قفل کردن زانو",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -25,7 +25,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Arm_Circles/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Arm_Circles/1.jpg",
+"mediaFrames": "/media/ex/Arm_Circles/0.jpg\n/media/ex/Arm_Circles/1.jpg",
 "instructions": "دست‌ها را صاف به طرفین باز کن و دایره‌های کوچک تا بزرگ رو به جلو و عقب بزن.",
 "mistakes": "بالا انداختن شانه‌ها",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -40,7 +40,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Knee_Tuck_Jump/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Knee_Tuck_Jump/1.jpg",
+"mediaFrames": "/media/ex/Knee_Tuck_Jump/0.jpg\n/media/ex/Knee_Tuck_Jump/1.jpg",
 "instructions": "درجا بدو و زانوها را تا ارتفاع لگن بالا بیاور؛ دست‌ها هماهنگ حرکت کنند.",
 "mistakes": "خم شدن به عقب",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -55,7 +55,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Hip_Circles/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Hip_Circles/1.jpg",
+"mediaFrames": "/media/ex/Standing_Hip_Circles/0.jpg\n/media/ex/Standing_Hip_Circles/1.jpg",
 "instructions": "دست‌ها روی کمر، لگن را آرام در دایره‌های بزرگ در هر دو جهت بچرخان.",
 "mistakes": "حرکت دادن شانه‌ها به‌جای لگن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -70,7 +70,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pushups/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pushups/1.jpg",
+"mediaFrames": "/media/ex/Pushups/0.jpg\n/media/ex/Pushups/1.jpg",
 "instructions": "دست‌ها کمی بازتر از شانه، بدن یک خط صاف. سینه را تا نزدیک زمین پایین ببر و با فشار کف دست بالا بیا.",
 "mistakes": "افتادن لگن؛ باز کردن زیاد آرنج",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -85,7 +85,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Push-Up/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Push-Up/1.jpg",
+"mediaFrames": "/media/ex/Incline_Push-Up/0.jpg\n/media/ex/Incline_Push-Up/1.jpg",
 "instructions": "مثل شنا ولی زانوها روی زمین؛ از زانو تا سر یک خط صاف بماند.",
 "mistakes": "قوس دادن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -100,7 +100,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Bench_Press_-_Medium_Grip/1.jpg",
+"mediaFrames": "/media/ex/Barbell_Bench_Press_-_Medium_Grip/0.jpg\n/media/ex/Barbell_Bench_Press_-_Medium_Grip/1.jpg",
 "instructions": "کتف‌ها جمع، پاها محکم روی زمین. هالتر را کنترل‌شده تا وسط سینه بیاور و به بالا پرس کن.",
 "mistakes": "کوبیدن هالتر به سینه؛ بلند کردن باسن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -115,7 +115,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bench_Press/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bench_Press/1.jpg",
+"mediaFrames": "/media/ex/Dumbbell_Bench_Press/0.jpg\n/media/ex/Dumbbell_Bench_Press/1.jpg",
 "instructions": "دمبل‌ها کنار سینه، آرنج حدود ۴۵ درجه. به بالا پرس کن و آرام برگردان.",
 "mistakes": "برخورد دمبل‌ها در بالا",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -130,7 +130,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Incline_Dumbbell_Press/1.jpg",
+"mediaFrames": "/media/ex/Incline_Dumbbell_Press/0.jpg\n/media/ex/Incline_Dumbbell_Press/1.jpg",
 "instructions": "نیمکت ۳۰ درجه. دمبل‌ها را از کنار بالاسینه به بالا پرس کن.",
 "mistakes": "شیب بیش از حد نیمکت",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -145,7 +145,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crossover/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cable_Crossover/1.jpg",
+"mediaFrames": "/media/ex/Cable_Crossover/0.jpg\n/media/ex/Cable_Crossover/1.jpg",
 "instructions": "آرنج کمی خم، دسته‌ها را در قوسی بزرگ جلوی سینه به هم برسان.",
 "mistakes": "خم و راست کردن آرنج",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -160,7 +160,7 @@ export const SEED_EXERCISES = [
 "difficulty": "advanced",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pullups/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Pullups/1.jpg",
+"mediaFrames": "/media/ex/Pullups/0.jpg\n/media/ex/Pullups/1.jpg",
 "instructions": "از آویزان کامل، کتف‌ها را پایین بکش و تا رسیدن چانه به میله بالا برو.",
 "mistakes": "تاب خوردن؛ نیمه‌کاره رفتن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -175,7 +175,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Wide-Grip_Lat_Pulldown/1.jpg",
+"mediaFrames": "/media/ex/Wide-Grip_Lat_Pulldown/0.jpg\n/media/ex/Wide-Grip_Lat_Pulldown/1.jpg",
 "instructions": "میله را با سینه‌ی باز تا بالای سینه پایین بکش و آرام برگردان.",
 "mistakes": "عقب رفتن زیاد بدن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -190,7 +190,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Cable_Rows/1.jpg",
+"mediaFrames": "/media/ex/Seated_Cable_Rows/0.jpg\n/media/ex/Seated_Cable_Rows/1.jpg",
 "instructions": "کمر صاف، دسته را به سمت شکم بکش و کتف‌ها را به هم بفشار.",
 "mistakes": "گرد کردن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -205,7 +205,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/One-Arm_Dumbbell_Row/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/One-Arm_Dumbbell_Row/1.jpg",
+"mediaFrames": "/media/ex/One-Arm_Dumbbell_Row/0.jpg\n/media/ex/One-Arm_Dumbbell_Row/1.jpg",
 "instructions": "یک دست و زانو روی نیمکت، دمبل را به سمت لگن بکش.",
 "mistakes": "چرخاندن تنه",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -220,7 +220,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bent_Over_Barbell_Row/1.jpg",
+"mediaFrames": "/media/ex/Bent_Over_Barbell_Row/0.jpg\n/media/ex/Bent_Over_Barbell_Row/1.jpg",
 "instructions": "از لگن خم شو با کمر صاف، هالتر را به سمت ناف بکش.",
 "mistakes": "گرد شدن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -235,7 +235,7 @@ export const SEED_EXERCISES = [
 "difficulty": "advanced",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Deadlift/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Deadlift/1.jpg",
+"mediaFrames": "/media/ex/Barbell_Deadlift/0.jpg\n/media/ex/Barbell_Deadlift/1.jpg",
 "instructions": "هالتر نزدیک ساق، کمر صاف، با فشار پاها و باز کردن لگن بایست.",
 "mistakes": "گرد کردن کمر؛ دور شدن هالتر از بدن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -250,7 +250,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Superman/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Superman/1.jpg",
+"mediaFrames": "/media/ex/Superman/0.jpg\n/media/ex/Superman/1.jpg",
 "instructions": "دمر بخواب، دست‌ها و پاها را هم‌زمان کمی بالا بیاور و ۲ ثانیه نگه دار.",
 "mistakes": "بالا آوردن بیش از حد سر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -265,7 +265,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Military_Press/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Military_Press/1.jpg",
+"mediaFrames": "/media/ex/Standing_Military_Press/0.jpg\n/media/ex/Standing_Military_Press/1.jpg",
 "instructions": "ایستاده با شکم سفت، هالتر را از جلوی شانه بالای سر پرس کن.",
 "mistakes": "قوس زیاد کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -280,7 +280,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Dumbbell_Press/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Seated_Dumbbell_Press/1.jpg",
+"mediaFrames": "/media/ex/Seated_Dumbbell_Press/0.jpg\n/media/ex/Seated_Dumbbell_Press/1.jpg",
 "instructions": "دمبل‌ها هم‌سطح گوش، به بالا پرس کن تا دست‌ها تقریباً صاف شوند.",
 "mistakes": "پایین آوردن ناقص",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -295,7 +295,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Lateral_Raise/1.jpg",
+"mediaFrames": "/media/ex/Side_Lateral_Raise/0.jpg\n/media/ex/Side_Lateral_Raise/1.jpg",
 "instructions": "با آرنج کمی خم، دمبل‌ها را تا ارتفاع شانه به طرفین بالا ببر.",
 "mistakes": "تاب دادن بدن؛ وزنه سنگین",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -310,7 +310,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Face_Pull/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Face_Pull/1.jpg",
+"mediaFrames": "/media/ex/Face_Pull/0.jpg\n/media/ex/Face_Pull/1.jpg",
 "instructions": "طناب را به سمت صورت بکش و دست‌ها را از هم باز کن.",
 "mistakes": "کشیدن به سمت گردن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -325,7 +325,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Handstand_Push-Ups/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Handstand_Push-Ups/1.jpg",
+"mediaFrames": "/media/ex/Handstand_Push-Ups/0.jpg\n/media/ex/Handstand_Push-Ups/1.jpg",
 "instructions": "لگن را بالا ببر (شکل ۸ برعکس) و سر را بین دست‌ها پایین بیاور.",
 "mistakes": "پایین افتادن لگن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -340,7 +340,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bicep_Curl/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dumbbell_Bicep_Curl/1.jpg",
+"mediaFrames": "/media/ex/Dumbbell_Bicep_Curl/0.jpg\n/media/ex/Dumbbell_Bicep_Curl/1.jpg",
 "instructions": "آرنج‌ها کنار بدن ثابت، دمبل‌ها را بالا بیاور و آرام پایین ببر.",
 "mistakes": "تاب دادن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -355,7 +355,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curls/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hammer_Curls/1.jpg",
+"mediaFrames": "/media/ex/Hammer_Curls/0.jpg\n/media/ex/Hammer_Curls/1.jpg",
 "instructions": "کف دست‌ها رو به هم، دمبل‌ها را بالا بیاور.",
 "mistakes": "جلو آمدن آرنج",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -370,7 +370,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Triceps_Pushdown/1.jpg",
+"mediaFrames": "/media/ex/Triceps_Pushdown/0.jpg\n/media/ex/Triceps_Pushdown/1.jpg",
 "instructions": "آرنج‌ها چسبیده به بدن، میله را تا صاف شدن دست پایین فشار بده.",
 "mistakes": "باز شدن آرنج‌ها",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -385,7 +385,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bench_Dips/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bench_Dips/1.jpg",
+"mediaFrames": "/media/ex/Bench_Dips/0.jpg\n/media/ex/Bench_Dips/1.jpg",
 "instructions": "دست‌ها لبه‌ی نیمکت، بدن را تا زاویه ۹۰ درجه آرنج پایین ببر و بالا بیا.",
 "mistakes": "پایین رفتن بیش از حد",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -400,7 +400,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bodyweight_Squat/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bodyweight_Squat/1.jpg",
+"mediaFrames": "/media/ex/Bodyweight_Squat/0.jpg\n/media/ex/Bodyweight_Squat/1.jpg",
 "instructions": "پاها عرض شانه، لگن را عقب و پایین ببر تا ران موازی زمین شود.",
 "mistakes": "جمع شدن زانوها به داخل",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -415,7 +415,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Goblet_Squat/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Goblet_Squat/1.jpg",
+"mediaFrames": "/media/ex/Goblet_Squat/0.jpg\n/media/ex/Goblet_Squat/1.jpg",
 "instructions": "وزنه جلوی سینه، سینه بالا، تا پایین اسکات برو.",
 "mistakes": "خم شدن به جلو",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -430,7 +430,7 @@ export const SEED_EXERCISES = [
 "difficulty": "advanced",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Full_Squat/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Barbell_Full_Squat/1.jpg",
+"mediaFrames": "/media/ex/Barbell_Full_Squat/0.jpg\n/media/ex/Barbell_Full_Squat/1.jpg",
 "instructions": "هالتر روی پشت، شکم سفت، کنترل‌شده پایین برو و با فشار پاها بالا بیا.",
 "mistakes": "بلند شدن پاشنه؛ گرد شدن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -445,7 +445,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bodyweight_Walking_Lunge/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Bodyweight_Walking_Lunge/1.jpg",
+"mediaFrames": "/media/ex/Bodyweight_Walking_Lunge/0.jpg\n/media/ex/Bodyweight_Walking_Lunge/1.jpg",
 "instructions": "یک گام بلند بردار و زانوی عقب را نزدیک زمین ببر؛ برگرد.",
 "mistakes": "رد شدن زانوی جلو از پنجه",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -460,7 +460,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Romanian_Deadlift/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Romanian_Deadlift/1.jpg",
+"mediaFrames": "/media/ex/Romanian_Deadlift/0.jpg\n/media/ex/Romanian_Deadlift/1.jpg",
 "instructions": "زانو کمی خم، لگن را عقب ببر و وزنه را نزدیک پا تا وسط ساق پایین بیاور.",
 "mistakes": "گرد شدن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -475,7 +475,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Leg_Press/1.jpg",
+"mediaFrames": "/media/ex/Leg_Press/0.jpg\n/media/ex/Leg_Press/1.jpg",
 "instructions": "پاها عرض شانه روی صفحه، تا زاویه ۹۰ درجه پایین بیاور و پرس کن.",
 "mistakes": "قفل کردن زانو در بالا",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -490,7 +490,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Butt_Lift_Bridge/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Butt_Lift_Bridge/1.jpg",
+"mediaFrames": "/media/ex/Butt_Lift_Bridge/0.jpg\n/media/ex/Butt_Lift_Bridge/1.jpg",
 "instructions": "طاق‌باز با زانوی خم، لگن را بالا ببر و باسن را بفشار.",
 "mistakes": "قوس دادن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -505,7 +505,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Calf_Raises/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Standing_Calf_Raises/1.jpg",
+"mediaFrames": "/media/ex/Standing_Calf_Raises/0.jpg\n/media/ex/Standing_Calf_Raises/1.jpg",
 "instructions": "روی پنجه بالا برو، مکث کن و آرام پایین بیا.",
 "mistakes": "حرکت سریع و ناقص",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -520,7 +520,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Plank/1.jpg",
+"mediaFrames": "/media/ex/Plank/0.jpg\n/media/ex/Plank/1.jpg",
 "instructions": "روی ساعد و پنجه، بدن یک خط صاف؛ شکم و باسن سفت.",
 "mistakes": "افتادن یا بالا رفتن لگن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -535,7 +535,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Bridge/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Side_Bridge/1.jpg",
+"mediaFrames": "/media/ex/Side_Bridge/0.jpg\n/media/ex/Side_Bridge/1.jpg",
 "instructions": "روی یک ساعد، بدن صاف به پهلو؛ لگن را بالا نگه دار.",
 "mistakes": "افتادن لگن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -550,7 +550,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Crunches/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Crunches/1.jpg",
+"mediaFrames": "/media/ex/Crunches/0.jpg\n/media/ex/Crunches/1.jpg",
 "instructions": "طاق‌باز، شانه‌ها را با انقباض شکم از زمین جدا کن.",
 "mistakes": "کشیدن گردن با دست",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -565,7 +565,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dead_Bug/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dead_Bug/1.jpg",
+"mediaFrames": "/media/ex/Dead_Bug/0.jpg\n/media/ex/Dead_Bug/1.jpg",
 "instructions": "دست و پای مخالف را آرام باز کن در حالی که کمر به زمین چسبیده است.",
 "mistakes": "جدا شدن کمر از زمین",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -580,7 +580,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Mountain_Climbers/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Mountain_Climbers/1.jpg",
+"mediaFrames": "/media/ex/Mountain_Climbers/0.jpg\n/media/ex/Mountain_Climbers/1.jpg",
 "instructions": "در حالت شنا، زانوها را به‌نوبت سریع به سمت سینه بیاور.",
 "mistakes": "بالا رفتن لگن",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -595,7 +595,7 @@ export const SEED_EXERCISES = [
 "difficulty": "intermediate",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Frog_Hops/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Frog_Hops/1.jpg",
+"mediaFrames": "/media/ex/Frog_Hops/0.jpg\n/media/ex/Frog_Hops/1.jpg",
 "instructions": "بنشین، پاها را عقب بپران، شنا برو، برگرد و بپر.",
 "mistakes": "فرود سنگین",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -610,7 +610,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Rope_Jumping/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Rope_Jumping/1.jpg",
+"mediaFrames": "/media/ex/Rope_Jumping/0.jpg\n/media/ex/Rope_Jumping/1.jpg",
 "instructions": "روی پنجه با پرش‌های کوتاه طناب بزن؛ چرخش از مچ.",
 "mistakes": "پرش بلند",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -625,7 +625,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": false,
 "location": "gym",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Walking_Treadmill/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Walking_Treadmill/1.jpg",
+"mediaFrames": "/media/ex/Walking_Treadmill/0.jpg\n/media/ex/Walking_Treadmill/1.jpg",
 "instructions": "با سرعت تند و کمی شیب راه برو؛ دست‌ها آزاد حرکت کنند.",
 "mistakes": "گرفتن دستگیره",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -640,7 +640,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Cat_Stretch/1.jpg",
+"mediaFrames": "/media/ex/Cat_Stretch/0.jpg\n/media/ex/Cat_Stretch/1.jpg",
 "instructions": "چهار دست و پا، کمر را به‌نوبت گرد و گود کن همراه با تنفس.",
 "mistakes": "حرکت سریع",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -655,7 +655,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Worlds_Greatest_Stretch/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Worlds_Greatest_Stretch/1.jpg",
+"mediaFrames": "/media/ex/Worlds_Greatest_Stretch/0.jpg\n/media/ex/Worlds_Greatest_Stretch/1.jpg",
 "instructions": "لانج بلند، آرنج را به سمت زمین ببر و تنه را به بالا بچرخان.",
 "mistakes": "عجله در حرکت",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -670,7 +670,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hamstring_Stretch/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Hamstring_Stretch/1.jpg",
+"mediaFrames": "/media/ex/Hamstring_Stretch/0.jpg\n/media/ex/Hamstring_Stretch/1.jpg",
 "instructions": "پا را صاف نگه دار و از لگن خم شو تا کشش حس شود؛ ۳۰ ثانیه.",
 "mistakes": "گرد کردن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -685,7 +685,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dynamic_Chest_Stretch/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Dynamic_Chest_Stretch/1.jpg",
+"mediaFrames": "/media/ex/Dynamic_Chest_Stretch/0.jpg\n/media/ex/Dynamic_Chest_Stretch/1.jpg",
 "instructions": "دست‌ها را پشت بدن به هم برسان و سینه را باز کن.",
 "mistakes": "بالا انداختن شانه",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -700,7 +700,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lying_Prone_Quadriceps/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Lying_Prone_Quadriceps/1.jpg",
+"mediaFrames": "/media/ex/Lying_Prone_Quadriceps/0.jpg\n/media/ex/Lying_Prone_Quadriceps/1.jpg",
 "instructions": "پاشنه را به سمت باسن بکش و زانوها کنار هم بمانند.",
 "mistakes": "قوس دادن کمر",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."
@@ -715,7 +715,7 @@ export const SEED_EXERCISES = [
 "difficulty": "beginner",
 "bodyweight": true,
 "location": "both",
-"mediaFrames": "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Childs_Pose/0.jpg\nhttps://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/Childs_Pose/1.jpg",
+"mediaFrames": "/media/ex/Childs_Pose/0.jpg\n/media/ex/Childs_Pose/1.jpg",
 "instructions": "روی زانو بنشین، به جلو خم شو و دست‌ها را دراز کن؛ عمیق نفس بکش.",
 "mistakes": "—",
 "safety": "با گرم‌کردن شروع کن؛ در صورت درد تیز یا سرگیجه حرکت را متوقف کن."

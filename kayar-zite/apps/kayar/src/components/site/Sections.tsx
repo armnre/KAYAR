@@ -57,7 +57,7 @@ export function MorshedSection() {
           <div className="mt-6 flex flex-wrap gap-2">{b.chips.map((c) => <span key={c} className="rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-sm font-bold">{c}</span>)}</div>
         </div>
         <div className="reveal relative min-w-0">
-          <img src="https://images.fillout.com/888622/bvjezbu9kd/generated-images/afjACL6i7DDEtnZvwFmFHK/img_oPmkOrwF9MOWO-W_.jpg" alt="هدفون و گوشی روی کف باشگاه" width={1376} height={768} loading="lazy" className="aspect-video w-full rounded-[28px] object-cover opacity-80" />
+          <img src="/media/img_oPmkOrwF9MOWO-W_.jpg" alt="هدفون و گوشی روی کف باشگاه" width={1376} height={768} loading="lazy" className="aspect-video w-full rounded-[28px] object-cover opacity-80" />
           <Glass className="relative -mt-16 mx-3 p-4 sm:mx-8">
             <div className="mb-3 flex items-center justify-between"><span className="text-sm text-muted-foreground">در حال پخش</span><SampleBadge /></div>
             <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export function FinalCTA() {
           <p className="mt-3 max-w-md text-[17px] font-medium leading-[1.8] opacity-80">{b.text}</p>
           <Link to="/app" className="press tap mt-6 inline-flex h-14 items-center gap-2 rounded-full bg-primary-foreground px-8 font-bold text-primary">ورود به کایار <ArrowLeft className="h-5 w-5" /></Link>
         </div>
-        <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/os1Spo3niySGCQKqh6RLQG/img_sgQAqtZdvystKoXd.jpg" alt="بانوی ورزشکار ایرانی با حجاب ورزشی و لباس تمرین کاپوش" width={1056} height={1408} loading="lazy" className="relative mx-auto h-80 w-auto object-cover md:h-[420px]" style={{ maskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)' }} />
+        <img src="/media/img_sgQAqtZdvystKoXd.jpg" alt="بانوی ورزشکار ایرانی با حجاب ورزشی و لباس تمرین کاپوش" width={1056} height={1408} loading="lazy" className="relative mx-auto h-80 w-auto object-cover md:h-[420px]" style={{ maskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)' }} />
       </div>
     </section>
   );

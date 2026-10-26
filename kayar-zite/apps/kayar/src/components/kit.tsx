@@ -169,14 +169,14 @@ export function useReveal() {
 }
 
 const GEN_COVERS = [
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/qmdMK1o3vEstTkde5fT9UH/img_tdlYlUJllc671jNd.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/pqkVBw6tnDyBpJUi9HCC8H/img_dOFrwvxRIxhSPoP2.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/3F4URT2YpYJ1PdmWXUDjsA/img_YRw32oFok7DDtzPM.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/x68G9FHZRs685JxKqEsWhq/img_BKDdvmayqguR-907.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/vw6zw2z1X1vszeozSSFT8c/img_OmY9BhW7BVEnw9wg.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/hBv9MWmzoMehVQGdzev28p/img_szairvjuFoZs1zUl.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/wec9HYykkErmrAW9VoLKPr/img_hMF4T8_VbKI7rjrd.jpg',
-  'https://images.fillout.com/903696/3gnpsh9aon/generated-images/oghJwRjHe9titUJgwNtyHm/img_peZgD-eX58v4Btxi.jpg',
+  '/media/img_tdlYlUJllc671jNd.jpg',
+  '/media/img_dOFrwvxRIxhSPoP2.jpg',
+  '/media/img_YRw32oFok7DDtzPM.jpg',
+  '/media/img_BKDdvmayqguR-907.jpg',
+  '/media/img_OmY9BhW7BVEnw9wg.jpg',
+  '/media/img_szairvjuFoZs1zUl.jpg',
+  '/media/img_hMF4T8_VbKI7rjrd.jpg',
+  '/media/img_peZgD-eX58v4Btxi.jpg',
 ];
 
 /** Track artwork. Real cover when present; otherwise a unique generative cover per track (6 styles × hue pairs), so rows never look uniform. */

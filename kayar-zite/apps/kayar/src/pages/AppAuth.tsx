@@ -29,7 +29,7 @@ function ArtPanel() {
   useEffect(() => { const t = setInterval(() => setQ((x) => (x + 1) % quotes.length), 3800); return () => clearInterval(t); }, []);
   return (
     <div className="relative hidden overflow-hidden lg:block">
-      <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/rTnQKvHZxdgaFf9Ji1zPET/img_PJWMwZkZrR_2yKfV.jpg" alt="" width={1056} height={1408} className="absolute inset-0 h-full w-full object-cover object-top" />
+      <img src="/media/img_PJWMwZkZrR_2yKfV.jpg" alt="" width={1056} height={1408} className="absolute inset-0 h-full w-full object-cover object-top" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-l from-background/80 to-transparent" />
       <div className="absolute -bottom-20 -start-10 h-72 w-72 -rotate-12 rounded-[40px] bg-primary/80 mix-blend-multiply" />
@@ -68,7 +68,7 @@ export function Login() {
       <ArtPanel />
       <div className="relative flex min-h-svh flex-col">
         <div className="relative h-[40svh] overflow-hidden lg:hidden">
-          <img src="https://images.fillout.com/888646/9une2mcrla/generated-images/rTnQKvHZxdgaFf9Ji1zPET/img_PJWMwZkZrR_2yKfV.jpg" alt="" width={1056} height={1408} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[50%_15%]" />
+          <img src="/media/img_PJWMwZkZrR_2yKfV.jpg" alt="" width={1056} height={1408} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[50%_15%]" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-background/10" />
           <div className="absolute -bottom-10 -end-10 h-40 w-40 rounded-full bg-primary/30 blur-[60px]" />
           <div className="pt-safe absolute inset-x-0 top-0 p-5"><KayarLogo className="text-lg" /></div>

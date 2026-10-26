@@ -1,9 +1,9 @@
 # KAYAR — production image for Liara (platform: docker)
 # Stage 1: build the React SPA from the monorepo
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /repo
 COPY . .
-RUN npm ci --ignore-scripts --no-audit --no-fund
+RUN npm install --ignore-scripts --no-audit --no-fund
 # Brand/SEO head for crawlers (the app also injects these at runtime)
 RUN cd apps/kayar \
  && sed -i '/<link rel="icon"/d; /<meta name="viewport"/d; /<title>/d' index.html \
@@ -13,7 +13,7 @@ RUN cd apps/kayar \
 
 # Stage 2: serve with nginx; /api/* is proxied to the KAYAR backend (Zite)
 FROM nginx:1.27-alpine
-ENV BACKEND_HOST=kayar.zite.so
+ENV BACKEND_HOST=ma8nxe5agt.zite.so
 COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /out /usr/share/nginx/html
 EXPOSE 80

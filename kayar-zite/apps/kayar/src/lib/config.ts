@@ -8,10 +8,10 @@ export const features = {
 };
 
 export const IMG = {
-  heroMale: 'https://images.fillout.com/888622/bvjezbu9kd/generated-images/m7CVfYZ1XxoDXoHHPmRnjU/img_6hSskSlC6BwCKZ21.jpg',
-  heroFemale: 'https://images.fillout.com/888622/bvjezbu9kd/generated-images/oxqDevwEubgV7SsJVPNB4N/img_n1JeLq9Rzgrcbrl3.jpg',
-  morshed: 'https://images.fillout.com/888622/bvjezbu9kd/generated-images/afjACL6i7DDEtnZvwFmFHK/img_oPmkOrwF9MOWO-W_.jpg',
-  run: 'https://images.fillout.com/888622/bvjezbu9kd/generated-images/jiupv5n9JM5Wv8yQ6PGx9P/img_0dCMOm1WQh9f_X8K.jpg',
+  heroMale: '/media/img_6hSskSlC6BwCKZ21.jpg',
+  heroFemale: '/media/img_n1JeLq9Rzgrcbrl3.jpg',
+  morshed: '/media/img_oPmkOrwF9MOWO-W_.jpg',
+  run: '/media/img_0dCMOm1WQh9f_X8K.jpg',
 };
 
 const faDigits = '۰۱۲۳۴۵۶۷۸۹';
