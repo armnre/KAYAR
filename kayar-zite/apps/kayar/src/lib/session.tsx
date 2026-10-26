@@ -26,12 +26,29 @@ export function readToken(scope: Scope) {
 }
 const clear = (scope: Scope) => localStorage.removeItem(KEY(scope));
 
+/** True for gateway/network hiccups (502/503/504, failed fetch) — worth retrying, never a reason to log out. */
+export function isTransient(e: unknown) {
+  const x = e as { message?: string; status?: number; userFacingMessage?: string };
+  const t = `${x?.status ?? ''} ${x?.message ?? ''} ${x?.userFacingMessage ?? ''}`;
+  return /\b50[234]\b|bad gateway|gateway|failed to fetch|networkerror|load failed|network|timeout|unexpected token|json/i.test(t);
+}
+/** Retries a call on transient failures with short backoff (0.8s, 2s, 4s). */
+export async function withRetry<T>(fn: () => Promise<T>, tries = 4): Promise<T> {
+  for (let i = 0; ; i++) {
+    try { return await fn(); } catch (e) {
+      if (i >= tries - 1 || !isTransient(e)) throw e;
+      await new Promise((r) => setTimeout(r, [800, 2000, 4000][i] ?? 4000));
+    }
+  }
+}
+
 /** Turns any thrown error into a friendly Persian message — never shows raw technical text. */
 export function errMsg(e: unknown) {
   const x = e as { userFacingMessage?: string; message?: string; status?: number };
   if (typeof navigator !== 'undefined' && !navigator.onLine) return 'اینترنتت قطعه؛ اتصال رو چک کن و دوباره امتحان کن.';
   const raw = (x?.userFacingMessage || x?.message || '').replace(/^PASSWORD_CHANGE_REQUIRED:\s*/, '').trim();
   if (/failed to fetch|networkerror|load failed|network/i.test(raw)) return 'ارتباط با سرور برقرار نشد؛ چند لحظه بعد دوباره امتحان کن.';
+  if (/\b50[234]\b|bad gateway/i.test(raw) || [502, 503, 504].includes(x?.status ?? 0)) return 'سرور موقتاً در دسترس نیست؛ چند لحظه بعد دوباره امتحان کن.';
   if (/timeout|timed out/i.test(raw)) return 'پاسخ سرور طول کشید؛ دوباره تلاش کن.';
   if (/429|too many|rate/i.test(raw)) return 'تعداد تلاش‌ها زیاد بود؛ کمی صبر کن و دوباره امتحان کن.';
   if (/401|unauthori[sz]ed|session|expired/i.test(raw) && !/[\u0600-\u06FF]/.test(raw)) return 'نشستت تموم شده؛ لطفاً دوباره وارد شو.';
@@ -50,9 +67,10 @@ export function SessionProvider({ scope, children }: { scope: Scope; children: R
     const token = readToken(scope);
     if (!token) { setS({ token: null, member: null, permissions: [], loading: false }); return; }
     try {
-      const r = await authMe({ token });
+      const r = await withRetry(() => authMe({ token }));
       setS({ token, member: r.member, permissions: r.permissions, loading: false });
-    } catch {
+    } catch (e) {
+      if (isTransient(e)) { setTimeout(() => void refresh(), 5000); return; }
       clear(scope);
       setS({ token: null, member: null, permissions: [], loading: false });
     }
@@ -62,7 +80,7 @@ export function SessionProvider({ scope, children }: { scope: Scope; children: R
   const login = async (username: string, password: string) => {
     const old = readToken(scope);
     if (old) authLogout({ token: old }).catch(() => {});
-    const r = await authLogin({ username, password, scope, userAgent: navigator.userAgent.slice(0, 300) });
+    const r = await withRetry(() => authLogin({ username, password, scope, userAgent: navigator.userAgent.slice(0, 300) }), 3);
     localStorage.setItem(KEY(scope), JSON.stringify({ token: r.token, expiresAt: r.expiresAt }));
     setS({ token: r.token, member: r.member, permissions: r.permissions, loading: false });
     return r.member;
