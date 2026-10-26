@@ -2,7 +2,8 @@
 # BACKEND_HOST = the KAYAR backend host only (no https://, no slash), e.g. ma8nxe5agt.zite.so or api.kapoosh.ir
 
 upstream kayar_backend {
-  server ${BACKEND_HOST}:443 max_fails=0;
+  # IPv4 addresses of BACKEND_HOST, written at start-up by 15-kayar-upstream.sh (Liara has no reliable IPv6)
+  include /etc/nginx/kayar_upstream.conf;
   keepalive 32;
   keepalive_timeout 60s;
 }
@@ -35,10 +36,10 @@ server {
   proxy_ssl_name ${BACKEND_HOST};
   proxy_ssl_protocols TLSv1.2 TLSv1.3;
   proxy_ssl_session_reuse on;
-  proxy_connect_timeout 8s;
+  proxy_connect_timeout 4s;
   proxy_send_timeout 60s;
-  proxy_next_upstream error timeout http_502 http_503 http_504;
-  proxy_next_upstream_tries 3;
+  proxy_next_upstream error timeout http_502 http_503 http_504 non_idempotent;
+  proxy_next_upstream_tries 4;
   proxy_next_upstream_timeout 25s;
 
   location ~ ^/api/(publicCms|publicSettings|publicPosts)$ {
@@ -66,6 +67,8 @@ server {
   location = /__backend {
     proxy_pass https://kayar_backend/api/publicSettings;
     proxy_method POST;
+    proxy_set_header Host ${BACKEND_HOST};
+    proxy_set_header Connection "";
     proxy_set_header Content-Type application/json;
     proxy_set_body "{}";
     proxy_read_timeout 20s;

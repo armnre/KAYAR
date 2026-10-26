@@ -15,5 +15,7 @@ RUN cd apps/kayar \
 FROM nginx:1.27-alpine
 ENV BACKEND_HOST=ma8nxe5agt.zite.so
 COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY deploy/15-kayar-upstream.sh /docker-entrypoint.d/15-kayar-upstream.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.d/15-kayar-upstream.sh && chmod +x /docker-entrypoint.d/15-kayar-upstream.sh
 COPY --from=build /out /usr/share/nginx/html
 EXPOSE 80
