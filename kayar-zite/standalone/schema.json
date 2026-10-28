@@ -488,5 +488,48 @@
    "note": "text",
    "created": "created"
   }
+ },
+ "ShopPartners": {
+  "key": "shopPartners",
+  "fields": {
+   "name": "text",
+   "type": "text",
+   "logo": "text",
+   "url": "text",
+   "description": "text",
+   "active": "bool",
+   "seedKey": "text"
+  }
+ },
+ "ShopItems": {
+  "key": "shopItems",
+  "fields": {
+   "title": "text",
+   "partnerId": "text",
+   "image": "text",
+   "price": "number",
+   "currency": "text",
+   "badge": "text",
+   "category": "text",
+   "tags": "text",
+   "targetUrl": "text",
+   "sort": "number",
+   "active": "bool",
+   "startsAt": "ts",
+   "endsAt": "ts",
+   "featured": "bool",
+   "showInLanding": "bool",
+   "showInApp": "bool",
+   "seedKey": "text",
+   "description": "text"
+  }
+ },
+ "ShopClicks": {
+  "key": "shopClicks",
+  "fields": {
+   "itemId": "text",
+   "day": "date",
+   "n": "number"
+  }
  }
 }

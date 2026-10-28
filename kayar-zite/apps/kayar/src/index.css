@@ -30,7 +30,7 @@
     --card-foreground: 0 0% 97%;
     --border: 0 0% 100% / 0.08;
     --input: 0 0% 100% / 0.1;
-    --primary: 71 100% 56%;          /* --lime #D7FF1F */
+    --primary: 67 100% 55%;          /* Kapoosh lime #E4FF1A */
     --primary-foreground: 200 12% 5%;/* #0B0D0E */
     --lime-hi: 69 100% 68%;
     --lime-lo: 71 100% 44%;
@@ -47,7 +47,7 @@
     --radius: 1.5rem;
     --sidebar-background: 218 18% 9%;
     --sidebar-foreground: 0 0% 97%;
-    --sidebar-primary: 71 100% 56%;
+    --sidebar-primary: 67 100% 55%;
     --sidebar-primary-foreground: 200 12% 5%;
     --sidebar-accent: 210 10% 15%;
     --sidebar-accent-foreground: 0 0% 97%;

@@ -39,6 +39,12 @@ function Orbit() {
   );
 }
 
+const PRODUCTS = [
+  { src: '/brand/products/kapoosh-tracksuit-navy-mustard.webp', alt: 'ست گرمکن کاپوش', style: { insetInlineStart: '29%', top: '0%', zIndex: 3 } },
+  { src: '/brand/products/kapoosh-sport-set-pink.webp', alt: 'ست ورزشی کاپوش', style: { insetInlineStart: '0%', top: '22%', rotate: '-8deg', zIndex: 2 } },
+  { src: '/brand/products/kapoosh-sport-tee-colors.webp', alt: 'تی‌شرت‌های ورزشی کاپوش', style: { insetInlineEnd: '0%', top: '24%', rotate: '8deg', zIndex: 2 } },
+];
+
 function Scene() {
   return (
     <div className="relative mx-auto h-[46svh] w-full max-w-[560px] md:h-full">
@@ -47,9 +53,14 @@ function Scene() {
         <div className="shine absolute inset-0" />
       </div>
       <div className="absolute left-1/2 top-[48%] aspect-square w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary/30 animate-spin-slow" aria-hidden />
-      <img src="/media/img_cJ6XDK12iHGbiv-o.jpg" alt="ورزشکار با هدفون و گوشی" width={1056} height={1408} fetchPriority="high"
-        className="absolute bottom-0 left-1/2 z-20 h-[104%] w-auto max-w-none -translate-x-1/2 object-contain"
-        style={{ maskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)' }} />
+      <div className="absolute inset-x-[10%] bottom-[4%] top-[10%] z-20">
+        {PRODUCTS.map((p, i) => (
+          <figure key={p.src} className="absolute w-[42%] overflow-hidden rounded-[22px] bg-[hsl(0_0%_88%)] shadow-[0_24px_60px_-20px_rgba(0,0,0,.8)] ring-1 ring-white/10" style={p.style}>
+            <picture><source srcSet={p.src} type="image/webp" /><img src={p.src.replace('.webp', '.jpg')} alt={p.alt} width={225} height={300} fetchPriority={i === 0 ? 'high' : 'auto'} loading={i === 0 ? 'eager' : 'lazy'} className="aspect-[3/4] w-full object-contain" /></picture>
+          </figure>
+        ))}
+        <img src="/brand/logo.svg" alt="کاپوش" width={137} height={46} className="absolute inset-x-0 bottom-[2%] mx-auto h-9 w-auto drop-shadow-lg" />
+      </div>
       <Orbit />
       <div aria-hidden className="pointer-events-none">
         <Glass className="animate-float absolute end-[-2%] top-[8%] z-30 hidden w-60 overflow-hidden p-3.5 shadow-[0_20px_60px_-20px_hsl(254_100%_60%/.6)] ring-1 ring-[hsl(254_100%_75%/.35)] sm:block">

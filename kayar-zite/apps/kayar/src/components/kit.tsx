@@ -4,16 +4,12 @@ import { Loader2, Eye, EyeOff, Check, X, Copy, type LucideIcon } from 'lucide-re
 import { cn } from '@project/components/lib/utils';
 import { fa } from '../lib/config';
 
-export function KayarLogo({ className, mark = true }: { className?: string; mark?: boolean }) {
+/** Official Kapoosh logo (public/brand/logo.svg). `mark` = square K badge only. Text "KAYAR" is the app name, shown beside it. */
+export function KayarLogo({ className, mark = true, appName = true }: { className?: string; mark?: boolean; appName?: boolean }) {
   return (
     <span className={cn('inline-flex items-center gap-2 font-latin font-extrabold tracking-[0.12em] text-foreground', className)} dir="ltr">
-      {mark && (
-        <svg viewBox="0 0 32 32" className="h-[1.4em] w-[1.4em]" aria-hidden>
-          <rect width="32" height="32" rx="9" fill="hsl(var(--primary))" />
-          <path d="M10 8v16M10 16l9-8M13 13.5 21 24" stroke="hsl(var(--primary-foreground))" strokeWidth="3.2" strokeLinecap="round" fill="none" />
-        </svg>
-      )}
-      KAYAR
+      {mark ? <img src="/brand/logo-mark.svg" alt="کاپوش" width={52} height={48} className="h-[1.5em] w-auto" /> : <img src="/brand/logo.svg" alt="کاپوش" width={137} height={46} className="h-[1.6em] w-auto" />}
+      {appName && 'KAYAR'}
     </span>
   );
 }

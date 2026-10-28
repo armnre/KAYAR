@@ -27,6 +27,8 @@ import { AdminCampaigns } from './pages/admin/Campaigns';
 import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
 import { NotFound } from './pages/Misc';
+import ShopPage from './pages/Shop';
+import { AdminShop } from './pages/admin/Shop';
 import { applyHeadTags } from './lib/headTags';
 
 export default function App() {
@@ -43,6 +45,7 @@ export default function App() {
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/p/:slug" element={<StaticPage />} />
+          <Route path="/shop" element={<ShopPage />} />
           <Route path="/shop/callback" element={<PickCallback />} />
           <Route path="/app/login" element={<Login />} />
           <Route path="/app/change-password" element={<ChangePassword />} />
@@ -73,6 +76,7 @@ export default function App() {
             <Route path="morshed" element={<AdminMorshed />} />
             <Route path="announcements" element={<AdminAnnouncements />} />
             <Route path="campaigns" element={<AdminCampaigns />} />
+            <Route path="shop" element={<AdminShop />} />
             <Route path="sms" element={<AdminSms />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit" element={<AdminAudit />} />

@@ -7,6 +7,7 @@ import { Skeleton } from '@project/components/ui/skeleton';
 import { Cover, Waveform } from '../kit';
 import { HomeBody } from './HomeBody';
 import { KayarSuggestions } from './KayarSuggestions';
+import { KapooshShelf } from './KapooshShelf';
 
 import { usePreview } from '../../lib/preview';
 import { useSession, errMsg } from '../../lib/session';
@@ -91,6 +92,7 @@ export function AppHome() {
       ))}
       {!data && <div className="-mx-4 mt-9 flex gap-3 overflow-hidden px-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="aspect-square w-36 shrink-0 rounded-2xl" />)}</div>}
       <KayarSuggestions />
+      <KapooshShelf />
     </div>
   );
 }

@@ -36,6 +36,7 @@ async function homeSeo() {
 async function metaFor(p: string): Promise<Meta | null> {
   if (p === '/' || p === '') { const h = await homeSeo(); return { ...h, path: '/', status: 200 }; }
   if (p === '/blog') return { title: `مجله‌ی کایار — مطالب تمرین، تغذیه و سلامت | KAYAR`, description: 'مقاله‌های کاربردی تمرین، تغذیه، موسیقی ورزشی و سبک زندگی سالم از تیم کایار.', path: '/blog', status: 200 };
+  if (p === '/shop') return { title: `فروشگاه کاپوش — پیشنهادهای ما برای تمرین بهتر | KAYAR`, description: 'پوشاک ورزشی کاپوش و پیشنهادهای شریک‌ها و حامیان کایار برای تمرین بهتر.', path: '/shop', status: 200 };
   let m = /^\/blog\/([^/]+)\/?$/.exec(p);
   if (m) {
     const slug = decodeURIComponent(m[1]).toLowerCase();
@@ -104,7 +105,7 @@ export async function renderHtml(req: Request, staticDir: string, inject: string
 
 export async function sitemap(req: Request, res: Response) {
   const base = baseUrl(req);
-  const urls: { loc: string; lastmod?: string; pri: string }[] = [{ loc: `${base}/`, pri: '1.0' }, { loc: `${base}/blog`, pri: '0.8' }];
+  const urls: { loc: string; lastmod?: string; pri: string }[] = [{ loc: `${base}/`, pri: '1.0' }, { loc: `${base}/blog`, pri: '0.8' }, { loc: `${base}/shop`, pri: '0.7' }];
   try {
     const { rows } = await pool.query(`SELECT p."slug", COALESCE(p."updatedAt", p.updated_at, p."publishedAt") AS m FROM "Posts" p WHERE ${VISIBLE} ORDER BY p."publishedAt" DESC LIMIT 5000`);
     for (const r of rows) urls.push({ loc: `${base}/blog/${encodeURIComponent(r.slug)}`, lastmod: r.m ? new Date(r.m).toISOString().slice(0, 10) : undefined, pri: '0.7' });

@@ -40,7 +40,7 @@ export const RULES: Record<string, Rule[]> = {
 };
 /** appCampaigns actions that send SMS / start payments get a tight limit; reads stay generous. */
 export const CAMPAIGN_COSTLY = new Set(['register', 'checkout', 'verify', 'claim']);
-export const PUBLIC_READ = new Set(['publicCms', 'publicSettings', 'publicPosts']);
+export const PUBLIC_READ = new Set(['publicCms', 'publicSettings', 'publicPosts', 'publicShop']);
 const GENERAL = num(process.env.RL_API_PER_MIN, 120);
 const PUBLIC = num(process.env.RL_PUBLIC_PER_MIN, 600);
 
