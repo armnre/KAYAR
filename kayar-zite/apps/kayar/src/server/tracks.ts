@@ -17,10 +17,14 @@ export const licenseLabel = (url?: string) => {
   return m ? `CC ${m.toUpperCase()}` : '';
 };
 
+/** External audio/covers are always served through our own domain (/media/*) so browsers in Iran never hit a foreign host. */
+const viaProxy = (r: TracksRecordType) => r.source === 'external';
+const coverOf = (r: TracksRecordType) => (r.coverUrl ? (viaProxy(r) && /^https?:\/\//.test(r.coverUrl) ? `/media/cover/${r.id}` : r.coverUrl) : '');
+
 export const libToDto = (r: TracksRecordType): TrackDto => ({
   id: `lib:${r.id}`, title: r.title ?? '', artist: r.artist ?? '', album: r.album ?? '', duration: r.durationSeconds ?? 0, cat: splitTags(r.categories)[0] ?? '',
-  hue: hue(r.id), license: licenseLabel(r.licenseUrl) || (r.licenseUrl ? 'مجوز' : ''), licenseUrl: r.licenseUrl ?? '', shareUrl: r.shareUrl ?? '', rights: r.rights ?? '',
-  audio: r.audioUrl ?? '', image: r.coverUrl ?? '', source: 'library', featured: !!r.isFeatured,
+  hue: hue(r.id), license: licenseLabel(r.licenseUrl) || (r.licenseUrl ? 'مجوز' : ''), licenseUrl: r.licenseUrl ?? '', shareUrl: r.shareUrl ?? '', rights: r.rights || (r.sourceName ? `${r.artist ?? ''} — منبع: ${r.sourceName}` : ''),
+  audio: viaProxy(r) ? `/media/stream/${r.id}` : r.audioUrl ?? '', image: coverOf(r), source: 'library', featured: !!r.isFeatured,
 });
 
 export type EpisodeRow = { id: string; title: string; audioUrl: string; durationSec: number | null; artwork: string | null; link: string | null; showTitle: string; showArtwork: string | null };
@@ -29,7 +33,7 @@ export const epToDto = (e: EpisodeRow): TrackDto => ({
   license: '', licenseUrl: '', shareUrl: e.link ?? '', rights: '', audio: e.audioUrl, image: e.artwork || e.showArtwork || '', source: 'podcast', featured: false,
 });
 
-export const playable = (r: TracksRecordType) => r.status === 'published' && !!r.audioUrl && r.audioUrl.startsWith('https://');
+export const playable = (r: TracksRecordType) => r.status === 'published' && !!r.audioUrl && /^(https:\/\/|\/uploads\/)/.test(r.audioUrl);
 
 const EP_SQL = `SELECT e.id, e."title", e."audioUrl", e."durationSec", e."artwork", e."link", s."title" AS "showTitle", s."artwork" AS "showArtwork"
   FROM "PodcastEpisodes" e JOIN "PodcastEpisodesPodcastShows" l ON l."podcastEpisodesId" = e.id JOIN "PodcastShows" s ON s.id = l."podcastShowsId"`;

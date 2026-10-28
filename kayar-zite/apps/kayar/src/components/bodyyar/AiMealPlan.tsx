@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Sparkles, Dumbbell, Moon, Droplets, Zap, Clock } from 'lucide-react';
+import { Sparkles, Dumbbell, Moon, Zap, Clock } from 'lucide-react';
+import { IcWater } from '../icons/kayar';
 import type { GetDashboardOutputType } from 'zitejs/api';
 import { faNum } from '../bkit';
 import { cn } from '@project/components/lib/utils';
@@ -70,7 +71,7 @@ export function AiMealPlan({ plan, trainedToday }: { plan: Dash['nutritionPlan']
           </motion.li>
         ))}
       </ul>
-      <div className="flex items-center gap-2 rounded-2xl bg-secondary/60 p-3 text-xs"><Droplets className="h-4 w-4 text-cyan" />آب روزانه: حدود {faNum(plan.waterL)} لیتر</div>
+      <div className="flex items-center gap-2 rounded-2xl bg-secondary/60 p-3 text-xs"><IcWater size={16} className="text-cyan" />آب روزانه: حدود {faNum(plan.waterL)} لیتر</div>
       {plan.tips.length > 0 && <ul className="list-disc space-y-1 ps-5 text-xs leading-6 text-muted-foreground">{plan.tips.map((x, i) => <li key={i}>{x}</li>)}</ul>}
     </div>
   );

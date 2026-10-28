@@ -10,7 +10,7 @@ import { H, useMorshed } from './HomeMorshed';
 import { useSession, errMsg } from '../../lib/session';
 import { Podcasts } from './Podcasts';
 import { usePreview } from '../../lib/preview';
-import type { Track } from '../../data/sample';
+import type { Track } from '../../lib/track';
 import { fa } from '../../lib/config';
 
 type Lang = 'all' | 'fa' | 'en' | 'trending';
@@ -55,7 +55,7 @@ function Featured({ list }: { list: Track[] }) {
           className="relative h-64 w-[82%] shrink-0 snap-center overflow-hidden rounded-[30px] sm:w-[60%]">
           <Cover hue={t.hue} image={t.image} title={t.title} className="absolute inset-0 h-full w-full rounded-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-          <span className="absolute start-4 top-4 rounded-full bg-black/40 px-3 py-1 text-[11px] font-black text-white backdrop-blur">{i === 0 ? '⭐ پیشنهاد ویژه' : `#${fa(i + 1)}`}</span>
+          <span className="absolute start-4 top-4 rounded-full bg-black/40 px-3 py-1 text-[11px] font-black text-white backdrop-blur">{i === 0 ? 'پیشنهاد ویژه' : `#${fa(i + 1)}`}</span>
           <div className="absolute inset-x-0 bottom-0 flex items-end gap-3 p-4">
             <div className="min-w-0 flex-1 text-white"><div className="truncate text-xl font-black">{t.title}</div><div className="truncate text-sm text-white/70">{t.artist}</div>
               {active && <Waveform bars={18} playing={playing} className="mt-2 h-4" color="bg-primary" />}</div>

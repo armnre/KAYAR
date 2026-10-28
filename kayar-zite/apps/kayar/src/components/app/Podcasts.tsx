@@ -8,7 +8,7 @@ import { useSession, errMsg } from '../../lib/session';
 import { usePreview } from '../../lib/preview';
 import { fa } from '../../lib/config';
 import { TrackRow } from './Morshed';
-import type { Track } from '../../data/sample';
+import type { Track } from '../../lib/track';
 
 type Show = MorshedPodcastsOutputType['shows'][0];
 const hue = (s: string) => [...s].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 360, 7);

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Dumbbell, Salad, Flame, Timer, Trophy, Droplets, Play, Sparkles, ChevronLeft, Bot } from 'lucide-react';
+import { Dumbbell, Flame, Timer, Trophy, Play, Sparkles, ChevronLeft, Bot } from 'lucide-react';
+import { IcLunch, IcWater } from '../icons/kayar';
 import { getDashboard } from 'zitejs/api';
 import { Skeleton } from '@project/components/ui/skeleton';
 import { tok } from '../../lib/session';
@@ -42,15 +43,15 @@ export function HomeBody() {
           <div className="text-xs opacity-70">{day ? `${fa(day.exercises.length)} حرکت · شروع کن` : 'با هوش مصنوعی'}</div>
         </Link>
         <Link to="/app/bodyyar/nutrition" className="press relative min-h-[164px] overflow-hidden rounded-[28px] border border-border bg-card p-5">
-          <Salad className="absolute -bottom-5 -end-5 h-28 w-28 opacity-5" />
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary"><Salad className="h-5 w-5" /></span>
+          <IcLunch size={112} className="absolute -bottom-5 -end-5 opacity-5" />
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary"><IcLunch size={20} /></span>
           <div className="mt-5 font-black">{t ? `${fa(Math.max(0, t.calories - eaten))} kcal` : 'رژیم غذایی'}</div>
           <div className="text-xs text-muted-foreground">{t ? `باقی‌مانده · ${data.trainedToday ? 'روز تمرین' : 'روز استراحت'}` : 'وعده‌ها را ثبت کن'}</div>
           {t && <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (eaten / t.calories) * 100)}%` }} /></div>}
         </Link>
       </motion.div>
       <motion.div {...up(4)} className="mt-3 grid grid-cols-2 gap-3">
-        <div className="flex items-center gap-3 rounded-[22px] border border-border bg-card p-3.5"><Droplets className="h-5 w-5 shrink-0 text-cyan" /><div className="text-xs"><b className="block text-sm">{fa(data.nutritionPlan?.waterL ?? 2.5)} لیتر آب</b><span className="text-muted-foreground">هدف امروز</span></div></div>
+        <div className="flex items-center gap-3 rounded-[22px] border border-border bg-card p-3.5"><IcWater size={20} className="text-cyan" /><div className="text-xs"><b className="block text-sm">{fa(data.nutritionPlan?.waterL ?? 2.5)} لیتر آب</b><span className="text-muted-foreground">هدف امروز</span></div></div>
         <Link to="/app/bodyyar/coach" className="press flex items-center gap-3 rounded-[22px] border border-border bg-card p-3.5"><Bot className="h-5 w-5 shrink-0 text-primary" /><div className="text-xs"><b className="block text-sm">مربی هوشمند</b><span className="text-muted-foreground">سؤال بپرس</span></div></Link>
       </motion.div>
     </>

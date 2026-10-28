@@ -1,0 +1,112 @@
+/** Morshed import pipeline: enabled adapters → quality/content filters → reachability probe (from Iran) → dedupe/blocklist → Tracks (status=pending). */
+import { zite } from 'zitejs/db';
+import { ADAPTERS, type Row } from './adapters';
+import { classify, dedupeKey, normFa, rejectReason } from './classify';
+import { probeAudio } from './http';
+
+type SourceState = { enabled: boolean; acceptedBy?: string; acceptedAt?: string };
+export type Job = { running: boolean; startedAt: string; finishedAt?: string; source: string; target: number; scanned: number; added: number; rejected: number; log: string[]; error?: string };
+
+const KEY_SOURCES = 'morshed.sources';
+const KEY_BLOCK = 'morshed.blocklist';
+const KEY_JOB = 'morshed.lastImport';
+
+async function readJson<T>(key: string, d: T): Promise<{ v: T; id?: string }> {
+  const r = await zite.siteSettings.findOne({ filters: { key } });
+  try { return { v: { ...d, ...JSON.parse(r?.value || '{}') } as T, id: r?.id }; } catch { return { v: d, id: r?.id }; }
+}
+async function writeJson(key: string, v: unknown) {
+  await zite.siteSettings.bulkCreate({ records: [{ key, value: JSON.stringify(v) }], matchOn: ['key'] });
+}
+
+export async function getSources() {
+  const { v } = await readJson<Record<string, SourceState>>(KEY_SOURCES, {});
+  return ADAPTERS.map((a) => ({ id: a.id, name: a.name, site: a.site, note: a.note, openLicense: a.openLicense, enabled: !!v[a.id]?.enabled, acceptedBy: v[a.id]?.acceptedBy ?? '', acceptedAt: v[a.id]?.acceptedAt ?? '' }));
+}
+export async function setSource(id: string, enabled: boolean, acceptedBy: string, accepted: boolean) {
+  const a = ADAPTERS.find((x) => x.id === id);
+  if (!a) throw new Error('unknown source');
+  if (enabled && !a.openLicense && !accepted) throw new Error('license not accepted');
+  const { v } = await readJson<Record<string, SourceState>>(KEY_SOURCES, {});
+  v[id] = enabled ? { enabled, acceptedBy, acceptedAt: new Date().toISOString() } : { enabled: false };
+  await writeJson(KEY_SOURCES, v);
+}
+
+export async function getBlocklist() {
+  const { v } = await readJson<{ tracks: string[]; artists: string[] }>(KEY_BLOCK, { tracks: [], artists: [] });
+  return v;
+}
+export async function addToBlocklist(o: { track?: string; artist?: string }) {
+  const b = await getBlocklist();
+  if (o.track) b.tracks = [...new Set([...b.tracks, o.track])].slice(-5000);
+  if (o.artist) b.artists = [...new Set([...b.artists, normFa(o.artist)])].slice(-2000);
+  await writeJson(KEY_BLOCK, b);
+}
+
+let job: Job | null = null;
+export async function getJob(): Promise<Job | null> {
+  if (job) return job;
+  const { v, id } = await readJson<Job | Record<string, never>>(KEY_JOB, {});
+  return id && 'startedAt' in v ? { ...(v as Job), running: false } : null;
+}
+
+const toRecord = (r: Row, key: string, dur: number) => {
+  const c = classify(`${r.text} ${r.title}`, r.lang);
+  return {
+    title: r.title, artist: r.artist, album: r.album, artwork: r.art, coverUrl: r.art, audioUrl: r.audioUrl,
+    durationSec: dur, durationSeconds: dur, genre: c.genre, categories: c.genre, tags: [r.lang, c.style, r.sourceName.toLowerCase()].join(','),
+    license: r.license, licenseUrl: '', rights: `${r.artist} — منبع: ${r.sourceName}`, source: 'external', sourceId: r.sourceId, sourceUrl: r.sourceUrl, shareUrl: r.sourceUrl,
+    sourceName: r.sourceName, importedAt: new Date().toISOString(), lang: r.lang, style: c.style, dedupeKey: key, artistKey: normFa(r.artist), bitrate: r.bitrate,
+    status: 'pending', published: false, downloadable: false, featured: false, isFeatured: false, sortOrder: 0,
+  };
+};
+
+/** Starts a background import (one at a time). Returns immediately; poll getJob(). */
+export async function startImport(sourceIds: string[], target: number) {
+  if (job?.running) throw new Error('busy');
+  const state = await getSources();
+  const adapters = ADAPTERS.filter((a) => sourceIds.includes(a.id) && state.find((s) => s.id === a.id)?.enabled);
+  if (!adapters.length) throw new Error('no enabled source');
+  const j: Job = { running: true, startedAt: new Date().toISOString(), source: adapters.map((a) => a.name).join('، '), target, scanned: 0, added: 0, rejected: 0, log: [] };
+  job = j;
+  const log = (m: string) => { j.log.push(`${new Date().toLocaleTimeString('fa-IR', { timeZone: 'Asia/Tehran' })} — ${m}`); if (j.log.length > 300) j.log.shift(); };
+  void (async () => {
+    try {
+      const { rows } = await zite.sql({ query: `SELECT "sourceId","audioUrl","dedupeKey","artist","title" FROM "Tracks"` });
+      const seen = new Set(rows.flatMap((r) => [String(r.sourceId ?? ''), String(r.audioUrl ?? ''), String(r.dedupeKey || dedupeKey(String(r.artist ?? ''), String(r.title ?? '')))]).filter(Boolean));
+      const block = await getBlocklist();
+      const perSource = Math.ceil(target / adapters.length);
+      for (const a of adapters) {
+        log(`شروع ${a.name}…`);
+        let candidates: Row[] = [];
+        try { candidates = await a.discover(perSource * 2, log); } catch (e) { log(`${a.name} در دسترس نیست: ${(e as Error).message}`); continue; }
+        log(`${a.name}: ${candidates.length} ترک پیدا شد`);
+        let added = 0;
+        for (const r of candidates) {
+          if (added >= perSource || j.added >= target) break;
+          j.scanned++;
+          const key = dedupeKey(r.artist, r.title);
+          if (seen.has(r.sourceId) || seen.has(r.audioUrl) || seen.has(key)) continue;
+          if (block.tracks.includes(key) || block.artists.includes(normFa(r.artist))) { j.rejected++; continue; }
+          const reason = rejectReason({ title: r.title, artist: r.artist, text: r.text, bitrate: r.bitrate, lang: r.lang });
+          if (reason) { j.rejected++; log(`رد: ${r.artist} - ${r.title} (${reason})`); continue; }
+          const probe = await probeAudio(r.audioUrl);
+          if (!probe) { j.rejected++; log(`رد: ${r.title} (فایل از سرور در دسترس نیست)`); continue; }
+          const dur = probe.bytes ? Math.round((probe.bytes * 8) / (r.bitrate * 1000)) : 0;
+          const late = rejectReason({ title: r.title, artist: r.artist, text: r.text, dur: dur || undefined, lang: r.lang });
+          if (late) { j.rejected++; log(`رد: ${r.title} (${late})`); continue; }
+          await zite.tracks.create({ record: toRecord(r, key, dur) as never });
+          seen.add(r.sourceId); seen.add(r.audioUrl); seen.add(key);
+          added++; j.added++;
+        }
+        log(`${a.name}: ${added} ترک جدید در صف بررسی`);
+      }
+    } catch (e) { j.error = (e as Error).message; log(`خطا: ${j.error}`); }
+    finally {
+      j.running = false; j.finishedAt = new Date().toISOString();
+      log(`پایان: ${j.added} ترک افزوده شد، ${j.rejected} رد شد.`);
+      await writeJson(KEY_JOB, j).catch(() => {});
+    }
+  })();
+  return j;
+}

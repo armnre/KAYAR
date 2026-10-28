@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { appLibrary } from 'zitejs/api';
-import { type Track } from '../data/sample';
+import { type Track } from './track';
 import { useSession } from './session';
 
 /**

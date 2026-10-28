@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, ArrowUp, RotateCcw, Copy, Check, Trash2, Dumbbell, Salad, Flame, HeartPulse, UserRound, ChevronDown } from 'lucide-react';
+import { Bot, ArrowUp, RotateCcw, Copy, Check, Trash2, Dumbbell, Flame, HeartPulse, UserRound, ChevronDown } from 'lucide-react';
+import { IcLunch } from '../../components/icons/kayar';
 import { coachChat } from 'zitejs/api';
 import { Markdown } from '@project/components/markdown';
 import { tok } from '../../lib/session';
@@ -15,7 +16,7 @@ type Msg = { role: 'user' | 'assistant'; content: string };
 const STORE = 'kayar.coach.v1';
 const STARTERS = [
   { i: Dumbbell, t: 'تمرین امروز', q: 'تمرین امروزم رو چطور بهتر اجرا کنم؟' },
-  { i: Salad, t: 'تغذیه', q: 'قبل و بعد از تمرین دقیقاً چی بخورم؟' },
+  { i: IcLunch, t: 'تغذیه', q: 'قبل و بعد از تمرین دقیقاً چی بخورم؟' },
   { i: Flame, t: 'چربی‌سوزی', q: 'برای کاهش چربی شکم بهترین روش چیه؟' },
   { i: HeartPulse, t: 'ریکاوری', q: 'بعد از تمرین عضلاتم درد می‌کنه، چیکار کنم؟' },
 ];
@@ -104,7 +105,7 @@ export default function Coach() {
         {msgs.length === 0 && (
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="pt-4 text-center">
             <div className="relative mx-auto grid h-20 w-20 place-items-center rounded-[28px] bg-primary text-primary-foreground shadow-[0_20px_50px_-15px_hsl(var(--primary)/.6)]"><Bot className="h-9 w-9" /><span className="absolute -bottom-1 -end-1 h-4 w-4 rounded-full border-4 border-background bg-primary" /></div>
-            <h2 className="mt-4 text-xl font-black">سلام! من بدن‌یارم 👋</h2>
+            <h2 className="mt-4 text-xl font-black">سلام! من بدن‌یارم</h2>
             <p className="mx-auto mt-1 max-w-xs text-sm leading-6 text-muted-foreground">برنامه، تغذیه و جلسه‌هات رو می‌شناسم. هر سؤالی داری بپرس.</p>
             <div className="mt-6 grid grid-cols-2 gap-2.5 text-start">
               {STARTERS.map((s) => (

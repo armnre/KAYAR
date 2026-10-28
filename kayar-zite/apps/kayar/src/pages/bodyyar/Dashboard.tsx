@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, Apple, LineChart, Bot, BookOpen, Sparkles, CheckCircle2, Target, Flame, Timer, Scale, TrendingDown, ChevronLeft, Settings2 } from 'lucide-react';
+import { Play, LineChart, Bot, BookOpen, Sparkles, CheckCircle2, Target, Flame, Timer, Scale, TrendingDown, ChevronLeft, Settings2 } from 'lucide-react';
+import { IcLunch } from '../../components/icons/kayar';
 import { getDashboard } from 'zitejs/api';
 import { tok } from '../../lib/session';
 import { Button } from '@project/components/ui/button';
@@ -11,7 +12,7 @@ import { ASSETS } from '../../lib/assets';
 const QUICK = [
   { to: '/app/bodyyar/coach', label: 'مربی AI', sub: 'هر سوالی داری بپرس', icon: Bot },
   { to: '/app/bodyyar/exercises', label: 'حرکات', sub: 'آموزش تصویری', icon: BookOpen },
-  { to: '/app/bodyyar/nutrition', label: 'تغذیه', sub: 'رژیم و وعده‌ها', icon: Apple },
+  { to: '/app/bodyyar/nutrition', label: 'تغذیه', sub: 'رژیم و وعده‌ها', icon: IcLunch },
   { to: '/app/bodyyar/progress', label: 'پیشرفت', sub: 'وزن و نمودار', icon: LineChart },
 ];
 const up = (i: number) => ({ initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, transition: { delay: i * 0.06, duration: 0.4 } });
@@ -64,7 +65,7 @@ export default function Dashboard() {
       <motion.div {...up(0)} className="relative overflow-hidden rounded-[32px] border border-border bg-card p-5">
         <div className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative flex items-start justify-between">
-          <div><p className="font-latin text-[10px] font-bold tracking-[.3em] text-primary">BODYYAR</p><h1 className="mt-1 text-2xl font-black">{hello} 👋</h1><p className="mt-0.5 text-sm text-muted-foreground">هدف: <b className="text-foreground">{data.profile.goal}</b></p></div>
+          <div><p className="font-latin text-[10px] font-bold tracking-[.3em] text-primary">BODYYAR</p><h1 className="mt-1 text-2xl font-black">{hello}</h1><p className="mt-0.5 text-sm text-muted-foreground">هدف: <b className="text-foreground">{data.profile.goal}</b></p></div>
           <Link to="/app/bodyyar/profile" className="press grid h-10 w-10 place-items-center rounded-2xl border border-border bg-background/60" aria-label="ویرایش پروفایل"><Settings2 className="h-4.5 w-4.5" /></Link>
         </div>
         <div className="relative mt-5 flex items-center gap-4">
