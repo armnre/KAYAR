@@ -1,6 +1,12 @@
 node_modules
 dist
-.env.local
+.env
+.env.*
+!.env.example
+*.log
 .tsbuildinfo
+*.tsbuildinfo
 __zite__*
 .npmrc
+.DS_Store
+standalone/endpoints.generated.ts

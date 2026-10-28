@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /app/
-Sitemap: https://kayar.ir/sitemap.xml
+Sitemap: https://kayar.kapoosh.ir/sitemap.xml

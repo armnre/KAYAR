@@ -14,7 +14,7 @@ export default defineConfig({
   plugins: [react(), {
     name: 'kayar-html',
     transformIndexHtml(html: string) {
-      const head = fs.readFileSync(path.resolve(root, 'deploy/head.html'), 'utf8');
+      const head = fs.readFileSync(path.resolve(__dirname, 'head.html'), 'utf8');
       return html
         .replace('<html lang="en">', '<html lang="fa" dir="rtl" class="dark">')
         .replace(/\s*<link rel="icon"[^>]*>/, '').replace(/\s*<meta name="viewport"[^>]*>/, '').replace(/\s*<title>[^<]*<\/title>/, '')

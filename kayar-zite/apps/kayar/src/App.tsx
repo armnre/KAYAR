@@ -25,7 +25,7 @@ import { PickDetail, PickCallback } from './components/app/PickDetail';
 import { AdminCampaigns } from './pages/admin/Campaigns';
 import { AdminSms } from './pages/admin/Sms';
 import { AdminDashboard, AdminCustomers, AdminContent, AdminPosts, AdminMedia, AdminMorshed, AdminSettings, AdminAudit, AdminAnnouncements, AdminStaff } from './pages/Admin';
-import { NotFound, Styleguide } from './pages/Misc';
+import { NotFound } from './pages/Misc';
 import { applyHeadTags } from './lib/headTags';
 
 export default function App() {
@@ -76,7 +76,6 @@ export default function App() {
             <Route path="settings" element={<AdminSettings />} />
             <Route path="audit" element={<AdminAudit />} />
           </Route>
-          {import.meta.env.DEV && <Route path="/styleguide" element={<Styleguide />} />}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
