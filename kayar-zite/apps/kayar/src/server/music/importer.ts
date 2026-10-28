@@ -2,7 +2,9 @@
 import { zite } from 'zitejs/db';
 import { ADAPTERS, type Row } from './adapters';
 import { classify, dedupeKey, normFa, rejectReason } from './classify';
-import { probeAudio } from './http';
+import { probeAudio, relayEnabled } from './http';
+
+const PROBE_CONCURRENCY = 8;
 
 type SourceState = { enabled: boolean; acceptedBy?: string; acceptedAt?: string };
 export type Job = { running: boolean; startedAt: string; finishedAt?: string; source: string; target: number; scanned: number; added: number; rejected: number; log: string[]; error?: string };
@@ -84,23 +86,34 @@ export async function startImport(sourceIds: string[], target: number, opts: { a
         try { candidates = await a.discover(perSource * 2, log); } catch (e) { log(`${a.name} در دسترس نیست: ${(e as Error).message}`); continue; }
         log(`${a.name}: ${candidates.length} ترک پیدا شد`);
         let added = 0;
+        const queue: { r: Row; key: string }[] = [];
         for (const r of candidates) {
-          if (added >= perSource || j.added >= target) break;
           j.scanned++;
           const key = dedupeKey(r.artist, r.title);
           if (seen.has(r.sourceId) || seen.has(r.audioUrl) || seen.has(key)) continue;
           if (block.tracks.includes(key) || block.artists.includes(normFa(r.artist))) { j.rejected++; continue; }
           const reason = rejectReason({ title: r.title, artist: r.artist, text: r.text, bitrate: r.bitrate, lang: r.lang });
           if (reason) { j.rejected++; log(`رد: ${r.artist} - ${r.title} (${reason})`); continue; }
-          const probe = await probeAudio(r.audioUrl);
-          if (!probe) { j.rejected++; log(`رد: ${r.title} (فایل از سرور در دسترس نیست)`); continue; }
-          const dur = r.dur || (probe.bytes && r.bitrate ? Math.round((probe.bytes * 8) / (r.bitrate * 1000)) : 0);
-          const late = rejectReason({ title: r.title, artist: r.artist, text: r.text, dur: dur || undefined, lang: r.lang });
-          if (late) { j.rejected++; log(`رد: ${r.title} (${late})`); continue; }
-          await zite.tracks.create({ record: toRecord(r, key, dur, !!opts.autoPublishOpen && a.openLicense) as never });
-          seen.add(r.sourceId); seen.add(r.audioUrl); seen.add(key);
-          added++; j.added++;
+          seen.add(key); queue.push({ r, key });
         }
+        let i = 0; let unreachable = 0;
+        const worker = async () => {
+          while (i < queue.length && added < perSource && j.added < target) {
+            const { r, key } = queue[i++];
+            const probe = await probeAudio(r.audioUrl);
+            if (!probe) { j.rejected++; if (++unreachable <= 3) log(`رد: ${r.title} (فایل از سرور در دسترس نیست)`); continue; }
+            const dur = r.dur || (probe.bytes && r.bitrate ? Math.round((probe.bytes * 8) / (r.bitrate * 1000)) : 0);
+            const late = rejectReason({ title: r.title, artist: r.artist, text: r.text, dur: dur || undefined, lang: r.lang });
+            if (late) { j.rejected++; log(`رد: ${r.title} (${late})`); continue; }
+            if (added >= perSource || j.added >= target) return;
+            added++; j.added++;
+            seen.add(r.sourceId); seen.add(r.audioUrl);
+            await zite.tracks.create({ record: toRecord(r, key, dur, !!opts.autoPublishOpen && a.openLicense) as never })
+              .catch((e) => { added--; j.added--; log(`خطای ذخیره: ${r.title} (${(e as Error).message})`); });
+          }
+        };
+        await Promise.all(Array.from({ length: PROBE_CONCURRENCY }, worker));
+        if (unreachable > 3) log(`${a.name}: ${unreachable} فایل از سرور در دسترس نبود${relayEnabled ? '' : ' — برای منابع خارجی، رله (MEDIA_RELAY_URL) را تنظیم کن'}`);
         log(`${a.name}: ${added} ترک جدید در صف بررسی`);
       }
     } catch (e) { j.error = (e as Error).message; log(`خطا: ${j.error}`); }

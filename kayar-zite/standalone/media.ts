@@ -10,7 +10,7 @@ import { Readable } from 'node:stream';
 import { pool } from './db';
 import { UPLOAD_DIR, diskUsage } from './uploads';
 import { log } from './log';
-import { USER_AGENT } from '../apps/kayar/src/server/music/http';
+import { USER_AGENT, smartFetch } from '../apps/kayar/src/server/music/http';
 
 const MB = 1024 * 1024;
 const CACHE_DIR = path.join(UPLOAD_DIR, '.media-cache');
@@ -52,7 +52,7 @@ function fill(url: string, key: string): Promise<string | null> {
   const running = inflight.get(key); if (running) return running;
   const p = (async () => {
     try {
-      const r = await fetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow' });
+      const r = await smartFetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow' });
       const len = Number(r.headers.get('content-length') || 0);
       if (!r.ok || !r.body || (len && len > MAX_FILE) || !evict(len || 10 * MB)) return null;
       fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -82,7 +82,7 @@ function sendLocal(req: Request, res: Response, file: string, type: string) {
 
 /** Streams straight from the source when it can't be cached (Range is forwarded). */
 async function passThrough(req: Request, res: Response, url: string) {
-  const r = await fetch(url, { headers: { 'user-agent': USER_AGENT, ...(req.headers.range ? { range: String(req.headers.range) } : {}) }, redirect: 'follow' });
+  const r = await smartFetch(url, { headers: { 'user-agent': USER_AGENT, ...(req.headers.range ? { range: String(req.headers.range) } : {}) }, redirect: 'follow' });
   if (!r.ok && r.status !== 206) return res.status(502).end();
   res.status(r.status);
   for (const h of ['content-type', 'content-length', 'content-range', 'accept-ranges']) { const v = r.headers.get(h); if (v) res.setHeader(h, v); }
@@ -133,7 +133,7 @@ export async function pruneMediaCache() {
 /* ---------- Permanent mirror worker ---------- */
 const failedAt = new Map<string, number>();
 async function download(url: string, dest: string, max: number) {
-  const r = await fetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow', signal: AbortSignal.timeout(120_000) });
+  const r = await smartFetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow', signal: AbortSignal.timeout(120_000) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   const buf = Buffer.from(await r.arrayBuffer());
   if (!buf.length || buf.length > max) throw new Error('size');
