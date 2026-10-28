@@ -105,7 +105,8 @@ export function StatusBadge({ status }: { status: 'active' | 'pending' | 'suspen
 const common = ['12345678', 'password', '123456789', 'qwerty123', '11111111', '1234567890', 'kapoosh123'];
 export function passwordRules(pw: string, username = '') {
   return [
-    { ok: pw.length >= 8, label: 'حداقل ۸ نویسه' },
+    { ok: pw.length >= 10, label: 'حداقل ۱۰ نویسه' },
+    { ok: !!pw && !/^\d+$/.test(pw) && !/9\d{9}/.test(pw), label: 'فقط عدد یا شبیه شماره موبایل نباشد' },
     { ok: !!pw && pw !== username && !(username && pw.includes(username)), label: 'متفاوت با نام کاربری یا شماره' },
     { ok: !!pw && !common.includes(pw.toLowerCase()), label: 'جزو رمزهای رایج نباشد' },
     { ok: /\d/.test(pw) && /[a-zA-Z\u0600-\u06FF]/.test(pw), label: 'ترکیب حرف و عدد' },

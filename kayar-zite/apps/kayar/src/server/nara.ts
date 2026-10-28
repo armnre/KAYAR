@@ -75,6 +75,7 @@ export async function* aiStream(messages: AiMessage[]): AsyncGenerator<string> {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${process.env.ZITE_NARAROUTER_API_KEY}` },
         body: JSON.stringify({ model, messages, temperature: 0.5, stream: true }),
+        signal: AbortSignal.timeout(Number(process.env.AI_TIMEOUT_MS || 120_000)),
       });
       if (r.ok && r.body) { res = r; break; }
       if (r.status === 402 || r.status === 429) park(model);

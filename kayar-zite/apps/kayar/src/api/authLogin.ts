@@ -8,13 +8,14 @@ import { publicMember, toPublic } from '../server/util';
 
 const BAD = 'نام کاربری یا رمز عبور اشتباه است.';
 
-/** Creates the first superadmin from Secrets, once. */
+/** Creates the first superadmin from env, once: only when no superadmin exists. Never touches an existing
+ *  account, so a password changed in the panel survives restarts/redeploys. Must change password on first login. */
 async function bootstrap() {
   const u = process.env.ZITE_BOOTSTRAP_ADMIN_USERNAME, p = process.env.ZITE_BOOTSTRAP_ADMIN_PASSWORD;
   if (!u || !p) return;
   const existing = await zite.members.findOne({ filters: { role: 'superadmin' } });
   if (existing) return;
-  const m = await zite.members.create({ record: { username: normalizeUsername(u), displayName: 'مدیر ارشد', role: 'superadmin', status: 'active', passwordHash: await hashPassword(p), mustChangePassword: false, createdBy: 'bootstrap' } });
+  const m = await zite.members.create({ record: { username: normalizeUsername(u), displayName: 'مدیر ارشد', role: 'superadmin', status: 'active', passwordHash: await hashPassword(p), mustChangePassword: true, createdBy: 'bootstrap' } });
   await audit(null, 'bootstrap.superadmin', 'member', m.id);
 }
 

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
+import { VitePWA } from 'vite-plugin-pwa';
 
 const root = path.resolve(__dirname, '..');
 const app = path.resolve(root, 'apps/kayar');
@@ -11,7 +12,12 @@ export default defineConfig({
   root: app,
   publicDir: path.resolve(app, 'public'),
   build: { target: 'es2019', sourcemap: false, reportCompressedSize: false, outDir: path.resolve(__dirname, 'dist/public'), emptyOutDir: true },
-  plugins: [react(), {
+  plugins: [react(), VitePWA({
+    // Service worker source: standalone/pwa/sw.ts → dist/public/sw.js (served no-cache by server.ts; SW_DISABLED=1 swaps in a kill-switch)
+    strategies: 'injectManifest', srcDir: path.resolve(__dirname, 'pwa'), filename: 'sw.ts',
+    injectRegister: false, registerType: 'prompt', manifest: false,
+    injectManifest: { globPatterns: ['assets/**/*.{js,css,woff2}', 'offline.html', '*.{png,svg}'], globIgnores: ['index.html', 'media/**', 'og.png'], maximumFileSizeToCacheInBytes: 4 * 1024 * 1024 },
+  }), {
     name: 'kayar-html',
     transformIndexHtml(html: string) {
       const head = fs.readFileSync(path.resolve(__dirname, 'head.html'), 'utf8');

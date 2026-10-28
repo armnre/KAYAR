@@ -11,5 +11,7 @@ ENV NODE_ENV=production PORT=3000 STATIC_DIR=/srv/public UPLOAD_DIR=/data/upload
 COPY --from=build /repo/standalone/dist/server.mjs ./server.mjs
 COPY --from=build /repo/standalone/dist/public ./public
 COPY --from=build /repo/standalone/seed ./seed
+COPY --from=build /repo/standalone/dist/scripts ./scripts
 EXPOSE 3000
+STOPSIGNAL SIGTERM
 CMD ["node", "server.mjs"]

@@ -1,1 +1,74 @@
-{"name":"کایار | KAYAR","short_name":"KAYAR","description":"بدن‌یار، مرشد و پیشنهادات کایار — تمرین، تغذیه و موسیقی ورزشی","lang":"fa","dir":"rtl","start_url":"/app","scope":"/","display":"standalone","orientation":"portrait","background_color":"#0A0C0E","theme_color":"#0A0C0E","icons":[{"src":"/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"/icon-512.png","sizes":"512x512","type":"image/png"},{"src":"/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
+{
+ "name": "کایار | KAYAR",
+ "short_name": "KAYAR",
+ "description": "بدن‌یار، مرشد و پیشنهادات کایار — تمرین، تغذیه و موسیقی ورزشی",
+ "lang": "fa",
+ "dir": "rtl",
+ "start_url": "/app",
+ "scope": "/",
+ "display": "standalone",
+ "orientation": "portrait",
+ "background_color": "#0A0C0E",
+ "theme_color": "#0A0C0E",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "/icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "id": "/app",
+ "categories": [
+  "health",
+  "fitness",
+  "music"
+ ],
+ "shortcuts": [
+  {
+   "name": "مرشد — موسیقی ورزشی",
+   "short_name": "مرشد",
+   "url": "/app/morshed",
+   "icons": [
+    {
+     "src": "/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  },
+  {
+   "name": "بدن‌یار — برنامه‌ی تمرین",
+   "short_name": "بدن‌یار",
+   "url": "/app/bodyyar",
+   "icons": [
+    {
+     "src": "/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  },
+  {
+   "name": "تغذیه",
+   "short_name": "تغذیه",
+   "url": "/app/bodyyar/nutrition",
+   "icons": [
+    {
+     "src": "/icon-192.png",
+     "sizes": "192x192"
+    }
+   ]
+  }
+ ]
+}

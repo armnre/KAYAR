@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import '@fontsource-variable/vazirmatn';
 import '@fontsource-variable/sora';
 import { Toaster } from '@project/components/ui/sonner';
+import PwaManager from './components/PwaManager';
 import { PreviewProvider } from './lib/preview';
 import { CmsProvider } from './lib/cms';
 import { SessionProvider } from './lib/session';
@@ -78,6 +79,7 @@ export default function App() {
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <PwaManager />
       </BrowserRouter>
       <Toaster position="top-center" dir="rtl" />
     </CmsProvider></PreviewProvider></SessionProvider></SessionProvider>
