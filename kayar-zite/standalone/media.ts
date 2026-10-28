@@ -14,8 +14,11 @@ import { USER_AGENT } from '../apps/kayar/src/server/music/http';
 
 const MB = 1024 * 1024;
 const CACHE_DIR = path.join(UPLOAD_DIR, '.media-cache');
+/** Permanent mirror of published tracks (never LRU-evicted). Budget: MEDIA_LIBRARY_MB (default 1200). */
+const LIB_DIR = path.join(UPLOAD_DIR, '.media-library');
+const LIB_MAX = () => Number(process.env.MEDIA_LIBRARY_MB || 1200) * MB;
 const DISK_TOTAL = Number(process.env.DISK_TOTAL_MB || 2048) * MB;
-const CACHE_MAX = () => Math.max(0, Math.min(Number(process.env.MEDIA_CACHE_MB || 500) * MB, DISK_TOTAL - diskUsage().bytes - 300 * MB));
+const CACHE_MAX = () => Math.max(0, Math.min(Number(process.env.MEDIA_CACHE_MB || 500) * MB, DISK_TOTAL - diskUsage().bytes - dirSize(LIB_DIR).total - 300 * MB));
 const MAX_FILE = 25 * MB;
 const inflight = new Map<string, Promise<string | null>>();
 
@@ -28,9 +31,10 @@ async function sourceOf(id: string, kind: 'audio' | 'cover') {
   return /^https?:\/\//.test(u) ? u : null;
 }
 
-function cacheSize() {
+function cacheSize() { return dirSize(CACHE_DIR); }
+function dirSize(dir: string) {
   let total = 0; const files: { p: string; size: number; at: number }[] = [];
-  try { for (const f of fs.readdirSync(CACHE_DIR)) { const p = path.join(CACHE_DIR, f); const s = fs.statSync(p); total += s.size; files.push({ p, size: s.size, at: s.atimeMs }); } } catch { /* empty */ }
+  try { for (const f of fs.readdirSync(dir)) { if (f.endsWith('.part')) continue; const p = path.join(dir, f); const s = fs.statSync(p); total += s.size; files.push({ p, size: s.size, at: s.atimeMs }); } } catch { /* empty */ }
   return { total, files };
 }
 function evict(incoming: number) {
@@ -92,6 +96,8 @@ export function mediaRouter(): Router {
     try {
       const url = await sourceOf(req.params.id, 'audio');
       if (!url) return res.status(404).end();
+      const pinned = path.join(LIB_DIR, `a-${req.params.id}.mp3`);
+      if (fs.existsSync(pinned)) return sendLocal(req, res, pinned, 'audio/mpeg');
       const file = await fill(url, `a-${req.params.id}.mp3`);
       if (file) return sendLocal(req, res, file, 'audio/mpeg');
       await passThrough(req, res, url);
@@ -101,7 +107,8 @@ export function mediaRouter(): Router {
     try {
       const url = await sourceOf(req.params.id, 'cover');
       if (!url) return res.status(404).end();
-      const file = await fill(url, `c-${req.params.id}`);
+      const pinnedCover = path.join(LIB_DIR, `c-${req.params.id}`);
+      const file = fs.existsSync(pinnedCover) ? pinnedCover : await fill(url, `c-${req.params.id}`);
       if (!file) return res.status(404).end();
       const head = fs.readFileSync(file).subarray(0, 12);
       const type = head[0] === 0xff ? 'image/jpeg' : head.toString('latin1', 8, 12) === 'WEBP' ? 'image/webp' : head[1] === 0x50 ? 'image/png' : 'application/octet-stream';
@@ -115,10 +122,48 @@ export function mediaRouter(): Router {
 
 /** Removes cached files whose track no longer exists (called after purge/takedown via script). */
 export async function pruneMediaCache() {
-  const { files } = cacheSize();
+  const files = [...cacheSize().files, ...dirSize(LIB_DIR).files];
   const { rows } = await pool.query(`SELECT id::text AS id FROM "Tracks" WHERE status NOT IN ('deleted','rejected')`);
   const live = new Set(rows.map((x) => x.id));
   let removed = 0;
   for (const f of files) { const id = path.basename(f.p).replace(/^[ac]-/, '').replace(/\.mp3$/, ''); if (!live.has(id)) { try { fs.unlinkSync(f.p); removed++; } catch { /* gone */ } } }
   return removed;
+}
+
+/* ---------- Permanent mirror worker ---------- */
+const failedAt = new Map<string, number>();
+async function download(url: string, dest: string, max: number) {
+  const r = await fetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow', signal: AbortSignal.timeout(120_000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const buf = Buffer.from(await r.arrayBuffer());
+  if (!buf.length || buf.length > max) throw new Error('size');
+  const tmp = `${dest}.${crypto.randomBytes(4).toString('hex')}.part`;
+  fs.writeFileSync(tmp, buf); fs.renameSync(tmp, dest);
+  return buf.length;
+}
+
+/**
+ * Copies published external tracks (audio + cover) into the permanent library, newest first, within the budget.
+ * Once mirrored, playback is served from KAYAR's own disk — no dependency on the source host or on filtering.
+ */
+export async function mirrorTick(batch = 6): Promise<{ files: number; mb: number; budgetMb: number; pending: number; failed: number; at: string }> {
+  fs.mkdirSync(LIB_DIR, { recursive: true });
+  const { rows } = await pool.query(`SELECT id::text AS id, "audioUrl", "coverUrl" FROM "Tracks" WHERE status = 'published' AND source = 'external' AND "audioUrl" ~ '^https?://' ORDER BY "importedAt" DESC NULLS LAST LIMIT 5000`);
+  const missing = rows.filter((r) => !fs.existsSync(path.join(LIB_DIR, `a-${r.id}.mp3`)));
+  const free = () => Math.min(LIB_MAX() - dirSize(LIB_DIR).total, DISK_TOTAL - diskUsage().bytes - dirSize(LIB_DIR).total - dirSize(CACHE_DIR).total - 300 * MB);
+  let done = 0;
+  for (const r of missing) {
+    if (done >= batch || free() < 30 * MB) break;
+    if (Date.now() - (failedAt.get(r.id) ?? 0) < 6 * 3600_000) continue;
+    const cached = path.join(CACHE_DIR, `a-${r.id}.mp3`);
+    const dest = path.join(LIB_DIR, `a-${r.id}.mp3`);
+    try {
+      if (fs.existsSync(cached)) fs.renameSync(cached, dest); else await download(String(r.audioUrl), dest, MAX_FILE);
+      if (/^https?:\/\//.test(String(r.coverUrl ?? ''))) await download(String(r.coverUrl), path.join(LIB_DIR, `c-${r.id}`), 3 * MB).catch(() => {});
+      done++;
+    } catch (e) { failedAt.set(r.id, Date.now()); log('warn', 'mirror failed', { id: r.id, error: (e as Error).message }); }
+  }
+  const lib = dirSize(LIB_DIR);
+  const audioFiles = lib.files.filter((f) => path.basename(f.p).startsWith('a-')).length;
+  return { files: audioFiles, mb: Math.round(lib.total / MB), budgetMb: Math.round(LIB_MAX() / MB), pending: Math.max(0, missing.length - done), failed: failedAt.size, at: new Date().toISOString() };
 }

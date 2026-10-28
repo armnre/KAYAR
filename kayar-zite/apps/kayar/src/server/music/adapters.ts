@@ -1,6 +1,7 @@
 /** Source adapters for Persian music sites hosted inside Iran. Each returns metadata only — audio is never copied to disk. */
 import { getText, robotsAllows, decodeHtml } from './http';
 import type { Lang } from './classify';
+import { OPEN_ADAPTERS } from './openSources';
 
 export type Row = {
   title: string; artist: string; album: string; art: string; audioUrl: string; dur: number; bitrate: number;
@@ -97,6 +98,7 @@ async function crawl(site: string, name: string, items: { link: string; title: s
 }
 
 export const ADAPTERS: Adapter[] = [
+  ...OPEN_ADAPTERS,
   {
     id: 'musicdel', name: 'Musicdel', site: 'musicdel.ir', openLicense: false,
     note: 'فید RSS عمومی ریشه‌ی سایت (مجاز در robots.txt) + صفحه‌ی تک‌ترک. فایل‌ها روی dl.musicdel.ir (داخل ایران).',
@@ -122,5 +124,5 @@ export const EXCLUDED: { name: string; reason: string }[] = [
   { name: 'Ganja2Music', reason: 'پشت چالش Cloudflare؛ فید و robots.txt بدون اجرای جاوااسکریپت در دسترس نیست.' },
   { name: 'Melovaz', reason: 'محتوا عمدتاً پلی‌لیست‌های خارجی قدیمی (۲۰۱۹–۲۰۲۳) بدون فایل تک‌ترک در صفحه است.' },
   { name: 'Radio Javan', reason: 'از داخل ایران فیلتر است.' },
-  { name: 'Jamendo / Audius / Internet Archive / ccMixter', reason: 'از داخل ایران بدون فیلترشکن پخش نمی‌شوند؛ طبق دستور حذف شدند.' },
+  { name: 'Audius / Internet Archive', reason: 'API ناپایدار؛ Jamendo و ccMixter از طریق Openverse و API رسمی پوشش داده می‌شوند و بعد از تأیید روی سرور خود کایار ذخیره می‌شوند.' },
 ];
