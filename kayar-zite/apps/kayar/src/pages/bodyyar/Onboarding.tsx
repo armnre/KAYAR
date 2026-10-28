@@ -11,6 +11,7 @@ import { Textarea } from '@project/components/ui/textarea';
 import { Label } from '@project/components/ui/label';
 import { Card, PageHeader, errMsg, faNum } from '../../components/bkit';
 import { cn } from '@project/components/lib/utils';
+import { IconBadge, ACTIVITY_ICON, OPTION_ICON } from '../../components/icons/kayar';
 
 type F = { goal: string; level: string; daysPerWeek: number; place: string; equipment: string[]; sessionMinutes: number; diet: string; limitations: string; age: string; heightCm: string; weightKg: string; sex: '' | 'male' | 'female'; activityLevel: string; targetWeightKg: string; sleepHours: number; waistCm: string; allergies: string };
 const EMPTY: F = { goal: '', level: '', daysPerWeek: 3, place: '', equipment: [], sessionMinutes: 45, diet: '', limitations: '', age: '', heightCm: '', weightKg: '', sex: '', activityLevel: '', targetWeightKg: '', sleepHours: 7, waistCm: '', allergies: '' };
@@ -24,15 +25,15 @@ const DIETS = ['معمولی', 'گیاهی', 'وگان', 'بدون گلوتن', 
 const numOpt = (min: number, max: number) => z.string().refine((v) => v === '' || (Number(v) >= min && Number(v) <= max), `بین ${min} و ${max}`);
 const bodySchema = z.object({ age: numOpt(13, 100), heightCm: numOpt(100, 250), weightKg: numOpt(25, 300) });
 const lifeSchema = z.object({ targetWeightKg: numOpt(25, 300), waistCm: numOpt(40, 200) });
-const ACTIVITY = [['sedentary', '🪑', 'کم‌تحرک', 'پشت میز، کمتر از ۳ هزار قدم'], ['light', '🚶', 'سبک', 'کمی پیاده‌روی روزانه'], ['moderate', '🏃', 'متوسط', 'کار سرپا یا ۸ هزار قدم'], ['active', '⚡', 'فعال', 'کار بدنی یا ۱۲ هزار قدم+'], ['athlete', '🏆', 'ورزشکار', 'تمرین سنگین روزانه']] as const;
-const EMOJI: Record<string, string> = { 'کاهش وزن': '🔥', 'عضله‌سازی': '💪', 'افزایش قدرت': '🏋️', 'تناسب و سلامت عمومی': '❤️', 'آمادگی دویدن': '🏃', 'مبتدی': '🌱', 'متوسط': '⚡', 'پیشرفته': '🏆', 'خانه': '🏠', 'باشگاه': '🏢', 'فضای باز': '🌳' };
+const ACTIVITY = [['sedentary', ACTIVITY_ICON.sedentary, 'کم‌تحرک', 'پشت میز، کمتر از ۳ هزار قدم'], ['light', ACTIVITY_ICON.light, 'سبک', 'کمی پیاده‌روی روزانه'], ['moderate', ACTIVITY_ICON.moderate, 'متوسط', 'کار سرپا یا ۸ هزار قدم'], ['active', ACTIVITY_ICON.active, 'فعال', 'کار بدنی یا ۱۲ هزار قدم+'], ['athlete', ACTIVITY_ICON.athlete, 'ورزشکار', 'تمرین سنگین روزانه']] as const;
+
 
 function Chips({ options, value, onChange, multi }: { options: string[]; value: string | string[]; onChange: (v: string) => void; multi?: boolean }) {
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((o) => {
         const on = multi ? (value as string[]).includes(o) : value === o;
-        return <button type="button" key={o} onClick={() => onChange(o)} aria-pressed={on} className={cn('press min-h-[48px] rounded-2xl border px-4 text-sm font-bold transition', on ? 'border-primary bg-primary text-primary-foreground shadow-[0_8px_24px_-10px_hsl(var(--primary))]' : 'border-white/10 bg-white/[.04] hover:border-primary/50')}>{EMOJI[o] && <span className="me-1.5">{EMOJI[o]}</span>}{o}</button>;
+        return <button type="button" key={o} onClick={() => onChange(o)} aria-pressed={on} className={cn('press flex min-h-[48px] items-center gap-2 rounded-2xl border px-4 text-sm font-bold transition', on ? 'border-primary bg-primary text-primary-foreground shadow-[0_8px_24px_-10px_hsl(var(--primary))]' : 'border-white/10 bg-white/[.04] hover:border-primary/50')}>{(() => { const I = OPTION_ICON[o]; return I ? <I size={18} className={on ? '' : 'text-primary'} /> : null; })()}{o}</button>;
       })}
     </div>
   );
@@ -87,7 +88,7 @@ export default function Onboarding() {
       <div className="space-y-5">
         <div className="grid gap-2">{ACTIVITY.map(([v, e, l, d]) => (
           <button key={v} type="button" onClick={() => set('activityLevel', v)} className={cn('press flex items-center gap-3 rounded-2xl border p-3 text-start transition', f.activityLevel === v ? 'border-primary bg-primary/15' : 'border-white/10 bg-white/[.03]')}>
-            <span className="text-2xl">{e}</span><span className="flex-1"><b className="block text-sm">{l}</b><span className="text-xs text-muted-foreground">{d}</span></span>
+            <IconBadge icon={e} tone={f.activityLevel === v ? 'primary' : 'muted'} size="sm" active={f.activityLevel === v} /><span className="flex-1"><b className="block text-sm">{l}</b><span className="text-xs text-muted-foreground">{d}</span></span>
             <span className={cn('h-5 w-5 rounded-full border-2', f.activityLevel === v ? 'border-primary bg-primary' : 'border-white/20')} />
           </button>))}</div>
         <div><Label>خواب شبانه: <span className="text-primary">{faNum(f.sleepHours)}</span> ساعت</Label><input type="range" min={3} max={12} step={0.5} value={f.sleepHours} onChange={(e) => set('sleepHours', Number(e.target.value))} className="mt-2 w-full accent-[hsl(var(--primary))]" /></div>

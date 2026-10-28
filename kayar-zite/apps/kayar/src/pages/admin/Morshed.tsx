@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Music, Search, Plus, ExternalLink, Star, Pencil, Trash2, Mic2, Loader2, RefreshCw } from 'lucide-react';
 import { useUpload } from 'zitejs/upload';
 import { toast } from 'sonner';
-import { adminDiscover, adminTracks, adminShows, adminInspectUrl, type AdminTracksOutputType, type AdminShowsOutputType, type AdminShowsInputType, type AdminInspectUrlOutputType } from 'zitejs/api';
+import { adminTracks, adminShows, adminInspectUrl, type AdminTracksOutputType, type AdminShowsOutputType, type AdminShowsInputType, type AdminInspectUrlOutputType } from 'zitejs/api';
 import { Switch } from '@project/components/ui/switch';
 import { cn } from '@project/components/lib/utils';
 import { KButton, Glass, StateView, Cover } from '../../components/kit';
@@ -11,6 +11,7 @@ import { SortableList } from '../../components/admin/SortableList';
 import { CollectionsPanel } from './Collections';
 import { Pill } from './Posts';
 import { useAdmin, errMsg } from '../../lib/session';
+import { ReviewTab, SourcesTab } from './MorshedReview';
 import { fa } from '../../lib/config';
 
 type T = AdminTracksOutputType['tracks'][0];
@@ -20,12 +21,12 @@ const CATS = ['شروع قدرتی', 'کاردیو', 'ریکاوری', 'تمرک
 
 function EditTrack({ t, onSaved }: { t: T; onSaved: (all: T[]) => void }) {
   const { token } = useAdmin();
-  const [f, setF] = useState({ title: t.title, artist: t.artist, album: t.album, rights: t.rights, categories: t.categories, tags: t.tags.join('، '), featured: t.featured, status: t.status as 'draft' | 'published' | 'hidden' });
+  const [f, setF] = useState({ title: t.title, artist: t.artist, album: t.album, rights: t.rights, categories: t.categories, tags: t.tags.join('، '), featured: t.featured, status: (['draft', 'published', 'hidden'].includes(t.status) ? t.status : 'draft') as 'draft' | 'published' | 'hidden' });
   const [busy, setBusy] = useState(false);
   const save = async () => { setBusy(true); try { const r = await adminTracks({ token, action: 'update', id: t.id, patch: { ...f, tags: f.tags.split(/[,،]/).map((x) => x.trim()).filter(Boolean) } }); onSaved(r.tracks); toast.success('ذخیره شد'); } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); } };
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-3"><Cover hue={200} image={t.coverUrl} className="h-16 w-16 rounded-xl" /><div className="min-w-0 text-sm text-muted-foreground"><div>منبع: {t.source === 'upload' ? 'آپلود' : 'لینک خارجی'}</div><div>مدت: {dur(t.duration)}</div>{t.audioUrl && <audio src={t.audioUrl} controls preload="none" className="mt-1 h-8 w-full" />}</div></div>
+      <div className="flex items-center gap-3"><Cover hue={200} image={t.coverUrl} className="h-16 w-16 rounded-xl" /><div className="min-w-0 text-sm text-muted-foreground"><div>منبع: {t.source === 'upload' ? 'آپلود' : t.sourceName || 'لینک خارجی'}</div><div>مدت: {dur(t.duration)}</div>{t.audioUrl && <audio src={t.source === 'external' ? `/media/stream/${t.id}` : t.audioUrl} controls preload="none" className="mt-1 h-8 w-full" />}</div></div>
       <label className="block text-sm font-bold">عنوان<input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} className={inp} /></label>
       <div className="grid gap-3 sm:grid-cols-2"><label className="block text-sm font-bold">هنرمند<input value={f.artist} onChange={(e) => setF({ ...f, artist: e.target.value })} className={inp} /></label><label className="block text-sm font-bold">آلبوم<input value={f.album} onChange={(e) => setF({ ...f, album: e.target.value })} className={inp} /></label></div>
       <div className="text-sm font-bold">دسته‌ها<div className="mt-1 flex flex-wrap gap-2">{CATS.map((c) => <button key={c} onClick={() => setF({ ...f, categories: f.categories.includes(c) ? f.categories.filter((x) => x !== c) : [...f.categories, c] })} className={cn('rounded-full px-3 py-1.5 text-xs font-bold', f.categories.includes(c) ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{c}</button>)}</div></div>
@@ -48,7 +49,7 @@ function LibraryTab({ tracks, setTracks }: { tracks: T[]; setTracks: (t: T[]) =>
   const row = (t: T) => <button onClick={() => setEdit(t)} className="flex w-full items-center gap-3 text-start"><Cover hue={200} image={t.coverUrl} className="h-11 w-11 shrink-0 rounded-xl" /><div className="min-w-0 flex-1"><div className="flex items-center gap-1 truncate font-bold">{t.featured && <Star className="h-3.5 w-3.5 shrink-0 fill-gold text-gold" />}{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist} · {t.source} · {dur(t.duration)}</div></div><Pill s={t.status === 'hidden' ? 'archived' : t.status} /></button>;
   return (
     <>
-      <div className="mb-3 flex flex-wrap gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جست‌وجو…" className="h-11 min-w-0 flex-1 basis-40 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><select value={st} onChange={(e) => setSt(e.target.value)} aria-label="وضعیت" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه</option><option value="published">منتشر</option><option value="draft">پیش‌نویس</option><option value="hidden">مخفی</option></select></div>
+      <div className="mb-3 flex flex-wrap gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جست‌وجو…" className="h-11 min-w-0 flex-1 basis-40 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><select value={st} onChange={(e) => setSt(e.target.value)} aria-label="وضعیت" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه</option><option value="published">منتشر</option><option value="draft">پیش‌نویس</option><option value="hidden">مخفی</option><option value="pending">در انتظار بررسی</option><option value="rejected">ردشده</option></select></div>
       {!tracks.length ? <Glass><StateView icon={Music} title="کتابخانه خالی است" text="از تب «افزودن آهنگ» یا «ورود از لینک» آهنگ اضافه کن." /></Glass>
         : canSort ? <><p className="mb-2 text-xs text-muted-foreground">برای تغییر ترتیب نمایش، بکش یا از فلش‌ها استفاده کن.</p><SortableList items={tracks} onReorder={reorder} render={(t) => <div className="flex items-center gap-2">{row(t)}<button onClick={() => setDel(t)} className="tap grid place-items-center text-muted-foreground hover:text-destructive" aria-label="حذف"><Trash2 className="h-4 w-4" /></button></div>} /></>
         : <ul className="space-y-2">{filtered.map((t) => <li key={t.id} className="glass flex items-center gap-2 rounded-2xl p-2">{row(t)}<Pencil className="h-4 w-4 text-muted-foreground" /></li>)}</ul>}
@@ -101,22 +102,8 @@ function ImportTab({ onAdded }: { onAdded: (all: T[]) => void }) {
   const [res, setRes] = useState<AdminInspectUrlOutputType | null>(null);
   const [draft, setDraft] = useState<Draft>(BLANK);
   const inspect = async () => { setBusy(true); setRes(null); try { setRes(await adminInspectUrl({ token, url })); } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); } };
-  const [disc, setDisc] = useState<'music' | 'podcasts' | null>(null);
-  const discover = async (kind: 'music' | 'podcasts') => {
-    setDisc(kind);
-    try { const r = await adminDiscover({ token, kind }); toast.success(`${fa(r.added)} مورد جدید اضافه شد`); if (kind === 'music') { const all = await adminTracks({ token, action: 'list' }); onAdded(all.tracks); } }
-    catch (e) { toast.error(errMsg(e)); } finally { setDisc(null); }
-  };
   return (
     <div className="space-y-4">
-      <Glass className="space-y-3 p-4">
-        <div className="text-sm font-bold">کشف خودکار محتوا</div>
-        <p className="text-xs leading-6 text-muted-foreground">موزیک‌های با مجوز Creative Commons در همه ژانرها (فارسی، انگلیسی، بی‌کلام) و پادکست‌های فارسی و انگلیسی از فهرست‌های عمومی پیدا و بدون تکرار اضافه می‌شوند. ممکن است یکی دو دقیقه طول بکشد.</p>
-        <div className="flex flex-wrap gap-2">
-          <KButton loading={disc === 'music'} disabled={!!disc} onClick={() => discover('music')}><Music className="h-4 w-4" />کشف موزیک</KButton>
-          <KButton variant="outline" loading={disc === 'podcasts'} disabled={!!disc} onClick={() => discover('podcasts')}><Mic2 className="h-4 w-4" />کشف پادکست</KButton>
-        </div>
-      </Glass>
       <Glass className="space-y-2 p-4">
         <div className="text-sm font-bold">پیدا کردن فایل‌های صوتی عمومی در یک صفحه یا فید</div>
         <form onSubmit={(e) => { e.preventDefault(); inspect(); }} className="flex gap-2"><input value={url} onChange={(e) => setUrl(e.target.value)} dir="ltr" placeholder="https://…" className="h-11 min-w-0 flex-1 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><KButton type="submit" loading={busy} disabled={!/^https?:\/\//.test(url)}><Search className="h-4 w-4" />بررسی</KButton></form>
@@ -170,7 +157,7 @@ function PodcastsTab() {
 
 export function AdminMorshed() {
   const { token } = useAdmin();
-  const [tab, setTab] = useState<'library' | 'add' | 'import' | 'podcasts' | 'collections'>('library');
+  const [tab, setTab] = useState<'review' | 'sources' | 'library' | 'add' | 'import' | 'podcasts' | 'collections'>('review');
   const [d, setD] = useState<{ tracks: T[] } | null>(null); const [err, setErr] = useState<string>();
   const load = useCallback(() => { setErr(undefined); adminTracks({ token, action: 'list' }).then((r) => setD({ tracks: r.tracks })).catch((e) => setErr(errMsg(e))); }, [token]);
   useEffect(load, [load]);
@@ -178,9 +165,9 @@ export function AdminMorshed() {
   const added = useCallback((tracks: T[]) => { setD({ tracks }); setTab('library'); }, []);
   return (
     <div>
-      <PageHead title="مرشد" sub="کتابخانه‌ی موزیک، افزودن با آپلود یا لینک، پادکست‌ها و مجموعه‌ها" />
-      <div className="mb-4 flex gap-2 overflow-x-auto" role="tablist">{([['library', 'کتابخانه'], ['add', 'افزودن آهنگ'], ['import', 'ورود از لینک'], ['podcasts', 'پادکست‌ها'], ['collections', 'مجموعه‌ها']] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn('tap shrink-0 rounded-full px-5 text-sm font-bold', tab === k ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{l}</button>)}</div>
-      {tab === 'podcasts' ? <PodcastsTab /> : err ? <Glass><ErrorState text={err} onRetry={load} /></Glass> : !d ? <ListSkeleton /> : tab === 'library' ? <LibraryTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'add' ? <AddTrack init={BLANK} onAdded={added} /> : tab === 'import' ? <ImportTab onAdded={added} /> : <CollectionsPanel tracks={d.tracks} />}
+      <PageHead title="مرشد" sub="منبع ← import ← بررسی و تأیید ← انتشار؛ به‌علاوه‌ی آپلود دستی، پادکست‌ها و مجموعه‌ها" />
+      <div className="mb-4 flex gap-2 overflow-x-auto" role="tablist">{([['review', `بررسی ترک‌ها${d ? ` (${fa(d.tracks.filter((x) => x.status === 'pending').length)})` : ''}`], ['sources', 'منابع و import'], ['library', 'کتابخانه'], ['add', 'افزودن آهنگ'], ['import', 'ورود از لینک'], ['podcasts', 'پادکست‌ها'], ['collections', 'مجموعه‌ها']] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn('tap shrink-0 rounded-full px-5 text-sm font-bold', tab === k ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{l}</button>)}</div>
+      {tab === 'podcasts' ? <PodcastsTab /> : tab === 'sources' ? <SourcesTab onImported={load} /> : err ? <Glass><ErrorState text={err} onRetry={load} /></Glass> : !d ? <ListSkeleton /> : tab === 'review' ? <ReviewTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'library' ? <LibraryTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'add' ? <AddTrack init={BLANK} onAdded={added} /> : tab === 'import' ? <ImportTab onAdded={added} /> : <CollectionsPanel tracks={d.tracks} />}
     </div>
   );
 }

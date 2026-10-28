@@ -74,7 +74,7 @@ export function MorshedSection() {
 }
 
 function PhoneMock() {
-  const msgs = ['سلام! هدفت چیه؟', 'می‌خوام ۵ کیلو کم کنم و قوی‌تر بشم 💪', 'عالیه. برنامه‌ی ۴ روز در هفته برات ساختم.'];
+  const msgs = ['سلام! هدفت چیه؟', 'می‌خوام ۵ کیلو کم کنم و قوی‌تر بشم', 'عالیه. برنامه‌ی ۴ روز در هفته برات ساختم.'];
   const [n, setN] = useState(1);
   useEffect(() => { const t = setInterval(() => setN((x) => (x >= 3 ? 1 : x + 1)), 1800); return () => clearInterval(t); }, []);
   return (

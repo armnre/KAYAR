@@ -26,7 +26,7 @@ function RestOverlay({ rest, total, onAdd, onSkip }: { rest: number; total: numb
             <circle cx="80" cy="80" r={r} className="fill-none stroke-primary transition-[stroke-dashoffset] duration-1000 ease-linear" strokeWidth="10" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - p)} /></svg>
           <div className="absolute inset-0 grid place-items-center"><span className="latin text-5xl font-black tabular-nums">{fmtTime(rest)}</span></div>
         </div>
-        <p className="mt-4 text-sm text-muted-foreground">نفس عمیق بکش، ست بعدی نزدیکه 💪</p>
+        <p className="mt-4 text-sm text-muted-foreground">نفس عمیق بکش، ست بعدی نزدیکه.</p>
         <div className="mt-6 flex gap-3">
           <Button variant="outline" className="h-12 flex-1 rounded-2xl" onClick={onAdd}>+۱۵ ثانیه</Button>
           <Button className="h-12 flex-1 rounded-2xl font-black" onClick={onSkip}>بزن بریم</Button>
@@ -108,7 +108,7 @@ export default function Session() {
       await saveSession({ token: tok(),  clientKey: meta.current.key, title: pday.name, startedAt: meta.current.startedAt, durationSec: elapsed, sets });
       setSaved(true);
       localStorage.removeItem(storeKey);
-      toast.success('تمرین ذخیره شد 💪');
+      toast.success('تمرین ذخیره شد. آفرین!');
     } catch (e) { toast.error(`${errMsg(e)} — اطلاعات محفوظ است، دوباره امتحان کن.`); } finally { setSaving(false); }
   };
 

@@ -155,7 +155,7 @@ function GeneratingCard() {
           </li>
         ))}
       </ul>
-      <p className="relative mt-5 rounded-2xl bg-secondary/60 p-3 text-xs leading-6 text-muted-foreground">💡 {GEN_TIPS[Math.floor(t / 6) % GEN_TIPS.length]}</p>
+      <p className="relative mt-5 rounded-2xl bg-secondary/60 p-3 text-xs leading-6 text-muted-foreground">{GEN_TIPS[Math.floor(t / 6) % GEN_TIPS.length]}</p>
     </div>
   );
 }

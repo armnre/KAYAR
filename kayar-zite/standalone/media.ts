@@ -1,0 +1,124 @@
+// Same-origin media proxy for Morshed: GET /media/stream/:id (Range-aware) and /media/cover/:id.
+// Browsers only ever talk to KAYAR's own domain; the real source URL stays server-side.
+// A small LRU disk cache (MEDIA_CACHE_MB, default 500 MB, inside UPLOAD_DIR/.media-cache) keeps hot tracks local
+// while respecting Liara's 2 GB disk: the cap shrinks automatically when uploads grow.
+import express, { type Router, type Request, type Response } from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { Readable } from 'node:stream';
+import { pool } from './db';
+import { UPLOAD_DIR, diskUsage } from './uploads';
+import { log } from './log';
+import { USER_AGENT } from '../apps/kayar/src/server/music/http';
+
+const MB = 1024 * 1024;
+const CACHE_DIR = path.join(UPLOAD_DIR, '.media-cache');
+const DISK_TOTAL = Number(process.env.DISK_TOTAL_MB || 2048) * MB;
+const CACHE_MAX = () => Math.max(0, Math.min(Number(process.env.MEDIA_CACHE_MB || 500) * MB, DISK_TOTAL - diskUsage().bytes - 300 * MB));
+const MAX_FILE = 25 * MB;
+const inflight = new Map<string, Promise<string | null>>();
+
+async function sourceOf(id: string, kind: 'audio' | 'cover') {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const { rows } = await pool.query(`SELECT "audioUrl","coverUrl","status" FROM "Tracks" WHERE id::text = $1 LIMIT 1`, [id]);
+  const r = rows[0];
+  if (!r || r.status === 'deleted' || r.status === 'rejected') return null;
+  const u = String(kind === 'audio' ? r.audioUrl ?? '' : r.coverUrl ?? '');
+  return /^https?:\/\//.test(u) ? u : null;
+}
+
+function cacheSize() {
+  let total = 0; const files: { p: string; size: number; at: number }[] = [];
+  try { for (const f of fs.readdirSync(CACHE_DIR)) { const p = path.join(CACHE_DIR, f); const s = fs.statSync(p); total += s.size; files.push({ p, size: s.size, at: s.atimeMs }); } } catch { /* empty */ }
+  return { total, files };
+}
+function evict(incoming: number) {
+  const max = CACHE_MAX();
+  const { total, files } = cacheSize();
+  let used = total;
+  for (const f of files.sort((a, b) => a.at - b.at)) { if (used + incoming <= max) break; try { fs.unlinkSync(f.p); used -= f.size; } catch { /* gone */ } }
+  return used + incoming <= max;
+}
+
+/** Downloads one file into the cache (once, even with concurrent requests). Returns the local path or null. */
+function fill(url: string, key: string): Promise<string | null> {
+  const dest = path.join(CACHE_DIR, key);
+  if (fs.existsSync(dest)) { const now = new Date(); try { fs.utimesSync(dest, now, fs.statSync(dest).mtime); } catch { /* ignore */ } return Promise.resolve(dest); }
+  const running = inflight.get(key); if (running) return running;
+  const p = (async () => {
+    try {
+      const r = await fetch(url, { headers: { 'user-agent': USER_AGENT }, redirect: 'follow' });
+      const len = Number(r.headers.get('content-length') || 0);
+      if (!r.ok || !r.body || (len && len > MAX_FILE) || !evict(len || 10 * MB)) return null;
+      fs.mkdirSync(CACHE_DIR, { recursive: true });
+      const tmp = `${dest}.${crypto.randomBytes(4).toString('hex')}.part`;
+      const buf = Buffer.from(await r.arrayBuffer());
+      if (buf.length > MAX_FILE) return null;
+      fs.writeFileSync(tmp, buf); fs.renameSync(tmp, dest);
+      return dest;
+    } catch (e) { log('warn', 'media cache fill failed', { error: (e as Error).message }); return null; }
+    finally { inflight.delete(key); }
+  })();
+  inflight.set(key, p);
+  return p;
+}
+
+function sendLocal(req: Request, res: Response, file: string, type: string) {
+  const size = fs.statSync(file).size;
+  res.setHeader('Accept-Ranges', 'bytes'); res.setHeader('Content-Type', type); res.setHeader('Cache-Control', 'private, max-age=86400');
+  const m = /bytes=(\d*)-(\d*)/.exec(String(req.headers.range ?? ''));
+  if (!m) { res.setHeader('Content-Length', size); return fs.createReadStream(file).pipe(res); }
+  const start = m[1] ? Number(m[1]) : Math.max(0, size - Number(m[2]));
+  const end = m[1] && m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+  if (start >= size || start > end) { res.status(416).setHeader('Content-Range', `bytes */${size}`); return res.end(); }
+  res.status(206).setHeader('Content-Range', `bytes ${start}-${end}/${size}`); res.setHeader('Content-Length', end - start + 1);
+  fs.createReadStream(file, { start, end }).pipe(res);
+}
+
+/** Streams straight from the source when it can't be cached (Range is forwarded). */
+async function passThrough(req: Request, res: Response, url: string) {
+  const r = await fetch(url, { headers: { 'user-agent': USER_AGENT, ...(req.headers.range ? { range: String(req.headers.range) } : {}) }, redirect: 'follow' });
+  if (!r.ok && r.status !== 206) return res.status(502).end();
+  res.status(r.status);
+  for (const h of ['content-type', 'content-length', 'content-range', 'accept-ranges']) { const v = r.headers.get(h); if (v) res.setHeader(h, v); }
+  res.setHeader('Cache-Control', 'private, max-age=3600');
+  if (r.body) Readable.fromWeb(r.body as never).pipe(res); else res.end();
+}
+
+export function mediaRouter(): Router {
+  const r = express.Router();
+  r.get('/media/stream/:id', async (req, res) => {
+    try {
+      const url = await sourceOf(req.params.id, 'audio');
+      if (!url) return res.status(404).end();
+      const file = await fill(url, `a-${req.params.id}.mp3`);
+      if (file) return sendLocal(req, res, file, 'audio/mpeg');
+      await passThrough(req, res, url);
+    } catch (e) { log('warn', 'media stream failed', { error: (e as Error).message }); if (!res.headersSent) res.status(502).end(); }
+  });
+  r.get('/media/cover/:id', async (req, res) => {
+    try {
+      const url = await sourceOf(req.params.id, 'cover');
+      if (!url) return res.status(404).end();
+      const file = await fill(url, `c-${req.params.id}`);
+      if (!file) return res.status(404).end();
+      const head = fs.readFileSync(file).subarray(0, 12);
+      const type = head[0] === 0xff ? 'image/jpeg' : head.toString('latin1', 8, 12) === 'WEBP' ? 'image/webp' : head[1] === 0x50 ? 'image/png' : 'application/octet-stream';
+      if (type === 'application/octet-stream') return res.status(404).end();
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      sendLocal(req, res, file, type);
+    } catch { if (!res.headersSent) res.status(404).end(); }
+  });
+  return r;
+}
+
+/** Removes cached files whose track no longer exists (called after purge/takedown via script). */
+export async function pruneMediaCache() {
+  const { files } = cacheSize();
+  const { rows } = await pool.query(`SELECT id::text AS id FROM "Tracks" WHERE status NOT IN ('deleted','rejected')`);
+  const live = new Set(rows.map((x) => x.id));
+  let removed = 0;
+  for (const f of files) { const id = path.basename(f.p).replace(/^[ac]-/, '').replace(/\.mp3$/, ''); if (!live.has(id)) { try { fs.unlinkSync(f.p); removed++; } catch { /* gone */ } } }
+  return removed;
+}

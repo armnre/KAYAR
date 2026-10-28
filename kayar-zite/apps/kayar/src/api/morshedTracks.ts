@@ -49,7 +49,7 @@ export default createEndpoint({
     const browse = input.mode === 'library' && !q && !input.cat;
     const pool = pub.filter(langOk);
     const defs: [string, string][] = input.lang === 'trending' ? [['trending', 'ترندهای جهانی این هفته']]
-      : [...(input.lang !== 'fa' ? [['trending', '🔥 ترند جهانی'] as [string, string]] : []),
+      : [...(input.lang !== 'fa' ? [['trending', 'ترند'] as [string, string]] : []),
          ...STYLES.filter((x) => input.lang === 'all' || x.lang === input.lang).map((x) => [x.key, x.title] as [string, string])];
     const sections = browse ? defs.map(([key, title]) => { const all = pool.filter((r) => has(r, key)); return { key, title, count: all.length, tracks: mix(all).slice(0, 14).map(libToDto) }; }).filter((x) => x.count > 0) : [];
     const byArtist = new Map<string, { name: string; image: string; count: number }>();

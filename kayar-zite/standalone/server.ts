@@ -10,6 +10,7 @@ import { endpoints } from './endpoints.generated';
 import { log, installConsole, initOpsTables, recordError, requestLogger, alert } from './log';
 import { apiLimiter, tooMany } from './ratelimit';
 import { uploadRouter } from './uploads';
+import { mediaRouter } from './media';
 import { opsRouter, APP_VERSION } from './ops';
 import { renderHtml, sitemap, robots, invalidateSeoCache } from './seo';
 import { sha256 } from '../apps/kayar/src/server/auth';
@@ -50,8 +51,8 @@ app.set('trust proxy', /^\d+$/.test(tp) ? Number(tp) : tp === 'true' ? true : tp
 
 /* ---------- security headers ---------- */
 const CSP = [
-  "default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' data: https://fonts.gstatic.com", "img-src 'self' data: blob: https:", "media-src 'self' blob: https:",
+  "default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:", "img-src 'self' data: blob: https:", "media-src 'self' blob: https:",
   "connect-src 'self' https:", "worker-src 'self'", "manifest-src 'self'", "frame-src 'self' https:", "frame-ancestors 'none'", "base-uri 'self'", "form-action 'self' https:", "object-src 'none'",
 ].join('; ');
 app.use((req, res, next) => {
@@ -73,6 +74,7 @@ app.get('/healthz', async (_req, res) => {
 });
 
 app.use(uploadRouter(PUBLIC_URL));
+app.use(mediaRouter()); // /media/stream/:id, /media/cover/:id (same-origin proxy + LRU cache)
 
 /* ---------- AI daily quota (per member) ---------- */
 async function aiQuota(req: Request, res: Response) {
@@ -177,6 +179,7 @@ process.on('uncaughtException', (e) => { log('error', 'uncaughtException', { err
   }
   await initOpsTables();
   await importSeedIfEmpty();
+  await migrateMorshedV4().catch((e) => log('error', 'morshed v4 migration failed', { error: (e as Error).message }));
   const server = app.listen(PORT, () => log('info', `KAYAR standalone listening on :${PORT}`, { endpoints: Object.keys(endpoints).length, version: APP_VERSION }));
   server.requestTimeout = 10 * 60_000; // large admin uploads on slow links
   let closing = false;
@@ -190,3 +193,20 @@ process.on('uncaughtException', (e) => { log('error', 'uncaughtException', { err
   process.on('SIGINT', () => shutdown('SIGINT'));
 })();
 void crypto;
+
+/** One-time + idempotent: removes legacy scraped tracks (Audius/ccMixter/Archive/Jamendo — no sourceName) and their references. Uploaded tracks stay. */
+async function migrateMorshedV4() {
+  const done = await pool.query(`SELECT 1 FROM "SiteSettings" WHERE key = 'migration.morshed-v4' LIMIT 1`);
+  if (done.rowCount) return;
+  const { rows } = await pool.query(`SELECT id::text AS id FROM "Tracks" WHERE COALESCE("source",'') <> 'upload' AND COALESCE("sourceName",'') = ''`);
+  const ids = rows.map((r) => r.id);
+  if (ids.length) {
+    const keys = ids.map((id) => `lib:${id}`);
+    await pool.query(`DELETE FROM "CollectionItems" WHERE "trackId" = ANY($1)`, [ids]);
+    await pool.query(`DELETE FROM "Favorites" WHERE "itemKey" = ANY($1) OR "trackId" = ANY($2)`, [keys, ids]);
+    await pool.query(`DELETE FROM "ListeningHistory" WHERE "itemKey" = ANY($1) OR "trackId" = ANY($2)`, [keys, ids]);
+    await pool.query(`DELETE FROM "Tracks" WHERE id::text = ANY($1)`, [ids]);
+  }
+  await pool.query(`INSERT INTO "SiteSettings" (key, value) VALUES ('migration.morshed-v4', $1)`, [JSON.stringify({ removed: ids.length, at: new Date().toISOString() })]);
+  log('info', 'morshed v4 migration done', { removed: ids.length });
+}

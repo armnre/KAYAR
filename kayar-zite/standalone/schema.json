@@ -207,7 +207,15 @@
    "isFeatured": "bool",
    "status": "text",
    "sortOrder": "number",
-   "createdAt": "created"
+   "createdAt": "created",
+   "sourceName": "text",
+   "importedAt": "ts",
+   "lang": "text",
+   "style": "text",
+   "dedupeKey": "text",
+   "artistKey": "text",
+   "bitrate": "number",
+   "reviewNote": "text"
   }
  },
  "Staff": {

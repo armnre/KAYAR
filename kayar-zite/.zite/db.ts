@@ -494,7 +494,15 @@ export type TracksRecordType = {
   categories?: string;
   tags?: string;
   isFeatured?: boolean;
-  status?: "draft" | "published" | "hidden" | "deleted" | string;
+  sourceName?: string;
+  importedAt?: string;
+  lang?: string;
+  style?: string;
+  dedupeKey?: string;
+  artistKey?: string;
+  bitrate?: number;
+  reviewNote?: string;
+  status?: "pending" | "draft" | "published" | "hidden" | "rejected" | "deleted" | string;
   /** "Sort Order". 1 decimal places, format: local (e.g. 1,000,000.50) */
   sortOrder?: number;
   /** Read-only. "Created At". Auto-set when record was created (ISO 8601) */

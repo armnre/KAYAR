@@ -11,6 +11,7 @@ import { Card, ErrorState, LoadingBlocks, PageHeader, Ring, errMsg, faNum, today
 import { MEAL_LABELS } from '../../lib/assets';
 import { useLoad } from '../../lib/useLoad';
 import { cn } from '@project/components/lib/utils';
+import { IconBadge } from '../../components/icons/kayar';
 
 export default function Nutrition() {
   const [date, setDate] = useState(todayStr());
@@ -38,7 +39,7 @@ export default function Nutrition() {
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="relative overflow-hidden rounded-[32px] border border-white/[.08] bg-[radial-gradient(120%_120%_at_100%_0%,hsl(var(--primary)/.18),transparent_50%),radial-gradient(100%_100%_at_0%_100%,hsl(var(--violet)/.18),transparent_55%)] p-5">
         <div className="flex items-center gap-5">
-          <Ring value={totals.c} max={targets?.calories ?? Math.max(1, totals.c)} size={148} stroke={13} color={left < 0 ? 'hsl(var(--destructive))' : 'hsl(var(--primary))'}>
+          <Ring value={totals.c} max={targets?.calories ?? Math.max(1, totals.c)} size={148} stroke={13} color={left < 0 ? 'hsl(var(--gold))' : 'hsl(var(--primary))'}>
             <div><div className="text-[10px] text-muted-foreground">{targets ? (left >= 0 ? 'باقی‌مانده' : 'اضافه') : 'دریافتی'}</div>
               <div className="text-3xl font-black leading-tight">{faNum(Math.abs(Math.round(targets ? left : totals.c)))}</div><div className="font-latin text-[10px] text-muted-foreground">kcal</div></div>
           </Ring>
@@ -52,8 +53,8 @@ export default function Nutrition() {
           </div>
         </div>
         {date === todayStr() && (
-          <div className={cn('mt-4 flex items-start gap-2.5 rounded-2xl border p-3 text-xs leading-6', insight.tone === 'destructive' ? 'border-destructive/30 bg-destructive/10' : 'border-white/[.08] bg-black/20')}>
-            <insight.icon className={cn('mt-1 h-4 w-4 shrink-0', insight.tone === 'destructive' ? 'text-destructive' : insight.tone === 'cyan' ? 'text-[hsl(var(--cyan))]' : 'text-primary')} />
+          <div className={cn('mt-4 flex items-start gap-2.5 rounded-2xl border p-3 text-xs leading-6', 'border-white/[.08] bg-black/20')}>
+            <insight.icon size={18} className={cn('mt-0.5', insight.tone === 'cyan' ? 'text-[hsl(var(--cyan))]' : 'text-primary')} />
             <span><b className="text-foreground">دستیار بدن‌یار: </b>{insight.text}</span>
           </div>
         )}
@@ -72,10 +73,10 @@ export default function Nutrition() {
             return (
               <motion.div key={k} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} className={cn('overflow-hidden rounded-[28px] border border-white/[.07] bg-gradient-to-br p-4', meta.g)}>
                 <div className="flex items-center gap-3">
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-black/25 text-2xl backdrop-blur">{meta.emoji}</span>
+                  <IconBadge icon={meta.icon} tone={meta.tone} active={goal > 0 && kcal >= goal * 0.8} label={label} />
                   <div className="min-w-0 flex-1"><div className="font-black">{label}</div>
                     <div className="text-xs text-muted-foreground"><b className="text-foreground">{faNum(Math.round(kcal))}</b>{goal ? ` / ${faNum(goal)}` : ''} کالری · {meta.hint}</div></div>
-                  <button onClick={() => setAdding(k)} className="press grid h-11 w-11 place-items-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-8px_hsl(var(--primary))]" aria-label={`افزودن به ${label}`}><Plus className="h-5 w-5" /></button>
+                  <button onClick={() => setAdding(k)} className="press grid h-12 w-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_-8px_hsl(var(--primary))]" aria-label={`افزودن به ${label}`}><Plus className="h-5 w-5" /></button>
                 </div>
                 {goal > 0 && <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/25"><div className="h-full rounded-full bg-foreground/80 transition-all duration-700" style={{ width: `${Math.min(100, (kcal / goal) * 100)}%` }} /></div>}
                 {list.length > 0 ? (
@@ -84,7 +85,7 @@ export default function Nutrition() {
                       <li key={m.id} className="flex items-center gap-2 rounded-2xl bg-black/25 px-3 py-2 text-sm backdrop-blur">
                         <span className="min-w-0 flex-1 truncate font-bold">{m.foodName} <span className="text-xs font-normal text-muted-foreground">{faNum(m.grams)}g</span></span>
                         <span className="text-[11px] text-muted-foreground">{faNum(Math.round(m.calories))} kcal</span>
-                        <button className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-destructive/15 hover:text-destructive" disabled={deleting === m.id} onClick={() => remove(m.id)} aria-label="حذف">{deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</button>
+                        <button className="grid h-11 w-11 place-items-center rounded-full text-muted-foreground hover:bg-destructive/15 hover:text-destructive" disabled={deleting === m.id} onClick={() => remove(m.id)} aria-label={`حذف ${m.foodName}`}>{deleting === m.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}</button>
                       </li>
                     ))}
                   </ul>
@@ -107,7 +108,7 @@ export default function Nutrition() {
           </div>
         </Card>
       )}
-      <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground"><Info className="mt-1 h-3.5 w-3.5 shrink-0" />مقادیر تقریبی و بر اساس USDA FoodData Central است. برای بیماری، حساسیت یا رژیم درمانی با متخصص مشورت کن.</p>
+      <p className="flex items-start gap-2 text-xs leading-6 text-muted-foreground"><Info className="mt-1 h-3.5 w-3.5 shrink-0" />مقادیر تقریبی‌اند (بر پایه‌ی USDA FoodData Central و جداول غذایی ایران). توصیه‌ها عمومی‌اند و جایگزین مشاوره‌ی پزشک یا متخصص تغذیه نیستند.</p>
 
       <AddFoodSheet open={!!adding} meal={adding ?? 'snack'} date={date} foods={foods.data?.foods ?? []} recent={meals.data?.recentFoodIds ?? []} totals={totals} targets={date === todayStr() ? targets : null} onClose={() => setAdding(null)} onAdded={() => { setAdding(null); meals.reload(); }} />
     </div>
