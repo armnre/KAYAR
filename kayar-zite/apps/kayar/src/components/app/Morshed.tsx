@@ -10,7 +10,7 @@ import { H, useMorshed } from './HomeMorshed';
 import { useSession, errMsg } from '../../lib/session';
 import { Podcasts } from './Podcasts';
 import { usePreview } from '../../lib/preview';
-import type { Track } from '../../data/sample';
+import type { Track } from '../../lib/track';
 import { fa } from '../../lib/config';
 
 type Lang = 'all' | 'fa' | 'en' | 'trending';

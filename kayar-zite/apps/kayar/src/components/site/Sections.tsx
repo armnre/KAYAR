@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingBag, KeyRound, QrCode, Play, Pause, ArrowLeft } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@project/components/ui/accordion';
 import { KButton, Glass, IconBox, Waveform, SampleBadge, Cover, ProgressRing, KayarLogo } from '../kit';
-import { tracks, faqs } from '../../data/sample';
+import { defaultFaqs } from '../../lib/defaultFaqs';
 import { usePosts, usePublicSettings, type PostCard } from '../../lib/publicData';
 import { fa, faDate } from '../../lib/config';
 import { useBlock } from '../../lib/cms';
@@ -62,7 +62,7 @@ export function MorshedSection() {
             <div className="mb-3 flex items-center justify-between"><span className="text-sm text-muted-foreground">در حال پخش</span><SampleBadge /></div>
             <div className="flex items-center gap-3">
               <Cover hue={254} className="h-14 w-14 shrink-0" />
-              <div className="min-w-0 flex-1"><div className="truncate font-bold">{tracks[0].title}</div><div className="truncate text-sm text-muted-foreground">{tracks[0].artist}</div></div>
+              <div className="min-w-0 flex-1"><div className="truncate font-bold">ضرب‌آهنگ شروع قدرتی</div><div className="truncate text-sm text-muted-foreground">مرشد کایار</div></div>
               <button className="press tap grid h-12 w-12 place-items-center rounded-full bg-violet text-white" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'توقف' : 'پخش'}>{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current" />}</button>
             </div>
             <Waveform bars={40} playing={playing} className="mt-3 w-full justify-between" color="bg-[hsl(254_100%_75%)]" />
@@ -150,7 +150,7 @@ export function LatestPosts() {
 
 export function FAQ() {
   const b = useBlock('faq');
-  const items = b.items.length ? b.items : faqs;
+  const items = b.items.length ? b.items : defaultFaqs;
   return (
     <section className="px-4 py-20">
       <SectionHead eyebrow="FAQ" title="سؤال‌های" accent="پرتکرار" />
