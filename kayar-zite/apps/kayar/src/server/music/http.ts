@@ -11,18 +11,51 @@ async function slot(host: string) {
   if (at > now) await new Promise((r) => setTimeout(r, at - now));
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/* ---------- Anti-filter routing: direct first, then relay (Cloudflare Worker) for hosts unreachable from Iran ---------- */
+const RELAY = (process.env.MEDIA_RELAY_URL || '').replace(/\/$/, '');
+const RELAY_KEY = process.env.MEDIA_RELAY_KEY || '';
+export const relayEnabled = !!RELAY;
+const fails = new Map<string, number>();
+const deadUntil = new Map<string, number>();
+const isDead = (host: string) => (deadUntil.get(host) ?? 0) > Date.now();
+const relayUrl = (url: string) => `${RELAY}/?url=${encodeURIComponent(url)}${RELAY_KEY ? `&key=${encodeURIComponent(RELAY_KEY)}` : ''}`;
+async function once(url: string, init: RequestInit, ms: number) {
+  const c = new AbortController();
+  const t = setTimeout(() => c.abort(), ms);
+  init.signal?.addEventListener('abort', () => c.abort());
+  try { return await fetch(url, { ...init, redirect: 'follow', signal: c.signal }); } finally { clearTimeout(t); }
+}
+/** Fetch that survives filtering: fast direct attempt (skipped for hosts known dead), then via MEDIA_RELAY_URL. Timeout covers headers only, so streams are not cut. */
+export async function smartFetch(url: string, init: RequestInit & { timeoutMs?: number } = {}): Promise<Response> {
+  const host = new URL(url).host;
+  const ms = init.timeoutMs ?? 8000;
+  const headers = { 'user-agent': UA, ...((init.headers as Record<string, string>) ?? {}) };
+  if (!isDead(host)) {
+    try {
+      const r = await once(url, { ...init, headers }, ms);
+      if (r.status < 500 && r.status !== 403) { fails.delete(host); return r; }
+      if (!RELAY) return r;
+    } catch (e) {
+      const n = (fails.get(host) ?? 0) + 1; fails.set(host, n);
+      if (n >= 2) deadUntil.set(host, Date.now() + 15 * 60_000);
+      if (!RELAY) throw new Error(`unreachable: ${host} (${(e as Error).message})`);
+    }
+  } else if (!RELAY) throw new Error(`unreachable: ${host}`);
+  return once(relayUrl(url), { ...init, headers }, Math.max(ms, 20_000));
+}
+
 export async function politeFetch(url: string, init: RequestInit & { timeoutMs?: number } = {}): Promise<Response> {
   const host = new URL(url).host;
   let last: unknown;
   for (let a = 0; a < 3; a++) {
     await slot(host);
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), init.timeoutMs ?? 15_000);
     try {
-      const r = await fetch(url, { ...init, redirect: 'follow', signal: ctrl.signal, headers: { 'user-agent': UA, 'accept-language': 'fa,en;q=0.5', ...(init.headers ?? {}) } });
-      if (r.status === 429 || r.status >= 500) { last = new Error(`HTTP ${r.status}`); await new Promise((ok) => setTimeout(ok, 2000 * (a + 1) ** 2)); continue; }
+      const r = await smartFetch(url, { ...init, headers: { 'accept-language': 'fa,en;q=0.5', ...((init.headers as Record<string, string>) ?? {}) }, timeoutMs: init.timeoutMs ?? 12_000 });
+      if (r.status === 429 || r.status >= 500) { last = new Error(`HTTP ${r.status}`); await sleep(2000 * (a + 1) ** 2); continue; }
       return r;
-    } catch (e) { last = e; await new Promise((ok) => setTimeout(ok, 1500 * (a + 1) ** 2)); } finally { clearTimeout(t); }
+    } catch (e) { last = e; if (/unreachable/.test((e as Error).message) && isDead(host)) break; await sleep(1000 * (a + 1)); }
   }
   throw last instanceof Error ? last : new Error('fetch failed');
 }
@@ -63,7 +96,7 @@ export async function robotsAllows(url: string) {
 /** Checks from THIS server (in Iran on Liara) that an audio URL answers with audio. Returns size/type, or null. */
 export async function probeAudio(url: string): Promise<{ bytes: number; type: string } | null> {
   try {
-    const r = await politeFetch(url, { headers: { range: 'bytes=0-1' }, timeoutMs: 12_000 });
+    const r = await smartFetch(url, { headers: { range: 'bytes=0-1' }, timeoutMs: 7000 });
     const type = r.headers.get('content-type') ?? '';
     const total = Number(r.headers.get('content-range')?.split('/')[1] ?? r.headers.get('content-length') ?? 0);
     try { await r.body?.cancel(); } catch { /* ignore */ }
