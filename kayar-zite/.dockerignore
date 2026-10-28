@@ -1,6 +1,9 @@
-node_modules
 **/node_modules
 **/dist
 .git
 .env*
 **/.env*
+*.log
+**/*.tsbuildinfo
+standalone/endpoints.generated.ts
+README.md

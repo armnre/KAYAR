@@ -1,5 +1,5 @@
 // Stable asset map — every image in the app is resolved here, never hardcoded in components.
-// All images are original AI-generated assets owned by the project (see OVERVIEW.md → Assets).
+// All images are original AI-generated assets owned by the project.
 
 export const ASSETS = {
   hero: `/media/img_pMf4iZFlJSygMHuN.jpg`,
