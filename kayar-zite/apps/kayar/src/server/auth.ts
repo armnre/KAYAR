@@ -52,12 +52,19 @@ export async function verifyPassword(password: string, stored?: string) {
   return constantTimeEqual(got, unb64(parts[3])) && !!stored;
 }
 
-const COMMON = ['12345678', '123456789', '1234567890', 'password', 'password1', 'qwerty123', '11111111', '00000000', '87654321', 'iloveyou', 'kapoosh', 'kayar123', 'abcd1234', 'qwertyui'];
+const SEQS = ['0123456789', 'abcdefghijklmnopqrstuvwxyz', 'qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+/** True when the password is mostly one ascending/descending keyboard or alphabet run. */
+function isSequence(s: string) {
+  return SEQS.some((q) => { const r = [...q].reverse().join(''); for (let i = 0; i + 6 <= s.length; i++) { const w = s.slice(i, i + 6); if (q.includes(w) || r.includes(w)) return s.length - 6 < 4; } return false; });
+}
+const COMMON = ['1234567890', 'password123', 'qwerty1234', 'iloveyou12', 'kayar12345', 'kapoosh123', 'admin12345', 'administrator', 'passw0rd123', 'welcome123', 'abc1234567', 'p@ssw0rd123', 'superadmin', '12345678', '123456789', '1234567890', 'password', 'password1', 'qwerty123', '11111111', '00000000', '87654321', 'iloveyou', 'kapoosh', 'kayar123', 'abcd1234', 'qwertyui'];
 export function passwordPolicyError(pw: string, ctx: { username?: string; phone?: string; name?: string }) {
-  if (pw.length < 8) return 'رمز باید حداقل ۸ نویسه باشد.';
+  if (pw.length < 10) return 'رمز باید حداقل ۱۰ نویسه باشد.';
   if (pw.length > 128) return 'رمز بیش از حد طولانی است.';
   const low = latinDigits(pw).toLowerCase();
-  if (COMMON.includes(low) || /^(\d)\1+$/.test(low)) return 'این رمز خیلی رایج است؛ رمز دیگری انتخاب کن.';
+  if (/^\d+$/.test(low)) return 'رمز نباید فقط عدد باشد؛ حروف هم اضافه کن.';
+  if (/(^|\D)(\+?98|0)?9\d{9}(\D|$)/.test(low)) return 'رمز نباید شبیه شماره‌ی موبایل باشد.';
+  if (COMMON.includes(low) || /^(.)\1+$/.test(low) || /^(.{1,3})\1{2,}$/.test(low) || isSequence(low)) return 'این رمز خیلی رایج یا قابل حدس است؛ رمز دیگری انتخاب کن.';
   for (const v of [ctx.username, ctx.phone, ctx.name]) if (v && low === latinDigits(v).toLowerCase().replace(/\s+/g, '')) return 'رمز نباید با نام کاربری، شماره یا نام یکی باشد.';
   return null;
 }

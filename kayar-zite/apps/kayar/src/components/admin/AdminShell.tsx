@@ -44,6 +44,7 @@ export default function AdminShell() {
   const nav = useNavigate();
   if (loading) return <div className="grid min-h-svh place-items-center depth-bg"><KayarLogo className="animate-pulse text-xl" /></div>;
   if (!member) return <Navigate to="/admin/login" replace />;
+  if (member.mustChangePassword) return <AdminChangePassword />;
   return (
     <div className="min-h-svh depth-bg">
       <div className="flex">
@@ -103,13 +104,13 @@ export function AdminLogin() {
     e.preventDefault();
     if (!u.trim() || !p) { setErr('نام کاربری و رمز را وارد کنید.'); return; }
     setLoading(true); setErr(undefined);
-    try { await login(u, p); nav('/admin', { replace: true }); } catch (x) { setErr(errMsg(x)); setLoading(false); }
+    try { await login(u, p); nav('/admin', { replace: true }); /* AdminShell shows the forced password change when needed */ } catch (x) { setErr(errMsg(x)); setLoading(false); }
   };
   return (
     <AuthFrame onSubmit={submit}>
       <h1 className="mt-6 text-2xl font-black">ورود مدیر</h1>
       {ready === false ? (
-        <div className="mt-5 rounded-2xl border border-gold/30 bg-gold/10 p-4 text-sm leading-7 text-gold">راه‌اندازی اولیه انجام نشده است. مالک سایت باید رازهای <span className="font-latin" dir="ltr">ZITE_BOOTSTRAP_ADMIN_USERNAME</span> و <span className="font-latin" dir="ltr">ZITE_BOOTSTRAP_ADMIN_PASSWORD</span> را در تنظیمات Zite ثبت کند.</div>
+        <div className="mt-5 rounded-2xl border border-gold/30 bg-gold/10 p-4 text-sm leading-7 text-gold">راه‌اندازی اولیه انجام نشده است. مالک سایت باید رازهای <span className="font-latin" dir="ltr">ZITE_BOOTSTRAP_ADMIN_USERNAME</span> و <span className="font-latin" dir="ltr">ZITE_BOOTSTRAP_ADMIN_PASSWORD</span> را در متغیرهای محیطی لیارا ثبت کند (یا با <span className="font-latin" dir="ltr">node scripts/create-admin.mjs</span> مدیر بسازد).</div>
       ) : (
         <div className="mt-5 space-y-4">
           <FloatInput id="au" label="نام کاربری" value={u} onChange={setU} autoComplete="username" dir="ltr" />
@@ -128,7 +129,7 @@ function AdminChangePassword() {
   const [err, setErr] = useState<string>(); const [loading, setLoading] = useState(false);
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (pw.length < 8 || pw !== pw2) { setErr(pw !== pw2 ? 'تکرار رمز یکسان نیست.' : 'رمز باید حداقل ۸ نویسه باشد.'); return; }
+    if (pw.length < 10 || pw !== pw2) { setErr(pw !== pw2 ? 'تکرار رمز یکسان نیست.' : 'رمز باید حداقل ۱۰ نویسه باشد.'); return; }
     setLoading(true); setErr(undefined);
     try { await authChangePassword({ token: token!, current: cur, next: pw }); await refresh(); } catch (x) { setErr(errMsg(x)); } finally { setLoading(false); }
   };
