@@ -43,6 +43,8 @@ import type { default as _MorshedTracksEp } from '../src/api/morshedTracks';
 import type { default as _PublicCmsEp } from '../src/api/publicCms';
 import type { default as _PublicPostsEp } from '../src/api/publicPosts';
 import type { default as _PublicSettingsEp } from '../src/api/publicSettings';
+import type { default as _AdminShopEp } from '../src/api/adminShop';
+import type { default as _PublicShopEp } from '../src/api/publicShop';
 import type { default as _SaveProfileEp } from '../src/api/saveProfile';
 import type { default as _SaveSessionEp } from '../src/api/saveSession';
 import type { default as _SetAvatarEp } from '../src/api/setAvatar';
@@ -248,6 +250,14 @@ export type PublicPostsInputType = NonNullable<_PublicPostsCfg['inputSchema']> e
 export type PublicPostsOutputType = Awaited<ReturnType<_PublicPostsCfg['execute']>>;
 export const publicPosts = createCaller<PublicPostsInputType, PublicPostsOutputType>('publicPosts');
 
+type _PublicShopCfg = typeof _PublicShopEp;
+export type PublicShopInputType = NonNullable<_PublicShopCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_PublicShopCfg['execute']>[0]['input'];
+export type PublicShopOutputType = Awaited<ReturnType<_PublicShopCfg['execute']>>;
+export const publicShop = createCaller<PublicShopInputType, PublicShopOutputType>('publicShop');
+type _AdminShopCfg = typeof _AdminShopEp;
+export type AdminShopInputType = NonNullable<_AdminShopCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminShopCfg['execute']>[0]['input'];
+export type AdminShopOutputType = Awaited<ReturnType<_AdminShopCfg['execute']>>;
+export const adminShop = createCaller<AdminShopInputType, AdminShopOutputType>('adminShop');
 type _PublicSettingsCfg = typeof _PublicSettingsEp;
 export type PublicSettingsInputType = NonNullable<_PublicSettingsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_PublicSettingsCfg['execute']>[0]['input'];
 export type PublicSettingsOutputType = Awaited<ReturnType<_PublicSettingsCfg['execute']>>;
@@ -316,6 +326,8 @@ export const api = {
   publicCms,
   publicPosts,
   publicSettings,
+  adminShop,
+  publicShop,
   saveProfile,
   saveSession,
   setAvatar,

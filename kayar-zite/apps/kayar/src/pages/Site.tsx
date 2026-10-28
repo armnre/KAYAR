@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@project/components/lib/utils';
 import SiteHeader, { useMeta } from '../components/site/SiteHeader';
 import Hero from '../components/site/Hero';
+import { ShopSection } from '../components/site/ShopSection';
 import { Steps, MorshedSection, BodyyarSection, BlogCards, LatestPosts, FAQ, FinalCTA, Footer } from '../components/site/Sections';
 import { Markdown } from '@project/components/markdown';
 import { publicPosts, type PublicPostsOutputType } from 'zitejs/api';
@@ -36,6 +37,7 @@ export function Landing() {
         <MorshedSection />
         <BodyyarSection />
         <LatestPosts />
+        <ShopSection />
         <FAQ />
         <FinalCTA />
       </main>

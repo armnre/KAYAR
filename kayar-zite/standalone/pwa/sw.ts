@@ -17,7 +17,7 @@ const AV = /\.(mp3|m4a|aac|ogg|wav|mp4|webm)$/i;
 const NEVER = (url: URL, req: Request) =>
   req.method !== 'GET' ||
   AV.test(url.pathname) || req.headers.has('range') || req.destination === 'audio' || req.destination === 'video' ||
-  (url.origin === self.location.origin && (/^\/(api|upload|ops|healthz|sw\.js)(\/|$|\?)/.test(url.pathname) || url.pathname.startsWith('/media/')));
+  (url.origin === self.location.origin && (/^\/(api|go|upload|ops|healthz|sw\.js)(\/|$|\?)/.test(url.pathname) || url.pathname.startsWith('/media/')));
 registerRoute(({ url, request }) => NEVER(url, request), new NetworkOnly());
 
 // HTML navigations: always try the network first so a new deploy is picked up immediately

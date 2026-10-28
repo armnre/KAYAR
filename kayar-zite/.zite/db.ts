@@ -795,6 +795,17 @@ export type MediaAssetsRecordInput = {
   mimeType: string | null;
 };
 
+
+/** A record in the "Shop Partners" table. */
+export type ShopPartnersRecordType = { id: string; name?: string; type?: "own" | "partner" | "sponsor" | string; logo?: string; url?: string; description?: string; active?: boolean; seedKey?: string };
+export type ShopPartnersRecordInput = { name: string | null; type: string | null; logo: string | null; url: string | null; description: string | null; active: boolean | null; seedKey: string | null };
+/** A record in the "Shop Items" table. */
+export type ShopItemsRecordType = { id: string; title?: string; partnerId?: string; image?: string; price?: number; currency?: string; badge?: string; category?: string; tags?: string; targetUrl?: string; sort?: number; active?: boolean; startsAt?: string; endsAt?: string; featured?: boolean; showInLanding?: boolean; showInApp?: boolean; seedKey?: string; description?: string };
+export type ShopItemsRecordInput = { title: string | null; partnerId: string | null; image: string | null; price: number | string | null; currency: string | null; badge: string | null; category: string | null; tags: string | null; targetUrl: string | null; sort: number | string | null; active: boolean | null; startsAt: string | null; endsAt: string | null; featured: boolean | null; showInLanding: boolean | null; showInApp: boolean | null; seedKey: string | null; description: string | null };
+/** A record in the "Shop Clicks" table (daily aggregate). */
+export type ShopClicksRecordType = { id: string; itemId?: string; day?: string; n?: number };
+export type ShopClicksRecordInput = { itemId: string | null; day: string | null; n: number | string | null };
+
 /** A record in the "Collections" table, as it is read back. */
 export type CollectionsRecordType = {
   id: string;
@@ -1135,6 +1146,9 @@ export const zite = {
   smsMessages: createTableClient<SmsMessagesRecordType, SmsMessagesRecordInput>('SmsMessages'), // "Sms Messages"
   campaigns: createTableClient<CampaignsRecordType, CampaignsRecordInput>('Campaigns'), // "Campaigns"
   campaignRegistrations: createTableClient<CampaignRegistrationsRecordType, CampaignRegistrationsRecordInput>('CampaignRegistrations'), // "Campaign Registrations"
+  shopPartners: createTableClient<ShopPartnersRecordType, ShopPartnersRecordInput>('ShopPartners'),
+  shopItems: createTableClient<ShopItemsRecordType, ShopItemsRecordInput>('ShopItems'),
+  shopClicks: createTableClient<ShopClicksRecordType, ShopClicksRecordInput>('ShopClicks'),
   sql: createSqlClient(),
   auth: createAuthClient<ZiteAuthUser>(),
 };

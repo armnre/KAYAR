@@ -13,6 +13,7 @@ import { uploadRouter } from './uploads';
 import { mediaRouter, mirrorTick } from './media';
 import { autoTick, saveMirror } from '../apps/kayar/src/server/music/importer';
 import { opsRouter, APP_VERSION } from './ops';
+import { shopRouter, initShop } from './shopRoutes';
 import { renderHtml, sitemap, robots, invalidateSeoCache } from './seo';
 import { sha256 } from '../apps/kayar/src/server/auth';
 
@@ -75,6 +76,7 @@ app.get('/healthz', async (_req, res) => {
 });
 
 app.use(uploadRouter(PUBLIC_URL));
+app.use(shopRouter()); // /go/:itemId (click count + safe redirect)
 app.use(mediaRouter()); // /media/stream/:id, /media/cover/:id (same-origin proxy + LRU cache)
 
 /* ---------- AI daily quota (per member) ---------- */
@@ -180,6 +182,7 @@ process.on('uncaughtException', (e) => { log('error', 'uncaughtException', { err
   }
   await initOpsTables();
   await importSeedIfEmpty();
+  await initShop().catch((e) => log('error', 'shop init failed', { error: (e as Error).message }));
   await migrateMorshedV4().catch((e) => log('error', 'morshed v4 migration failed', { error: (e as Error).message }));
   const server = app.listen(PORT, () => log('info', `KAYAR standalone listening on :${PORT}`, { endpoints: Object.keys(endpoints).length, version: APP_VERSION }));
   server.requestTimeout = 10 * 60_000; // large admin uploads on slow links
