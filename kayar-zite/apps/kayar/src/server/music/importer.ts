@@ -2,9 +2,9 @@
 import { zite } from 'zitejs/db';
 import { ADAPTERS, type Row } from './adapters';
 import { classify, dedupeKey, normFa, rejectReason } from './classify';
-import { probeAudio, relayEnabled } from './http';
+import { probeAudio, relayEnabled, relayHealth } from './http';
 
-const PROBE_CONCURRENCY = 8;
+const PROBE_CONCURRENCY = relayEnabled ? 12 : 8;
 
 type SourceState = { enabled: boolean; acceptedBy?: string; acceptedAt?: string };
 export type Job = { running: boolean; startedAt: string; finishedAt?: string; source: string; target: number; scanned: number; added: number; rejected: number; log: string[]; error?: string };
@@ -79,11 +79,15 @@ export async function startImport(sourceIds: string[], target: number, opts: { a
       const { rows } = await zite.sql({ query: `SELECT "sourceId","audioUrl","dedupeKey","artist","title" FROM "Tracks"` });
       const seen = new Set(rows.flatMap((r) => [String(r.sourceId ?? ''), String(r.audioUrl ?? ''), String(r.dedupeKey || dedupeKey(String(r.artist ?? ''), String(r.title ?? '')))]).filter(Boolean));
       const block = await getBlocklist();
-      const perSource = Math.ceil(target / adapters.length);
-      for (const a of adapters) {
+      log(await relayHealth());
+      let perSource = 0;
+      for (const [ai, a] of adapters.entries()) {
+        // Unused quota from earlier sources flows to the remaining ones.
+        perSource = Math.ceil((target - j.added) / (adapters.length - ai));
+        if (perSource <= 0) break;
         log(`شروع ${a.name}…`);
         let candidates: Row[] = [];
-        try { candidates = await a.discover(perSource * 2, log); } catch (e) { log(`${a.name} در دسترس نیست: ${(e as Error).message}`); continue; }
+        try { candidates = await a.discover(Math.min(perSource * 4, 200), log); } catch (e) { log(`${a.name} در دسترس نیست: ${(e as Error).message}`); continue; }
         log(`${a.name}: ${candidates.length} ترک پیدا شد`);
         let added = 0;
         const queue: { r: Row; key: string }[] = [];

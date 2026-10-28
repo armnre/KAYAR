@@ -43,18 +43,44 @@ function EditTrack({ t, onSaved }: { t: T; onSaved: (all: T[]) => void }) {
 function LibraryTab({ tracks, setTracks }: { tracks: T[]; setTracks: (t: T[]) => void }) {
   const { token } = useAdmin();
   const [q, setQ] = useState(''); const [st, setSt] = useState(''); const [edit, setEdit] = useState<T | null>(null); const [del, setDel] = useState<T | null>(null);
+  const [selMode, setSelMode] = useState(false); const [sel, setSel] = useState<Set<string>>(new Set());
+  const [bulk, setBulk] = useState<'selected' | 'all' | null>(null); const [phrase, setPhrase] = useState(''); const [busy, setBusy] = useState(false);
   const filtered = tracks.filter((t) => (!st || t.status === st) && `${t.title} ${t.artist}`.toLowerCase().includes(q.toLowerCase()));
-  const canSort = !q && !st;
+  const canSort = !q && !st && !selMode;
+  const allSel = filtered.length > 0 && filtered.every((t) => sel.has(t.id));
+  const toggle = (id: string) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const reorder = useCallback((next: T[]) => { adminTracks({ token, action: 'reorder', ids: next.map((t) => t.id) }).then((r) => setTracks(r.tracks)).catch((e) => toast.error(errMsg(e))); }, [token, setTracks]);
-  const row = (t: T) => <button onClick={() => setEdit(t)} className="flex w-full items-center gap-3 text-start"><Cover hue={200} image={t.coverUrl} className="h-11 w-11 shrink-0 rounded-xl" /><div className="min-w-0 flex-1"><div className="flex items-center gap-1 truncate font-bold">{t.featured && <Star className="h-3.5 w-3.5 shrink-0 fill-gold text-gold" />}{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist} · {t.source} · {dur(t.duration)}</div></div><Pill s={t.status === 'hidden' ? 'archived' : t.status} /></button>;
+  const runBulk = async () => {
+    setBusy(true);
+    try {
+      const r = bulk === 'all' ? await adminTracks({ token, action: 'purgeAll', confirm: phrase.trim() }) : await adminTracks({ token, action: 'purgeIds', ids: [...sel] });
+      setTracks(r.tracks); toast.success('حذف شد'); setSel(new Set()); setBulk(null); setPhrase(''); setSelMode(false);
+    } catch (e) { toast.error(errMsg(e)); } finally { setBusy(false); }
+  };
+  const row = (t: T) => <button onClick={() => (selMode ? toggle(t.id) : setEdit(t))} className="flex min-w-0 flex-1 items-center gap-3 text-start"><Cover hue={200} image={t.coverUrl} className="h-11 w-11 shrink-0 rounded-xl" /><div className="min-w-0 flex-1"><div className="flex items-center gap-1 truncate font-bold">{t.featured && <Star className="h-3.5 w-3.5 shrink-0 fill-gold text-gold" />}{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist} · {t.sourceName || t.source} · {dur(t.duration)}</div></div><Pill s={t.status === 'hidden' ? 'archived' : t.status} /></button>;
   return (
     <>
       <div className="mb-3 flex flex-wrap gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جست‌وجو…" className="h-11 min-w-0 flex-1 basis-40 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><select value={st} onChange={(e) => setSt(e.target.value)} aria-label="وضعیت" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه</option><option value="published">منتشر</option><option value="draft">پیش‌نویس</option><option value="hidden">مخفی</option><option value="pending">در انتظار بررسی</option><option value="rejected">ردشده</option></select></div>
+      {tracks.length > 0 && <div className="mb-3 flex flex-wrap items-center gap-2">
+        <KButton size="sm" variant="outline" onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'لغو انتخاب' : 'انتخاب چندتایی'}</KButton>
+        {selMode && <>
+          <KButton size="sm" variant="outline" onClick={() => setSel(allSel ? new Set() : new Set(filtered.map((t) => t.id)))}>{allSel ? 'برداشتن همه' : `انتخاب همه (${fa(filtered.length)})`}</KButton>
+          <KButton size="sm" disabled={!sel.size} onClick={() => setBulk('selected')} className="bg-destructive text-destructive-foreground"><Trash2 className="h-4 w-4" />حذف {fa(sel.size)} ترک</KButton>
+        </>}
+        <KButton size="sm" variant="outline" onClick={() => setBulk('all')} className="ms-auto text-destructive"><Trash2 className="h-4 w-4" />حذف همه‌ی کتابخانه ({fa(tracks.length)})</KButton>
+      </div>}
       {!tracks.length ? <Glass><StateView icon={Music} title="کتابخانه خالی است" text="از تب «افزودن آهنگ» یا «ورود از لینک» آهنگ اضافه کن." /></Glass>
         : canSort ? <><p className="mb-2 text-xs text-muted-foreground">برای تغییر ترتیب نمایش، بکش یا از فلش‌ها استفاده کن.</p><SortableList items={tracks} onReorder={reorder} render={(t) => <div className="flex items-center gap-2">{row(t)}<button onClick={() => setDel(t)} className="tap grid place-items-center text-muted-foreground hover:text-destructive" aria-label="حذف"><Trash2 className="h-4 w-4" /></button></div>} /></>
-        : <ul className="space-y-2">{filtered.map((t) => <li key={t.id} className="glass flex items-center gap-2 rounded-2xl p-2">{row(t)}<Pencil className="h-4 w-4 text-muted-foreground" /></li>)}</ul>}
+        : <ul className="space-y-2">{filtered.map((t) => <li key={t.id} className={cn('glass flex items-center gap-2 rounded-2xl p-2', selMode && sel.has(t.id) && 'ring-2 ring-destructive/60')}>{selMode && <input type="checkbox" checked={sel.has(t.id)} onChange={() => toggle(t.id)} aria-label="انتخاب" className="h-5 w-5 shrink-0 accent-[hsl(var(--destructive))]" />}{row(t)}{!selMode && <button onClick={() => setDel(t)} className="tap grid place-items-center text-muted-foreground hover:text-destructive" aria-label="حذف"><Trash2 className="h-4 w-4" /></button>}</li>)}</ul>}
       <ResponsiveModal open={!!edit} onOpenChange={(v) => !v && setEdit(null)} title="ویرایش آهنگ">{edit && <EditTrack t={edit} onSaved={(all) => { setTracks(all); setEdit(null); }} />}</ResponsiveModal>
       <Confirm open={!!del} onOpenChange={(v) => !v && setDel(null)} danger title="حذف آهنگ؟" confirmLabel="حذف" text="آهنگ از کتابخانه و همه‌ی مجموعه‌ها حذف می‌شود." onConfirm={() => del && adminTracks({ token, action: 'delete', id: del.id }).then((r) => { setTracks(r.tracks); toast.success('حذف شد'); }).catch((e) => toast.error(errMsg(e)))} />
+      <ResponsiveModal open={!!bulk} onOpenChange={(v) => { if (!v) { setBulk(null); setPhrase(''); } }} title={bulk === 'all' ? 'حذف کامل کتابخانه' : `حذف ${fa(sel.size)} ترک`}>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">{bulk === 'all' ? `همه‌ی ${fa(tracks.length)} ترک، به‌همراه علاقه‌مندی‌ها، تاریخچه‌ی پخش و آیتم‌های مجموعه‌ها برای همیشه پاک می‌شوند. پادکست‌ها دست نمی‌خورند.` : 'ترک‌های انتخاب‌شده و همه‌ی ارجاع‌هایشان (مجموعه‌ها، علاقه‌مندی‌ها، تاریخچه) برای همیشه پاک می‌شوند.'}</p>
+          {bulk === 'all' && <label className="block text-sm font-bold">برای تأیید بنویس «حذف همه»<input value={phrase} onChange={(e) => setPhrase(e.target.value)} className={inp} /></label>}
+          <KButton className="w-full bg-destructive text-destructive-foreground" loading={busy} disabled={bulk === 'all' ? phrase.trim() !== 'حذف همه' : !sel.size} onClick={runBulk}><Trash2 className="h-4 w-4" />حذف برای همیشه</KButton>
+        </div>
+      </ResponsiveModal>
     </>
   );
 }
