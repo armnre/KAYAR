@@ -38,7 +38,12 @@ export const dedupeKey = (artist: string, title: string) => `${normFa(artist)}|$
 
 /** Picks style + workout genre from the source's categories/tags and the text. */
 export function classify(text: string, lang: Lang): { style: string; genre: Genre } {
-  if (lang === 'en') return { style: 'en-workout', genre: /ambient|chill|lofi|piano|sleep/i.test(text) ? 'focus' : 'workout' };
+  if (lang === 'en') {
+    if (/persian|iranian|santur|setar|kamancheh|tombak|\bdaf\b|\boud\b|\btar\b/i.test(text)) return { style: 'fa-traditional', genre: 'recovery' };
+    if (/ambient|chill|lofi|lo-fi|piano|sleep|meditat|relax|calm/i.test(text)) return { style: 'fa-instrumental', genre: 'focus' };
+    if (/running|cardio|drum and bass|dnb|speed_fast/i.test(text)) return { style: 'en-workout', genre: 'running' };
+    return { style: 'en-workout', genre: 'workout' };
+  }
   for (const s of STYLES) if (s.lang === 'fa' && s.words.test(text)) return { style: s.key, genre: s.genre };
   return { style: 'fa-pop', genre: 'running' };
 }

@@ -10,7 +10,8 @@ import { endpoints } from './endpoints.generated';
 import { log, installConsole, initOpsTables, recordError, requestLogger, alert } from './log';
 import { apiLimiter, tooMany } from './ratelimit';
 import { uploadRouter } from './uploads';
-import { mediaRouter } from './media';
+import { mediaRouter, mirrorTick } from './media';
+import { autoTick, saveMirror } from '../apps/kayar/src/server/music/importer';
 import { opsRouter, APP_VERSION } from './ops';
 import { renderHtml, sitemap, robots, invalidateSeoCache } from './seo';
 import { sha256 } from '../apps/kayar/src/server/auth';
@@ -182,6 +183,15 @@ process.on('uncaughtException', (e) => { log('error', 'uncaughtException', { err
   await migrateMorshedV4().catch((e) => log('error', 'morshed v4 migration failed', { error: (e as Error).message }));
   const server = app.listen(PORT, () => log('info', `KAYAR standalone listening on :${PORT}`, { endpoints: Object.keys(endpoints).length, version: APP_VERSION }));
   server.requestTimeout = 10 * 60_000; // large admin uploads on slow links
+  // Morshed background work: nightly auto-import + permanent mirroring of published tracks onto our own disk.
+  let mirroring = false;
+  const morshedTick = async () => {
+    await autoTick().catch((e) => log('warn', 'morshed auto-import tick failed', { error: (e as Error).message }));
+    if (mirroring) return; mirroring = true;
+    try { await saveMirror(await mirrorTick()); } catch (e) { log('warn', 'morshed mirror tick failed', { error: (e as Error).message }); } finally { mirroring = false; }
+  };
+  setTimeout(() => void morshedTick(), 60_000).unref();
+  setInterval(() => void morshedTick(), 5 * 60_000).unref();
   let closing = false;
   const shutdown = (sig: string) => {
     if (closing) return; closing = true;

@@ -9,6 +9,7 @@ import { KButton, Glass, StateView } from '../../components/kit';
 import { Confirm, ResponsiveModal } from '../../components/admin/ui';
 import { useAdmin, errMsg } from '../../lib/session';
 import { fa } from '../../lib/config';
+import { MorshedAuto } from './MorshedAuto';
 
 type T = AdminTracksOutputType['tracks'][0];
 const dur = (s: number) => (s ? `${fa(Math.floor(s / 60))}:${fa(String(Math.floor(s % 60)).padStart(2, '0'))}` : '—');
@@ -85,6 +86,7 @@ export function SourcesTab({ onImported }: { onImported: () => void }) {
   const [accept, setAccept] = useState<{ id: string; name: string } | null>(null);
   const [agree, setAgree] = useState(false);
   const [target, setTarget] = useState(50);
+  const [autoPub, setAutoPub] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [purge, setPurge] = useState(false); const [phrase, setPhrase] = useState('');
   const call = useCallback(async (key: string, input: Parameters<typeof adminDiscover>[0]) => {
@@ -106,7 +108,7 @@ export function SourcesTab({ onImported }: { onImported: () => void }) {
     <div className="space-y-4">
       <LegalNotice />
       <Glass className="space-y-3 p-4">
-        <div className="flex items-center gap-2 font-bold"><Radio className="h-4 w-4 text-primary" />۱. منابع موسیقی فارسی</div>
+        <div className="flex items-center gap-2 font-bold"><Radio className="h-4 w-4 text-primary" />۱. منابع موسیقی</div>
         {!d ? <p className="text-sm text-muted-foreground">در حال بارگذاری…</p> : d.sources.map((s) => (
           <div key={s.id} className="flex items-start gap-3 rounded-2xl bg-black/20 p-3">
             <div className="min-w-0 flex-1">
@@ -126,7 +128,8 @@ export function SourcesTab({ onImported }: { onImported: () => void }) {
         <p className="text-xs leading-6 text-muted-foreground">حداکثر ۱ درخواست در ثانیه به هر سایت؛ هر فایل قبل از ذخیره از همین سرور تست می‌شود. فقط متادیتا ذخیره می‌شود و پخش از طریق دامنه‌ی خود کایار است. ترک‌ها به صف بررسی می‌روند.</p>
         <label className="flex items-center gap-3 text-sm">سقف ترک
           <input type="number" inputMode="numeric" min={1} max={300} value={target} onChange={(e) => setTarget(Math.max(1, Math.min(300, Number(e.target.value) || 1)))} className="h-11 w-24 rounded-2xl border border-white/10 bg-bg1 px-3 text-center" /></label>
-        <KButton disabled={!enabled.length || running || !!busy} loading={busy === 'import'} onClick={() => call('import', { token, action: 'import', sourceIds: enabled.map((s) => s.id), target })}>
+        <label className="flex min-h-[44px] items-center gap-3 text-sm"><Checkbox checked={autoPub} onCheckedChange={(v) => setAutoPub(!!v)} />ترک‌های مجوز آزاد مستقیم منتشر شوند</label>
+        <KButton disabled={!enabled.length || running || !!busy} loading={busy === 'import'} onClick={() => call('import', { token, action: 'import', sourceIds: enabled.map((s) => s.id), target, autoPublishOpen: autoPub })}>
           <Download className="h-4 w-4" />{enabled.length ? `شروع از ${enabled.map((s) => s.name).join('، ')}` : 'اول یک منبع را فعال کن'}</KButton>
         {job && (
           <div className="space-y-2">
@@ -136,6 +139,8 @@ export function SourcesTab({ onImported }: { onImported: () => void }) {
           </div>
         )}
       </Glass>
+
+      {d && <MorshedAuto d={d} busy={busy === 'auto'} onSave={(auto) => void call('auto', { token, action: 'setAuto', auto })} />}
 
       <Glass className="flex flex-wrap items-center gap-3 p-4">
         <Mic2 className="h-4 w-4 text-primary" /><div className="flex-1 text-sm">کشف پادکست‌های فارسی (RSS رسمی خود تولیدکننده)</div>
