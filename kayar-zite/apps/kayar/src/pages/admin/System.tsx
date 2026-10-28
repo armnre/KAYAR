@@ -8,6 +8,7 @@ import { KButton, Glass, IconBox, FloatInput, StateView } from '../../components
 import { PageHead, ListSkeleton, ErrorState, fmtDate, ResponsiveModal } from '../../components/admin/ui';
 import { useAdmin, errMsg } from '../../lib/session';
 import { SeedCard } from '../../components/admin/SeedCard';
+import { SystemHealth } from '../../components/admin/SystemHealth';
 import { fa, faNum } from '../../lib/config';
 
 export const ACTION_FA: Record<string, string> = {
@@ -56,6 +57,7 @@ export function AdminDashboard() {
         <Glass className="p-5"><div className="mb-3 font-bold">پرپخش‌ترین آهنگ‌ها (۳۰ روز)</div>{d.topTracks.length === 0 ? <p className="text-sm text-muted-foreground">هنوز پخشی ثبت نشده.</p> : <ol className="space-y-2">{d.topTracks.map((t, i) => <li key={i} className="flex items-center gap-3"><span className="w-5 text-muted-foreground">{fa(i + 1)}</span><div className="min-w-0 flex-1"><div className="truncate font-bold">{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist}</div></div><span className="text-sm">{faNum(t.plays)}</span></li>)}</ol>}</Glass>
         <div className="grid grid-cols-2 gap-3"><Glass className="p-5"><IconBox icon={Newspaper} tone="gold" /><div className="mt-3 text-2xl font-black">{faNum(d.posts)}</div><div className="text-sm text-muted-foreground">مطلب منتشرشده</div></Glass><Glass className="p-5"><IconBox icon={Music} tone="violet" /><div className="mt-3 text-2xl font-black">{faNum(d.publishedTracks)}</div><div className="text-sm text-muted-foreground">آهنگ منتشرشده</div></Glass></div>
       </div>
+      <SystemHealth />
     </div>
   );
 }

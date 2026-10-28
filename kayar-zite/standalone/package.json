@@ -1,6 +1,7 @@
 {
   "name": "kayar-standalone",
   "private": true,
+  "version": "1.5.0",
   "type": "module",
   "scripts": { "build": "node build.mjs", "start": "node dist/server.mjs" },
   "dependencies": { "pg": "^8.13.1" }
