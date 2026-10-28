@@ -24,7 +24,7 @@ export default createEndpoint({
   description: 'Admin management of the Morshed track library (add by upload or public link, edit, publish, reorder)',
   inputSchema: z.object({
     token: tokenField,
-    action: z.enum(['list', 'create', 'update', 'reorder', 'delete', 'approve', 'reject', 'takedown', 'takedownArtist', 'purgeAll']),
+    action: z.enum(['list', 'create', 'update', 'reorder', 'delete', 'approve', 'reject', 'takedown', 'takedownArtist', 'purgeAll', 'purgeIds']),
     artist: z.string().max(120).optional(),
     confirm: z.string().max(40).optional(),
     q: z.string().max(80).optional(),
@@ -34,7 +34,7 @@ export default createEndpoint({
       audioUrl: z.string().url().max(2000), coverUrl: z.string().max(2000), durationSeconds: z.number().min(0).max(36000),
       source: z.enum(['upload', 'external']), shareUrl: z.string().max(2000), licenseUrl: z.string().max(2000), rights: z.string().max(1000),
     }).optional(),
-    ids: z.array(z.string().max(64)).max(500).optional(),
+    ids: z.array(z.string().max(64)).max(2000).optional(),
     patch: z.object({
       title: z.string().trim().min(1).max(160), artist: z.string().trim().max(120), album: z.string().trim().max(160), rights: z.string().max(1000),
       categories: z.array(z.string().max(40)).max(10), tags: z.array(z.string().max(40)).max(15), featured: z.boolean(), status: z.enum(['pending', 'draft', 'published', 'hidden', 'rejected']),
@@ -93,6 +93,11 @@ export default createEndpoint({
       const { rows } = await zite.sql({ query: `SELECT id FROM "Tracks"` });
       await purgeTracks(rows.map((r) => String(r.id)));
       await audit(member.id, 'track.purgeAll', 'track', '', { count: rows.length });
+    } else if (input.action === 'purgeIds') {
+      const ids = [...new Set(input.ids ?? [])];
+      if (!ids.length) throw bad('هیچ آهنگی انتخاب نشده است.');
+      await purgeTracks(ids);
+      await audit(member.id, 'track.purgeIds', 'track', '', { count: ids.length });
     } else if (input.action === 'delete') {
       const cur = input.id ? await zite.tracks.findOne({ id: input.id }) : undefined;
       if (!cur || cur.status === 'deleted') throw bad('آهنگ پیدا نشد.');

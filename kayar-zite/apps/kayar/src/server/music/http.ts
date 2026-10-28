@@ -107,3 +107,14 @@ export async function probeAudio(url: string): Promise<{ bytes: number; type: st
 }
 
 export const decodeHtml = (s: string) => s.replace(/<!\[CDATA\[|\]\]>/g, '').replace(/&amp;/g, '&').replace(/&#8211;|&#8212;/g, '-').replace(/&#8217;|&#039;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+
+/** Quick relay round-trip check, logged at the start of each import. */
+export async function relayHealth(): Promise<string> {
+  if (!RELAY) return 'رله تنظیم نشده — منابع خارجی از ایران ممکن است در دسترس نباشند.';
+  const t0 = Date.now();
+  try {
+    const r = await once(relayUrl('https://api.openverse.org/v1/audio/?q=music&page_size=1'), { headers: { 'user-agent': UA } }, 15_000);
+    try { await r.body?.cancel(); } catch { /* ignore */ }
+    return r.ok ? `رله فعال است ✓ (${Date.now() - t0}ms)` : `رله پاسخ ${r.status} داد — MEDIA_RELAY_KEY را با KEY ورکر یکی کن.`;
+  } catch (e) { return `رله در دسترس نیست: ${(e as Error).message}`; }
+}
