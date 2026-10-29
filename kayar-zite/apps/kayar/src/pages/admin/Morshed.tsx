@@ -19,6 +19,22 @@ const dur = (s: number) => `${fa(Math.floor(s / 60))}:${fa(String(Math.floor(s %
 const inp = 'mt-1 h-11 w-full rounded-2xl border border-white/10 bg-bg1 px-3 text-sm font-normal outline-none focus:border-primary';
 const CATS = ['شروع قدرتی', 'کاردیو', 'ریکاوری', 'تمرکز', 'انرژی'];
 
+const PHASE_FA = { warmup: 'گرم کردن', peak: 'اوج', cooldown: 'سرد کردن' } as const;
+function PhaseFitPanel({ f }: { f: T['phaseFit'] }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[.03] p-3 text-sm">
+      <div className="mb-2 font-bold">تناسب با مراحل تمرین</div>
+      <div className="grid grid-cols-3 gap-2">{(['warmup', 'peak', 'cooldown'] as const).map((k) => (
+        <div key={k} className={cn('rounded-xl p-2 text-center', f.best === k ? 'bg-primary/15 ring-1 ring-primary/40' : 'bg-white/5')}>
+          <div className="text-xs text-muted-foreground">{PHASE_FA[k]}</div><div className="font-latin text-lg font-black">{fa(f.scores[k])}</div>
+          <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-primary" style={{ width: `${f.scores[k]}%` }} /></div>
+        </div>))}</div>
+      {f.reasons.length > 0 && <ul className="mt-2 list-inside list-disc text-xs leading-6 text-muted-foreground">{f.reasons.map((r) => <li key={r}>{r}</li>)}</ul>}
+      {!f.complete && <p className="mt-2 text-xs leading-6 text-gold">امتیاز کامل نیست؛ داده‌ی ثبت‌نشده: {f.missing.join('، ')}. عددی برای این موارد حدس زده نمی‌شود.</p>}
+    </div>
+  );
+}
+
 function EditTrack({ t, onSaved }: { t: T; onSaved: (all: T[]) => void }) {
   const { token } = useAdmin();
   const [f, setF] = useState({ title: t.title, artist: t.artist, album: t.album, rights: t.rights, categories: t.categories, tags: t.tags.join('، '), featured: t.featured, status: (['draft', 'published', 'hidden'].includes(t.status) ? t.status : 'draft') as 'draft' | 'published' | 'hidden' });
@@ -27,6 +43,7 @@ function EditTrack({ t, onSaved }: { t: T; onSaved: (all: T[]) => void }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3"><Cover hue={200} image={t.coverUrl} className="h-16 w-16 rounded-xl" /><div className="min-w-0 text-sm text-muted-foreground"><div>منبع: {t.source === 'upload' ? 'آپلود' : t.sourceName || 'لینک خارجی'}</div><div>مدت: {dur(t.duration)}</div>{t.audioUrl && <audio src={t.source === 'external' ? `/media/stream/${t.id}` : t.audioUrl} controls preload="none" className="mt-1 h-8 w-full" />}</div></div>
+      <PhaseFitPanel f={t.phaseFit} />
       <label className="block text-sm font-bold">عنوان<input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} className={inp} /></label>
       <div className="grid gap-3 sm:grid-cols-2"><label className="block text-sm font-bold">هنرمند<input value={f.artist} onChange={(e) => setF({ ...f, artist: e.target.value })} className={inp} /></label><label className="block text-sm font-bold">آلبوم<input value={f.album} onChange={(e) => setF({ ...f, album: e.target.value })} className={inp} /></label></div>
       <div className="text-sm font-bold">دسته‌ها<div className="mt-1 flex flex-wrap gap-2">{CATS.map((c) => <button key={c} onClick={() => setF({ ...f, categories: f.categories.includes(c) ? f.categories.filter((x) => x !== c) : [...f.categories, c] })} className={cn('rounded-full px-3 py-1.5 text-xs font-bold', f.categories.includes(c) ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{c}</button>)}</div></div>
@@ -42,11 +59,11 @@ function EditTrack({ t, onSaved }: { t: T; onSaved: (all: T[]) => void }) {
 
 function LibraryTab({ tracks, setTracks }: { tracks: T[]; setTracks: (t: T[]) => void }) {
   const { token } = useAdmin();
-  const [q, setQ] = useState(''); const [st, setSt] = useState(''); const [edit, setEdit] = useState<T | null>(null); const [del, setDel] = useState<T | null>(null);
+  const [q, setQ] = useState(''); const [st, setSt] = useState(''); const [ph, setPh] = useState(''); const [edit, setEdit] = useState<T | null>(null); const [del, setDel] = useState<T | null>(null);
   const [selMode, setSelMode] = useState(false); const [sel, setSel] = useState<Set<string>>(new Set());
   const [bulk, setBulk] = useState<'selected' | 'all' | null>(null); const [phrase, setPhrase] = useState(''); const [busy, setBusy] = useState(false);
-  const filtered = tracks.filter((t) => (!st || t.status === st) && `${t.title} ${t.artist}`.toLowerCase().includes(q.toLowerCase()));
-  const canSort = !q && !st && !selMode;
+  const filtered = tracks.filter((t) => (!st || t.status === st) && (!ph || t.phaseFit.best === ph) && `${t.title} ${t.artist}`.toLowerCase().includes(q.toLowerCase()));
+  const canSort = !q && !st && !ph && !selMode;
   const allSel = filtered.length > 0 && filtered.every((t) => sel.has(t.id));
   const toggle = (id: string) => setSel((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const reorder = useCallback((next: T[]) => { adminTracks({ token, action: 'reorder', ids: next.map((t) => t.id) }).then((r) => setTracks(r.tracks)).catch((e) => toast.error(errMsg(e))); }, [token, setTracks]);
@@ -60,7 +77,7 @@ function LibraryTab({ tracks, setTracks }: { tracks: T[]; setTracks: (t: T[]) =>
   const row = (t: T) => <button onClick={() => (selMode ? toggle(t.id) : setEdit(t))} className="flex min-w-0 flex-1 items-center gap-3 text-start"><Cover hue={200} image={t.coverUrl} className="h-11 w-11 shrink-0 rounded-xl" /><div className="min-w-0 flex-1"><div className="flex items-center gap-1 truncate font-bold">{t.featured && <Star className="h-3.5 w-3.5 shrink-0 fill-gold text-gold" />}{t.title}</div><div className="truncate text-xs text-muted-foreground">{t.artist} · {t.sourceName || t.source} · {dur(t.duration)}</div></div><Pill s={t.status === 'hidden' ? 'archived' : t.status} /></button>;
   return (
     <>
-      <div className="mb-3 flex flex-wrap gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جست‌وجو…" className="h-11 min-w-0 flex-1 basis-40 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><select value={st} onChange={(e) => setSt(e.target.value)} aria-label="وضعیت" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه</option><option value="published">منتشر</option><option value="draft">پیش‌نویس</option><option value="hidden">مخفی</option><option value="pending">در انتظار بررسی</option><option value="rejected">ردشده</option></select></div>
+      <div className="mb-3 flex flex-wrap gap-2"><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="جست‌وجو…" className="h-11 min-w-0 flex-1 basis-40 rounded-full border border-white/10 bg-bg1 px-4 text-sm outline-none focus:border-primary" /><select value={st} onChange={(e) => setSt(e.target.value)} aria-label="وضعیت" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه</option><option value="published">منتشر</option><option value="draft">پیش‌نویس</option><option value="hidden">مخفی</option><option value="pending">در انتظار بررسی</option><option value="rejected">ردشده</option></select><select value={ph} onChange={(e) => setPh(e.target.value)} aria-label="مرحله‌ی تمرین" className="h-11 rounded-full border border-white/10 bg-bg1 px-3 text-sm"><option value="">همه‌ی مراحل</option><option value="warmup">مناسب گرم کردن</option><option value="peak">مناسب اوج</option><option value="cooldown">مناسب سرد کردن</option></select></div>
       {tracks.length > 0 && <div className="mb-3 flex flex-wrap items-center gap-2">
         <KButton size="sm" variant="outline" onClick={() => { setSelMode(!selMode); setSel(new Set()); }}>{selMode ? 'لغو انتخاب' : 'انتخاب چندتایی'}</KButton>
         {selMode && <>
