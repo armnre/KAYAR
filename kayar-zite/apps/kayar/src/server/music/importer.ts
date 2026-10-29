@@ -54,7 +54,7 @@ export async function getJob(): Promise<Job | null> {
   return id && 'startedAt' in v ? { ...(v as Job), running: false } : null;
 }
 
-const toRecord = (r: Row, key: string, dur: number, publish: boolean) => {
+export const toRecord = (r: Row, key: string, dur: number, publish: boolean) => {
   const c = classify(`${r.text} ${r.title}`, r.lang);
   return {
     title: r.title, artist: r.artist, album: r.album, artwork: r.art, coverUrl: r.art, audioUrl: r.audioUrl,

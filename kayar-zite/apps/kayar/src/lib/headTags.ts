@@ -31,4 +31,22 @@ export function applyHeadTags() {
   upsert('link[rel="apple-touch-icon"]', 'link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' });
   upsert('link[rel="manifest"]', 'link', { rel: 'manifest', href: '/manifest.webmanifest' });
   upsert('link[rel="canonical"]', 'link', { rel: 'canonical', href: origin + window.location.pathname });
+  if (!document.getElementById('ld-org')) {
+    const s = document.createElement('script');
+    s.type = 'application/ld+json'; s.id = 'ld-org';
+    s.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'Organization', name: 'KAYAR کایار', url: origin, logo: `${origin}/icon-512.png` },
+        { '@type': 'WebSite', name: 'کایار', url: origin, inLanguage: 'fa-IR' },
+      ],
+    });
+    document.head.appendChild(s);
+  }
+}
+
+/** Keeps private areas (app, admin) out of search results; call on every route change. */
+export function applyRobotsForPath(pathname: string) {
+  const priv = pathname.startsWith('/app') || pathname.startsWith('/admin');
+  if (priv) upsert('meta[name="robots"]', 'meta', { name: 'robots', content: 'noindex, nofollow' });
 }

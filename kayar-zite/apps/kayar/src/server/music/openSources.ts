@@ -23,7 +23,7 @@ type OV = {
   mature?: boolean; source: string; filetype?: string | null; bit_rate?: number | null; audio_set?: { title?: string } | null;
 };
 
-async function openverse(queries: string[], limit: number, log: (m: string) => void, hint: string): Promise<Row[]> {
+export async function openverse(queries: string[], limit: number, log: (m: string) => void, hint: string): Promise<Row[]> {
   const out: Row[] = [];
   const seen = new Set<string>();
   const order = [...queries].sort(() => Math.random() - 0.5);

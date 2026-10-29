@@ -81,7 +81,7 @@ export function BlogPost() {
   const [p, setP] = useState<PublicPostsOutputType['post'] | undefined>(undefined);
   const [err, setErr] = useState(false); const [n, setN] = useState(0);
   useEffect(() => { let on = true; setErr(false); setP(undefined); publicPosts({ slug }).then((r) => on && setP(r.post)).catch(() => on && setErr(true)); return () => { on = false; }; }, [slug, n]);
-  useMeta(p ? p.seoTitle || p.title : p === null ? 'مطلب پیدا نشد' : 'وبلاگ', p ? p.seoDescription || p.excerpt : '');
+  useMeta(p ? p.seoTitle || p.title : p === null ? 'مطلب پیدا نشد' : 'وبلاگ', p ? p.seoDescription || p.excerpt : '', { type: p ? 'article' : 'website', image: p?.coverUrl || undefined });
   return (
     <div className="min-h-svh depth-bg">
       <SiteHeader />

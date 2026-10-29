@@ -12,6 +12,7 @@ import { CollectionsPanel } from './Collections';
 import { Pill } from './Posts';
 import { useAdmin, errMsg } from '../../lib/session';
 import { ReviewTab, SourcesTab } from './MorshedReview';
+import { ScoutTab } from './MorshedScout';
 import { fa } from '../../lib/config';
 
 type T = AdminTracksOutputType['tracks'][0];
@@ -183,7 +184,7 @@ function PodcastsTab() {
 
 export function AdminMorshed() {
   const { token } = useAdmin();
-  const [tab, setTab] = useState<'review' | 'sources' | 'library' | 'add' | 'import' | 'podcasts' | 'collections'>('review');
+  const [tab, setTab] = useState<'review' | 'scout' | 'sources' | 'library' | 'add' | 'import' | 'podcasts' | 'collections'>('review');
   const [d, setD] = useState<{ tracks: T[] } | null>(null); const [err, setErr] = useState<string>();
   const load = useCallback(() => { setErr(undefined); adminTracks({ token, action: 'list' }).then((r) => setD({ tracks: r.tracks })).catch((e) => setErr(errMsg(e))); }, [token]);
   useEffect(load, [load]);
@@ -192,8 +193,8 @@ export function AdminMorshed() {
   return (
     <div>
       <PageHead title="مرشد" sub="منبع ← import ← بررسی و تأیید ← انتشار؛ به‌علاوه‌ی آپلود دستی، پادکست‌ها و مجموعه‌ها" />
-      <div className="mb-4 flex gap-2 overflow-x-auto" role="tablist">{([['review', `بررسی ترک‌ها${d ? ` (${fa(d.tracks.filter((x) => x.status === 'pending').length)})` : ''}`], ['sources', 'منابع و import'], ['library', 'کتابخانه'], ['add', 'افزودن آهنگ'], ['import', 'ورود از لینک'], ['podcasts', 'پادکست‌ها'], ['collections', 'مجموعه‌ها']] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn('tap shrink-0 rounded-full px-5 text-sm font-bold', tab === k ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{l}</button>)}</div>
-      {tab === 'podcasts' ? <PodcastsTab /> : tab === 'sources' ? <SourcesTab onImported={load} /> : err ? <Glass><ErrorState text={err} onRetry={load} /></Glass> : !d ? <ListSkeleton /> : tab === 'review' ? <ReviewTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'library' ? <LibraryTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'add' ? <AddTrack init={BLANK} onAdded={added} /> : tab === 'import' ? <ImportTab onAdded={added} /> : <CollectionsPanel tracks={d.tracks} />}
+      <div className="mb-4 flex gap-2 overflow-x-auto" role="tablist">{([['review', `بررسی ترک‌ها${d ? ` (${fa(d.tracks.filter((x) => x.status === 'pending').length)})` : ''}`], ['scout', 'کشف پیشرفته'], ['sources', 'منابع و import'], ['library', 'کتابخانه'], ['add', 'افزودن آهنگ'], ['import', 'ورود از لینک'], ['podcasts', 'پادکست‌ها'], ['collections', 'مجموعه‌ها']] as const).map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={cn('tap shrink-0 rounded-full px-5 text-sm font-bold', tab === k ? 'bg-primary text-primary-foreground' : 'bg-white/5 text-muted-foreground')}>{l}</button>)}</div>
+      {tab === 'scout' ? <ScoutTab /> : tab === 'podcasts' ? <PodcastsTab /> : tab === 'sources' ? <SourcesTab onImported={load} /> : err ? <Glass><ErrorState text={err} onRetry={load} /></Glass> : !d ? <ListSkeleton /> : tab === 'review' ? <ReviewTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'library' ? <LibraryTab tracks={d.tracks} setTracks={setTracks} /> : tab === 'add' ? <AddTrack init={BLANK} onAdded={added} /> : tab === 'import' ? <ImportTab onAdded={added} /> : <CollectionsPanel tracks={d.tracks} />}
     </div>
   );
 }

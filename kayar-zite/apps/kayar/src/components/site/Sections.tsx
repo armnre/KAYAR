@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, KeyRound, QrCode, Play, Pause, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, KeyRound, QrCode, ArrowLeft } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@project/components/ui/accordion';
-import { KButton, Glass, IconBox, Waveform, SampleBadge, Cover, ProgressRing, KayarLogo } from '../kit';
+import { KButton, Glass, IconBox, KayarLogo } from '../kit';
 import { defaultFaqs } from '../../lib/defaultFaqs';
 import { usePosts, usePublicSettings, type PostCard } from '../../lib/publicData';
 import { fa, faDate } from '../../lib/config';
@@ -42,82 +41,7 @@ export function Steps() {
   );
 }
 
-export function MorshedSection() {
-  const b = useBlock('morshed');
-  const [playing, setPlaying] = useState(true);
-  return (
-    <section id="morshed" className="relative scroll-mt-20 overflow-hidden px-4 py-20 md:py-28">
-      <div className="absolute inset-0 -z-10 [clip-path:polygon(0_6%,100%_0,100%_94%,0_100%)] bg-gradient-to-b from-violet/15 via-bg1 to-background" aria-hidden />
-      <div className="absolute start-1/2 top-1/3 -z-10 h-80 w-80 rounded-full bg-violet/30 blur-[120px]" aria-hidden />
-      <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
-        <div className="reveal min-w-0">
-          <div className="mb-2 font-latin text-sm font-bold tracking-[.2em] text-[hsl(254_100%_78%)]">MORSHED</div>
-          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-black">{b.title} <span className="text-[hsl(254_100%_78%)]">{b.accent}</span></h2>
-          <p className="mt-3 text-[17px] leading-[1.8] text-muted-foreground">{b.text}</p>
-          <div className="mt-6 flex flex-wrap gap-2">{b.chips.map((c) => <span key={c} className="rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-sm font-bold">{c}</span>)}</div>
-        </div>
-        <div className="reveal relative min-w-0">
-          <img src="/media/img_oPmkOrwF9MOWO-W_.jpg" alt="هدفون و گوشی روی کف باشگاه" width={1376} height={768} loading="lazy" className="aspect-video w-full rounded-[28px] object-cover opacity-80" />
-          <Glass className="relative -mt-16 mx-3 p-4 sm:mx-8">
-            <div className="mb-3 flex items-center justify-between"><span className="text-sm text-muted-foreground">در حال پخش</span><SampleBadge /></div>
-            <div className="flex items-center gap-3">
-              <Cover hue={254} className="h-14 w-14 shrink-0" />
-              <div className="min-w-0 flex-1"><div className="truncate font-bold">ضرب‌آهنگ شروع قدرتی</div><div className="truncate text-sm text-muted-foreground">مرشد کایار</div></div>
-              <button className="press tap grid h-12 w-12 place-items-center rounded-full bg-violet text-white" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'توقف' : 'پخش'}>{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current" />}</button>
-            </div>
-            <Waveform bars={40} playing={playing} className="mt-3 w-full justify-between" color="bg-[hsl(254_100%_75%)]" />
-          </Glass>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function PhoneMock() {
-  const msgs = ['سلام! هدفت چیه؟', 'می‌خوام ۵ کیلو کم کنم و قوی‌تر بشم', 'عالیه. برنامه‌ی ۴ روز در هفته برات ساختم.'];
-  const [n, setN] = useState(1);
-  useEffect(() => { const t = setInterval(() => setN((x) => (x >= 3 ? 1 : x + 1)), 1800); return () => clearInterval(t); }, []);
-  return (
-    <div className="relative mx-auto w-[min(300px,82vw)] rounded-[44px] border border-white/15 bg-bg1 p-3 shadow-xl" aria-hidden>
-      <div className="mx-auto mb-3 h-5 w-24 rounded-full bg-black" />
-      <div className="space-y-2 px-1">
-        {msgs.slice(0, n).map((m, i) => <div key={i} className={`max-w-[85%] rounded-2xl px-3 py-2 text-[13px] leading-6 ${i % 2 ? 'ms-auto bg-primary text-primary-foreground' : 'bg-white/[.07]'}`}>{m.replace('💪', '')}</div>)}
-      </div>
-      <div className="mt-3 rounded-2xl bg-white/[.05] p-3">
-        <div className="mb-2 flex items-center justify-between text-xs"><span className="font-bold">ماکروی امروز</span><SampleBadge /></div>
-        <div className="flex justify-between">
-          {[['پروتئین', 72, 'hsl(var(--primary))'], ['کربو', 54, 'hsl(var(--violet))'], ['چربی', 40, 'hsl(var(--gold))']].map(([l, v, c]) => <div key={l as string} className="text-center"><ProgressRing value={v as number} size={54} stroke={5} color={c as string}><span className="text-xs">{fa(v as number)}٪</span></ProgressRing><div className="mt-1 text-xs text-muted-foreground">{l}</div></div>)}
-        </div>
-      </div>
-      <div className="mt-3 rounded-2xl bg-white/[.05] p-3">
-        <div className="mb-1 text-xs font-bold">روند وزن</div>
-        <svg viewBox="0 0 100 30" className="h-12 w-full"><defs><linearGradient id="wg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="hsl(71 100% 56%)" stopOpacity=".4" /><stop offset="1" stopColor="hsl(71 100% 56%)" stopOpacity="0" /></linearGradient></defs><path d="M0 8 L20 10 L40 13 L60 15 L80 19 L100 22 L100 30 L0 30Z" fill="url(#wg)" /><path d="M0 8 L20 10 L40 13 L60 15 L80 19 L100 22" fill="none" stroke="hsl(71 100% 56%)" strokeWidth="1.5" /></svg>
-      </div>
-    </div>
-  );
-}
-
-export function BodyyarSection() {
-  const b = useBlock('bodyyar');
-  const steps = b.steps;
-  return (
-    <section id="bodyyar" className="relative scroll-mt-20 overflow-hidden px-4 py-20 md:py-28">
-      <div className="absolute end-0 top-10 -z-10 h-96 w-96 rounded-full bg-primary/15 blur-[120px]" aria-hidden />
-      <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
-        <div className="reveal order-2 md:order-1"><PhoneMock /></div>
-        <div className="reveal order-1 min-w-0 md:order-2">
-          <div className="mb-2 font-latin text-sm font-bold tracking-[.2em] text-primary">BODYYAR</div>
-          <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-black">{b.title} <span className="text-primary">{b.accent}</span></h2>
-          <p className="mt-3 text-[17px] leading-[1.8] text-muted-foreground">{b.text}</p>
-          <ol className="relative mt-8 space-y-5 ps-2">
-            <span className="absolute bottom-3 start-[27px] top-3 border-s-2 border-dashed border-primary/40" aria-hidden />
-            {steps.map((s, i) => <li key={s} className="relative flex items-center gap-4"><span className="z-10 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary font-black text-primary-foreground">{fa(i + 1)}</span><span className="text-lg font-bold">{s}</span></li>)}
-          </ol>
-        </div>
-      </div>
-    </section>
-  );
-}
+export { MorshedSection, BodyyarSection } from './Showcase';
 
 export function BlogCards({ list }: { list: PostCard[] }) {
   return (
@@ -177,7 +101,7 @@ export function FinalCTA() {
           <p className="mt-3 max-w-md text-[17px] font-medium leading-[1.8] opacity-80">{b.text}</p>
           <Link to="/app" className="press tap mt-6 inline-flex h-14 items-center gap-2 rounded-full bg-primary-foreground px-8 font-bold text-primary">ورود به کایار <ArrowLeft className="h-5 w-5" /></Link>
         </div>
-        <img src="/media/img_sgQAqtZdvystKoXd.jpg" alt="بانوی ورزشکار ایرانی با حجاب ورزشی و لباس تمرین کاپوش" width={1056} height={1408} loading="lazy" className="relative mx-auto h-80 w-auto object-cover md:h-[420px]" style={{ maskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)' }} />
+        <img src="/media/kapoosh_cta_woman.jpg" alt="بانوی ورزشکار ایرانی با حجاب ورزشی و لباس تمرین کاپوش" width={1056} height={1408} loading="lazy" className="relative mx-auto h-80 w-auto object-cover md:h-[420px]" style={{ maskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 55% 70% at 50% 45%, black 55%, transparent 100%)' }} />
       </div>
     </section>
   );

@@ -1,0 +1,18 @@
+{
+  "id": "2aumsmsyao",
+  "accessMode": "external",
+  "envVars": {
+    "ZITE_AUTH_PEPPER": {
+      "description": "Secret pepper used when hashing member passwords and session tokens"
+    },
+    "ZITE_BOOTSTRAP_ADMIN_PASSWORD": {
+      "description": "Password of the first admin account"
+    },
+    "ZITE_BOOTSTRAP_ADMIN_USERNAME": {
+      "description": "Username of the first admin account created automatically"
+    },
+    "ZITE_NARAROUTER_API_KEY": {
+      "description": "API key for the NaraRouter AI service used by the coach chat and plan generator"
+    }
+  }
+}

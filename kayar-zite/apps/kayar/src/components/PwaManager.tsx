@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Download, Share, PlusSquare, X } from 'lucide-react';
+import { applyRobotsForPath } from '../lib/headTags';
 
 declare global { interface Window { __KAYAR__?: { swDisabled?: boolean; version?: string } } }
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> };
@@ -20,9 +21,19 @@ function useServiceWorker() {
       return;
     }
     if (!import.meta.env.PROD) return;
+    if (window.location.hostname.startsWith('zite-editor-') || window.self !== window.top) {
+      void navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => void r.unregister()));
+      void caches?.keys().then((ks) => ks.forEach((k) => void caches.delete(k)));
+      return;
+    }
     let cancelled = false;
-    void import('workbox-window').then(({ Workbox }) => {
-      if (cancelled) return;
+    void fetch('/sw.js', { method: 'HEAD', cache: 'no-store' })
+      .then((r) => r.ok && /javascript/i.test(r.headers.get('content-type') ?? ''))
+      .catch(() => false)
+      .then((ok) => ok ? import('workbox-window') : null)
+      .then((mod) => {
+      if (cancelled || !mod) return;
+      const { Workbox } = mod;
       const wb = new Workbox('/sw.js', { scope: '/' });
       wb.addEventListener('waiting', () => {
         toast('نسخه‌ی جدید کایار آماده است', {
@@ -80,5 +91,7 @@ function InstallPrompt() {
 
 export default function PwaManager() {
   useServiceWorker();
+  const { pathname } = useLocation();
+  useEffect(() => { applyRobotsForPath(pathname); }, [pathname]);
   return <InstallPrompt />;
 }

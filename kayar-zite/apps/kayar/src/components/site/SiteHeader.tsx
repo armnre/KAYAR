@@ -13,19 +13,35 @@ const links = [
   { href: '/p/contact', label: 'تماس' },
 ];
 
-export function useMeta(title: string, description: string) {
+export function useMeta(title: string, description: string, opts: { image?: string; noindex?: boolean; type?: string } = {}) {
   useEffect(() => {
-    document.title = `${title} | کایار`;
+    const full = `${title} | کایار`;
+    document.title = full;
+    const origin = window.location.origin;
+    const url = origin + window.location.pathname;
+    const img = opts.image ? (opts.image.startsWith('http') ? opts.image : origin + opts.image) : `${origin}/og.png`;
     const set = (sel: string, attr: string, key: string, val: string) => {
       let m = document.head.querySelector<HTMLMetaElement>(sel);
       if (!m) { m = document.createElement('meta'); m.setAttribute(attr, key); document.head.appendChild(m); }
       m.content = val;
     };
     set('meta[name="description"]', 'name', 'description', description);
-    set('meta[property="og:title"]', 'property', 'og:title', title);
+    set('meta[name="robots"]', 'name', 'robots', opts.noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
+    set('meta[property="og:title"]', 'property', 'og:title', full);
     set('meta[property="og:description"]', 'property', 'og:description', description);
-    set('meta[property="og:image"]', 'property', 'og:image', '/assets/og/og.svg');
-  }, [title, description]);
+    set('meta[property="og:image"]', 'property', 'og:image', img);
+    set('meta[property="og:url"]', 'property', 'og:url', url);
+    set('meta[property="og:type"]', 'property', 'og:type', opts.type ?? 'website');
+    set('meta[property="og:locale"]', 'property', 'og:locale', 'fa_IR');
+    set('meta[property="og:site_name"]', 'property', 'og:site_name', 'کایار');
+    set('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+    set('meta[name="twitter:title"]', 'name', 'twitter:title', full);
+    set('meta[name="twitter:description"]', 'name', 'twitter:description', description);
+    set('meta[name="twitter:image"]', 'name', 'twitter:image', img);
+    let link = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
+    link.href = url;
+  }, [title, description, opts.image, opts.noindex, opts.type]);
 }
 
 export default function SiteHeader() {
