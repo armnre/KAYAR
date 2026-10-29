@@ -41,7 +41,7 @@ export function Steps() {
   );
 }
 
-export { MorshedSection, BodyyarSection } from './Showcase';
+export { MorshedSection, BodyyarSection, ShopSection } from './Showcase';
 
 export function BlogCards({ list }: { list: PostCard[] }) {
   return (
