@@ -85,6 +85,67 @@ async function ccmixter(limit: number, log: (m: string) => void): Promise<Row[]>
   return out;
 }
 
+
+/** Targeted ccMixter search by free-text tags (CC BY / CC0 only). */
+export async function ccmixterSearch(query: string, limit: number, log: (m: string) => void): Promise<Row[]> {
+  const out: Row[] = [];
+  const tags = query.toLowerCase().split(/[,،\s]+/).map((t) => t.replace(/[^a-z0-9_]/g, '')).filter(Boolean).slice(0, 3);
+  if (!tags.length) return out;
+  for (let off = 0; off < 30 && out.length < limit; off += 5) {
+    const u = `https://ccmixter.org/api/query?f=json&tags=${tags.join('+')}&type=any&limit=5&offset=${off}`;
+    let data: CCM[];
+    try { const r = await politeFetch(u, { timeoutMs: 20_000 }); if (!r.ok) { log(`ccMixter ${r.status}`); break; } const txt = await r.text(); data = txt.trim() ? JSON.parse(txt) : []; }
+    catch (e) { log(`ccMixter: ${(e as Error).message}`); break; }
+    if (!data.length) break;
+    for (const x of data) {
+      if (/nc|nd|sampling/i.test(x.license_url) || /non_commercial/.test(x.upload_tags)) continue;
+      const file = x.files?.find((f) => /\.mp3$/i.test(f.download_url));
+      if (!file) continue;
+      const ps = (file.file_format_info?.ps ?? '').split(':').map(Number);
+      const dur = ps.length === 2 && ps.every((n) => !Number.isNaN(n)) ? ps[0] * 60 + ps[1] : 0;
+      out.push({
+        title: x.upload_name.slice(0, 140), artist: (x.user_real_name || x.user_name).slice(0, 120), album: '', art: '', audioUrl: file.download_url, dur, bitrate: 0,
+        lang: 'en', text: `${query} ${x.upload_tags.replace(/,/g, ' ')}`, sourceId: `ccmixter:${x.upload_id}`, sourceName: 'ccMixter',
+        sourceUrl: x.file_page_url, license: `${x.license_name} · ${x.license_url}`,
+      });
+    }
+  }
+  return out.slice(0, limit);
+}
+
+type IAFile = { name: string; format?: string; length?: string; bitrate?: string };
+/** Internet Archive audio items whose licence is CC BY / BY-SA / CC0 / public domain. */
+export async function archiveSearch(query: string, limit: number, log: (m: string) => void): Promise<Row[]> {
+  const lic = '(licenseurl:*creativecommons.org/licenses/by/* OR licenseurl:*creativecommons.org/licenses/by-sa/* OR licenseurl:*publicdomain*)';
+  const q = `(${query.replace(/[,،]/g, ' OR ')}) AND mediatype:audio AND ${lic}`;
+  const u = `https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=licenseurl&fl[]=subject&rows=${Math.min(limit, 25)}&output=json`;
+  let docs: { identifier: string; title?: string; creator?: string | string[]; licenseurl?: string; subject?: string | string[] }[] = [];
+  try { const r = await politeFetch(u, { headers: { accept: 'application/json' }, timeoutMs: 20_000 }); if (!r.ok) { log(`Archive ${r.status}`); return []; } docs = (await r.json())?.response?.docs ?? []; }
+  catch (e) { log(`Archive: ${(e as Error).message}`); return []; }
+  const out: Row[] = [];
+  await Promise.all(docs.map(async (d) => {
+    if (!d.licenseurl || /-nc|-nd/i.test(d.licenseurl)) return;
+    try {
+      const r = await politeFetch(`https://archive.org/metadata/${encodeURIComponent(d.identifier)}/files`, { timeoutMs: 15_000 });
+      if (!r.ok) return;
+      const files: IAFile[] = (await r.json())?.result ?? [];
+      const f = files.find((x) => /\.mp3$/i.test(x.name) && /VBR MP3|128Kbps|320Kbps|MP3/i.test(x.format ?? ''));
+      if (!f) return;
+      const raw = String(f.length ?? '0');
+      const dur = raw.includes(':') ? raw.split(':').map(Number).reduce((a, n) => a * 60 + (n || 0), 0) : Math.round(Number(raw) || 0);
+      const creator = Array.isArray(d.creator) ? d.creator[0] : d.creator ?? 'Unknown';
+      const subj = Array.isArray(d.subject) ? d.subject.join(' ') : d.subject ?? '';
+      out.push({
+        title: (f.name.replace(/\.mp3$/i, '').replace(/[_-]+/g, ' ') || d.title || '').slice(0, 140), artist: String(creator).slice(0, 120), album: d.title ?? '',
+        art: `https://archive.org/services/img/${d.identifier}`, audioUrl: `https://archive.org/download/${d.identifier}/${encodeURIComponent(f.name)}`,
+        dur, bitrate: Number(f.bitrate ?? 0) || 0, lang: 'en', text: `${query} ${subj}`, sourceId: `archive:${d.identifier}/${f.name}`, sourceName: 'Internet Archive',
+        sourceUrl: `https://archive.org/details/${d.identifier}`, license: `${/publicdomain/i.test(d.licenseurl) ? 'مالکیت عمومی' : 'Creative Commons'} · ${d.licenseurl}`,
+      });
+    } catch { /* skip item */ }
+  }));
+  return out.slice(0, limit);
+}
+
 export const OPEN_ADAPTERS: Adapter[] = [
   {
     id: 'openverse-workout', name: 'Openverse · ورزشی', site: 'api.openverse.org', openLicense: true,
