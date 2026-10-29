@@ -16,6 +16,7 @@ import type { default as _AdminMemberBulkEp } from '../src/api/adminMemberBulk';
 import type { default as _AdminMemberCreateEp } from '../src/api/adminMemberCreate';
 import type { default as _AdminMembersEp } from '../src/api/adminMembers';
 import type { default as _AdminPostsEp } from '../src/api/adminPosts';
+import type { default as _AdminScoutEp } from '../src/api/adminScout';
 import type { default as _AdminSeedEp } from '../src/api/adminSeed';
 import type { default as _AdminSettingsEp } from '../src/api/adminSettings';
 import type { default as _AdminShowsEp } from '../src/api/adminShows';
@@ -117,6 +118,11 @@ type _AdminPostsCfg = typeof _AdminPostsEp;
 export type AdminPostsInputType = NonNullable<_AdminPostsCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminPostsCfg['execute']>[0]['input'];
 export type AdminPostsOutputType = Awaited<ReturnType<_AdminPostsCfg['execute']>>;
 export const adminPosts = createCaller<AdminPostsInputType, AdminPostsOutputType>('adminPosts');
+
+type _AdminScoutCfg = typeof _AdminScoutEp;
+export type AdminScoutInputType = NonNullable<_AdminScoutCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminScoutCfg['execute']>[0]['input'];
+export type AdminScoutOutputType = Awaited<ReturnType<_AdminScoutCfg['execute']>>;
+export const adminScout = createCaller<AdminScoutInputType, AdminScoutOutputType>('adminScout');
 
 type _AdminSeedCfg = typeof _AdminSeedEp;
 export type AdminSeedInputType = NonNullable<_AdminSeedCfg['inputSchema']> extends { _input: infer I } ? I : Parameters<_AdminSeedCfg['execute']>[0]['input'];
@@ -289,6 +295,7 @@ export const api = {
   adminMemberCreate,
   adminMembers,
   adminPosts,
+  adminScout,
   adminSeed,
   adminSettings,
   adminShows,

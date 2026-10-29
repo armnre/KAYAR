@@ -168,7 +168,7 @@ const PRODUCTS: { img: string; t: string; price: string; old?: string; href: str
 function ModelCard({ href, img, t, d }: { href: string; img: string; t: string; d: string }) {
   return (
     <a href={href} target="_blank" rel="noopener" className="reveal group relative block aspect-[4/5] overflow-hidden rounded-[28px] border border-white/[.08] bg-bg1">
-      <img src={img} alt={t} loading="lazy" width={1792} height={2390} className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]" />
+      <img src={img} alt={t} loading="lazy" width={1792} height={2390} className="absolute inset-0 h-full w-full object-cover object-top transition-transform [transition-duration:900ms] ease-out group-hover:scale-[1.04]" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-5">
         <div><div className="text-lg font-black text-white">{t}</div><div className="text-xs leading-6 text-white/70">{d}</div></div>

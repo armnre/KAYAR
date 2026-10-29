@@ -38,7 +38,7 @@ export function CampaignCard({ c, big = true, preview }: { c: C; big?: boolean; 
   return (
     <Link ref={ref} to={preview ? '#' : `/app/picks/${c.id}`} onClick={(e) => { if (preview) e.preventDefault(); else track(c.id, 'click'); }}
       className={cn('press group relative block shrink-0 snap-center overflow-hidden rounded-[32px] bg-gradient-to-br text-white shadow-[0_30px_60px_-30px_rgba(0,0,0,.9)]', THEMES[c.theme] ?? THEMES.lime, big ? 'h-[340px] w-[88%] sm:w-[62%]' : 'h-[240px] w-[72%] sm:w-[40%]')}>
-      {c.imageUrl && <img src={c.imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] group-hover:scale-110" />}
+      {c.imageUrl && <img src={c.imageUrl} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform [transition-duration:1.2s] group-hover:scale-110" />}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
       <div className="pointer-events-none absolute -end-14 -top-14 h-44 w-44 rounded-full border-[26px] border-white/10" />
       <div className="relative flex h-full flex-col p-5">

@@ -7,11 +7,13 @@ declare namespace NodeJS {
     ZITE_APP_URL: string;
     /** github access token (github) */
     ZITE_GITHUB_ACCESS_TOKEN: string;
-    /** Password of the first KAYAR admin (min 10 characters) */
+    /** Secret pepper used when hashing member passwords and session tokens */
+    ZITE_AUTH_PEPPER: string;
+    /** Password of the first admin account */
     ZITE_BOOTSTRAP_ADMIN_PASSWORD: string;
-    /** Username of the first KAYAR admin (created on first login to /admin) */
+    /** Username of the first admin account created automatically */
     ZITE_BOOTSTRAP_ADMIN_USERNAME: string;
-    /** NaraRouter API key for the BodyYar AI coach, workout and nutrition plans */
+    /** API key for the NaraRouter AI service used by the coach chat and plan generator */
     ZITE_NARAROUTER_API_KEY: string;
     [key: string]: string | undefined;
   }
