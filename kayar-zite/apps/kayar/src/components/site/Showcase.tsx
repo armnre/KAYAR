@@ -151,25 +151,33 @@ export function BodyyarSection() {
 }
 
 const PERKS: { icon: LucideIcon; t: string }[] = [
-  { icon: BadgePercent, t: 'تخفیف ویژه‌ی اعضا' },
+  { icon: BadgePercent, t: 'تخفیف اعضا' },
   { icon: Truck, t: 'ارسال سریع' },
   { icon: ShieldCheck, t: 'ضمانت اصالت' },
 ];
 
-function ShopCard({ href, img, t, d, tags }: { href: string; img: string; t: string; d: string; tags: string[] }) {
+function ModelCard({ href, img, t, d }: { href: string; img: string; t: string; d: string }) {
   return (
-    <a href={href} target="_blank" rel="noopener" className="reveal group relative block aspect-[4/5] overflow-hidden rounded-[28px] border border-white/[.08] bg-bg1 sm:aspect-[3/4]">
-      <img src={img} alt={t} loading="lazy" width={1056} height={1408} className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent" />
-      <span className="absolute start-3 top-3 rounded-full border border-white/15 bg-black/40 px-2.5 py-1 font-latin text-[10px] font-bold tracking-[.18em] text-white backdrop-blur-md">KAPOOSH</span>
-      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-        <div className="flex flex-wrap gap-1.5">
-          {tags.map((x) => <span key={x} className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] text-white/85 backdrop-blur-md">{x}</span>)}
-        </div>
-        <div className="mt-3 flex items-end justify-between gap-3">
-          <div><div className="text-lg font-black text-white">{t}</div><div className="text-xs text-white/65">{d}</div></div>
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition-transform duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1"><ArrowUpLeft className="h-4 w-4" /></span>
-        </div>
+    <a href={href} target="_blank" rel="noopener" className="reveal group relative block aspect-[4/5] overflow-hidden rounded-[28px] border border-white/[.08] bg-bg1">
+      <img src={img} alt={t} loading="lazy" width={1792} height={2390} className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-[900ms] ease-out group-hover:scale-[1.04]" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-5">
+        <div><div className="text-lg font-black text-white">{t}</div><div className="text-xs text-white/65">{d}</div></div>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground transition-transform duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1"><ArrowUpLeft className="h-4 w-4" /></span>
+      </div>
+    </a>
+  );
+}
+
+function ProductTile({ href, img, t }: { href: string; img: string; t: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener" className="group block min-w-0">
+      <div className="aspect-square overflow-hidden rounded-2xl border border-white/[.08] bg-white/[.03]">
+        <img src={img} alt={t} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+      </div>
+      <div className="mt-2 flex items-center justify-between gap-2 px-1 text-sm">
+        <span className="truncate font-bold">{t}</span>
+        <ArrowUpLeft className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
       </div>
     </a>
   );
@@ -182,19 +190,19 @@ export function ShopSection() {
     <section id="shop" className="relative scroll-mt-20 overflow-hidden px-4 py-16 md:py-24">
       <div className="absolute start-1/2 top-0 -z-10 h-72 w-[40rem] -translate-x-1/2 rounded-full bg-primary/[.06] blur-[120px]" aria-hidden />
       <div className="mx-auto max-w-6xl">
-        <div className="reveal mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div className="reveal mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <Eyebrow>KAPOOSH STORE</Eyebrow>
+            <img src="/media/kapoosh_logo.svg" alt="کاپوش" width={137} height={46} className="mb-4 h-10 w-auto" />
             <h2 className={H2}>فروشگاه و <span className="text-primary">پیشنهادهای کاپوش</span></h2>
-            <p className={LEAD}>لباس و تجهیزات تمرین کاپوش و برندهای همراه کایار، با پیشنهادهای ویژه برای اعضا.</p>
+            <p className={LEAD}>لباس تمرین کاپوش و محصولات برندهای همراه کایار، با پیشنهادهای ویژه برای اعضا.</p>
           </div>
-          <a href={shop} target="_blank" rel="noopener" className="press tap inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-primary/40 px-5 py-2.5 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-primary-foreground md:self-auto">
+          <a href={shop} target="_blank" rel="noopener" className="press tap inline-flex shrink-0 items-center gap-2 self-start rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground md:self-auto">
             <ShoppingBag className="h-4 w-4" />ورود به فروشگاه
           </a>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_.9fr]">
-          <ShopCard href={shop} img="/media/kapoosh_shop_men.jpg" t="لباس تمرین آقایان" d="ست تمرین، هودی و اکسسوری" tags={['تیشرت', 'جاگر', 'ساک ورزشی']} />
-          <ShopCard href={shop} img="/media/kapoosh_shop_women.jpg" t="لباس تمرین بانوان" d="ست پوشیده، لگ و حجاب ورزشی" tags={['حجاب ورزشی', 'لگ', 'مت یوگا']} />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_.95fr]">
+          <ModelCard href={shop} img="/media/kp_model_men.jpg" t="لباس تمرین آقایان" d="ست سویشرت و شلوار کاپوش" />
+          <ModelCard href={shop} img="/media/kp_model_women.jpg" t="لباس تمرین بانوان" d="ست تمرین و لگ کاپوش" />
           <div className="reveal flex flex-col justify-between gap-5 rounded-[28px] border border-primary/25 bg-gradient-to-br from-primary/[.16] via-primary/[.05] to-transparent p-5 sm:col-span-2 sm:p-6 lg:col-span-1">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-[11px] font-bold text-primary-foreground"><BadgePercent className="h-3.5 w-3.5" />پیشنهاد اعضا</span>
@@ -206,7 +214,16 @@ export function ShopSection() {
             <a href={shop} target="_blank" rel="noopener" className="press tap inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground"><Shirt className="h-4 w-4" />مشاهده‌ی محصولات</a>
           </div>
         </div>
-        <div className="reveal mt-3 flex flex-col items-start gap-3 rounded-2xl border border-white/[.08] bg-white/[.03] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="reveal mt-8">
+          <div className="mb-3 flex items-center justify-between"><h3 className="text-base font-black">محصولات منتخب</h3><a href={shop} target="_blank" rel="noopener" className="text-sm font-bold text-primary">همه‌ی محصولات</a></div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <ProductTile href={shop} img="/media/kp_tees.png" t="تیشرت ورزشی رنگی" />
+            <ProductTile href={shop} img="/media/kp_polo.png" t="پولوشرت کاپوش" />
+            <ProductTile href={shop} img="/media/kp_striped.png" t="تیشرت راه‌راه" />
+            <ProductTile href={shop} img="/media/kp_polo2.png" t="پولوشرت بافت" />
+          </div>
+        </div>
+        <div className="reveal mt-6 flex flex-col items-start gap-3 rounded-2xl border border-white/[.08] bg-white/[.03] p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Handshake className="h-5 w-5" /></span>
             <div><div className="text-sm font-bold">فروشنده یا برند ورزشی هستید؟</div><div className="text-xs text-muted-foreground">محصولاتتان را به‌عنوان همکار یا اسپانسر کنار کایار معرفی کنید.</div></div>
