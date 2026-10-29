@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Headphones, Dumbbell, Bot, Utensils, AudioWaveform, ArrowLeft, Play, Sparkles } from 'lucide-react';
-import { KButton, Glass, Waveform, ProgressRing, Cover } from '../kit';
-import { fa } from '../../lib/config';
+import { Headphones, Dumbbell, Bot, Utensils, AudioWaveform, ArrowLeft, Sparkles } from 'lucide-react';
+import { KButton } from '../kit';
 import { useBlock } from '../../lib/cms';
 
 const orbs = [
@@ -51,21 +50,6 @@ function Scene() {
         className="absolute bottom-0 left-1/2 z-20 h-[104%] w-auto max-w-none -translate-x-1/2 object-contain"
         style={{ maskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)', WebkitMaskImage: 'radial-gradient(ellipse 50% 62% at 50% 44%, black 58%, transparent 100%)' }} />
       <Orbit />
-      <div aria-hidden className="pointer-events-none">
-        <Glass className="animate-float absolute end-[-2%] top-[8%] z-30 hidden w-60 overflow-hidden p-3.5 shadow-[0_20px_60px_-20px_hsl(254_100%_60%/.6)] ring-1 ring-[hsl(254_100%_75%/.35)] sm:block">
-          <div className="pointer-events-none absolute -end-8 -top-8 h-24 w-24 rounded-full bg-[hsl(254_100%_70%/.35)] blur-2xl" />
-          <div className="relative mb-2.5 flex items-center justify-between text-[11px] text-muted-foreground">
-            <span className="flex items-center gap-1.5 font-bold text-[hsl(254_100%_80%)]"><span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(254_100%_75%)] opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(254_100%_75%)]" /></span>مرشد در حال پخش</span>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 font-latin">{fa(128)} BPM</span>
-          </div>
-          <div className="relative flex items-center gap-3">
-            <Cover hue={254} className="h-12 w-12 shrink-0 animate-spin-slow rounded-full"><Play className="absolute inset-0 m-auto h-4 w-4 fill-white text-white" /></Cover>
-            <div className="min-w-0 flex-1"><div className="truncate text-sm font-black">ضربان شهر</div><div className="truncate text-[11px] text-muted-foreground">پلی‌لیست قدرتی</div><Waveform bars={18} className="mt-1 h-5" color="bg-[hsl(254_100%_75%)]" /></div>
-          </div>
-          <div className="relative mt-2.5 h-1 overflow-hidden rounded-full bg-white/10"><div className="h-full w-[42%] rounded-full bg-gradient-to-l from-[hsl(254_100%_75%)] to-primary" /></div>
-          <div className="relative mt-1 flex justify-between font-latin text-[10px] text-muted-foreground"><span>1:24</span><span>3:18</span></div>
-        </Glass>
-      </div>
     </div>
   );
 }
@@ -73,7 +57,7 @@ function Scene() {
 export default function Hero() {
   const h = useBlock('hero');
   return (
-    <section className="noise relative isolate overflow-hidden pt-[calc(var(--header-h)+var(--safe-t)+8px)]">
+    <section className="noise relative isolate overflow-hidden pb-6 pt-[calc(var(--header-h)+var(--safe-t)+8px)]">
       <div className="absolute inset-0 -z-10 depth-bg" aria-hidden />
       <div className="dot-grid absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(70%_60%_at_50%_40%,black,transparent)]" aria-hidden />
       <div className="absolute -top-20 end-[-10%] -z-10 h-[420px] w-[420px] rounded-full bg-primary/20 blur-[120px]" aria-hidden />
@@ -96,9 +80,9 @@ export default function Hero() {
         <Scene />
       </div>
 
-      <div className="relative -mx-4 mt-2 -rotate-2 overflow-hidden bg-primary py-3 text-primary-foreground" aria-hidden>
+      <div className="relative -mx-4 mt-12 -rotate-2 overflow-hidden bg-primary py-3 text-primary-foreground md:mt-20" aria-hidden>
         <div className="ticker-track flex w-max gap-8 whitespace-nowrap text-lg font-black">
-          {Array.from({ length: 8 }).map((_, i) => <span key={i} className="flex gap-8">{['مرشد', 'بدن‌یار', 'موزیک ورزشی', 'برنامه‌ی هوشمند', 'لباس کاپوش'].map((w) => <span key={w}>{w} •</span>)}</span>)}
+          {Array.from({ length: 8 }).map((_, i) => <span key={i} className="flex gap-8">{['KAYAR', 'KAPOOSH', 'BodyYar', 'Morshed'].map((w) => <span key={w} className="font-latin tracking-wide">{w} •</span>)}</span>)}
         </div>
       </div>
     </section>
