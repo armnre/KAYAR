@@ -8,16 +8,19 @@ import { bad, splitTags, joinTags } from '../server/content';
 import { assertPublicUrl } from '../server/guard';
 import { addToBlocklist } from '../server/music/importer';
 import { dedupeKey, normFa } from '../server/music/classify';
+import { phaseFit } from '../server/music/phaseScore';
 
 const trackOut = z.object({
   id: z.string(), title: z.string(), artist: z.string(), album: z.string(), source: z.string(), sourceId: z.string(), coverUrl: z.string(), audioUrl: z.string(),
   duration: z.number(), licenseUrl: z.string(), shareUrl: z.string(), rights: z.string(), categories: z.array(z.string()), tags: z.array(z.string()),
   featured: z.boolean(), status: z.string(), sortOrder: z.number(), sourceName: z.string(), sourceUrl: z.string(), license: z.string(), bitrate: z.number(), importedAt: z.string(), style: z.string(),
+  phaseFit: z.object({ scores: z.object({ warmup: z.number(), peak: z.number(), cooldown: z.number() }), best: z.enum(['warmup', 'peak', 'cooldown']).nullable(), complete: z.boolean(), reasons: z.array(z.string()), missing: z.array(z.string()) }),
 });
 const toOut = (r: TracksRecordType) => ({
   id: r.id, title: r.title ?? '', artist: r.artist ?? '', album: r.album ?? '', source: r.source ?? '', sourceId: r.sourceId ?? '', coverUrl: r.coverUrl ?? '', audioUrl: r.audioUrl ?? '',
   duration: r.durationSeconds ?? 0, licenseUrl: r.licenseUrl ?? '', shareUrl: r.shareUrl ?? '', rights: r.rights ?? '', categories: splitTags(r.categories), tags: splitTags(r.tags),
   featured: !!r.isFeatured, status: r.status ?? 'draft', sortOrder: r.sortOrder ?? 0, sourceName: r.sourceName ?? '', sourceUrl: r.sourceUrl ?? '', license: r.license ?? '', bitrate: r.bitrate ?? 0, importedAt: r.importedAt ?? '', style: r.style ?? '',
+  phaseFit: phaseFit({ genre: r.genre, style: r.style, categories: splitTags(r.categories), duration: r.durationSeconds ?? 0 }),
 });
 
 export default createEndpoint({

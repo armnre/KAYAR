@@ -7,6 +7,19 @@ export const ASSETS = {
   morshed: `/media/img_7HSPmaPFIRMPDirp.jpg`,
 };
 
+/** KAPOOSH brand assets (real product photos supplied by the brand, v1). */
+export const KAPOOSH = {
+  logo: '/media/kapoosh/kapoosh-logo-v1.svg',
+  products: [
+    { img: '/media/kapoosh/women-set-v1.png', name: 'ست ورزشی بانوان', desc: 'بلوز آستین‌بلند زیپ‌دار با لگ ورزشی.' },
+    { img: '/media/kapoosh/hoodie-set-v1.png', name: 'ست هودی', desc: 'هودی زیپ‌دار و شلوار جاگر.' },
+    { img: '/media/kapoosh/tshirt-colors-v1.png', name: 'تی‌شرت ورزشی', desc: 'پارچه‌ی سبک، در رنگ‌بندی متنوع.' },
+    { img: '/media/kapoosh/tshirt-stripe-v1.png', name: 'تی‌شرت راه‌راه', desc: 'بافت راه‌راه ظریف برای تمرین و روزمره.' },
+    { img: '/media/kapoosh/polo-stripe-v1.png', name: 'پولوشرت راه‌راه', desc: 'پولوشرت ورزشی با یقه‌ی کلاسیک.' },
+    { img: '/media/kapoosh/polo-texture-v1.png', name: 'پولوشرت بافت‌دار', desc: 'یقه‌ی باز و بافت نقطه‌ای.' },
+  ],
+};
+
 export const CATEGORY_IMAGES: Record<string, string> = {
   chest: `/media/img_IJG13EHiq50wnjQM.jpg`,
   back: `/media/img_fQtT5ZmtTmn4VyRx.jpg`,

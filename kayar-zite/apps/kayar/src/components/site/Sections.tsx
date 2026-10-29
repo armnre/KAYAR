@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, KeyRound, QrCode, Play, Pause, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, KeyRound, QrCode, ArrowLeft, AudioWaveform, Mic2, Podcast } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@project/components/ui/accordion';
-import { KButton, Glass, IconBox, Waveform, SampleBadge, Cover, ProgressRing, KayarLogo } from '../kit';
+import { KButton, Glass, IconBox, Waveform, SampleBadge, ProgressRing, KayarLogo } from '../kit';
 import { defaultFaqs } from '../../lib/defaultFaqs';
 import { usePosts, usePublicSettings, type PostCard } from '../../lib/publicData';
 import { fa, faDate } from '../../lib/config';
@@ -42,32 +42,63 @@ export function Steps() {
   );
 }
 
+const MORSHED_FEATURES = [
+  { icon: AudioWaveform, t: 'موزیک هماهنگ با تمرین', d: 'ریتم و انرژی موزیک با مرحله و شدت تمرینت جور می‌شه.' },
+  { icon: Mic2, t: 'راهنمای صوتی و انگیزشی', d: 'صدای مربی و محتوای انگیزشی کنار تو، از شروع تا پایان.' },
+  { icon: Podcast, t: 'پادکست‌های ورزشی', d: 'تمرین، تغذیه، ریکاوری و سبک زندگی سالم، برای گوش دادن.' },
+];
+const PHASES = [{ k: 'Warm-up', fa: 'گرم کردن' }, { k: 'Peak', fa: 'اوج' }, { k: 'Cool-down', fa: 'سرد کردن' }];
+
+function MorshedVisual() {
+  return (
+    <Glass className="relative overflow-hidden p-5 sm:p-7" aria-hidden>
+      <div className="pointer-events-none absolute -end-16 -top-16 h-48 w-48 rounded-full bg-violet/30 blur-3xl" />
+      <div className="relative flex items-center justify-between text-xs font-bold text-muted-foreground">
+        <span className="font-latin tracking-[.2em] text-[hsl(254_100%_78%)]">SMART SELECTION</span>
+        <span>شدت تمرین</span>
+      </div>
+      <svg viewBox="0 0 300 110" className="relative mt-4 h-28 w-full" preserveAspectRatio="none">
+        <defs><linearGradient id="mz" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="hsl(254 100% 75%)" stopOpacity=".45" /><stop offset="1" stopColor="hsl(254 100% 75%)" stopOpacity="0" /></linearGradient></defs>
+        <path d="M0 95 C40 90 60 70 100 45 S150 12 200 18 S260 70 300 92 L300 110 L0 110Z" fill="url(#mz)" />
+        <path d="M0 95 C40 90 60 70 100 45 S150 12 200 18 S260 70 300 92" fill="none" stroke="hsl(254 100% 78%)" strokeWidth="2.5" />
+        <line x1="100" x2="100" y1="0" y2="110" stroke="currentColor" strokeOpacity=".12" strokeDasharray="3 4" />
+        <line x1="210" x2="210" y1="0" y2="110" stroke="currentColor" strokeOpacity=".12" strokeDasharray="3 4" />
+      </svg>
+      <div className="relative grid grid-cols-3 gap-2 text-center">
+        {PHASES.map((p, i) => (
+          <div key={p.k} className={`rounded-2xl px-2 py-3 ${i === 1 ? 'bg-violet/25 ring-1 ring-violet/50' : 'bg-white/[.05]'}`}>
+            <div className="font-latin text-[11px] font-bold tracking-wide text-[hsl(254_100%_80%)]">{p.k}</div>
+            <div className="mt-0.5 text-sm font-extrabold">{p.fa}</div>
+          </div>
+        ))}
+      </div>
+      <Waveform bars={36} playing className="relative mt-5 w-full justify-between" color="bg-[hsl(254_100%_75%)]" />
+    </Glass>
+  );
+}
+
 export function MorshedSection() {
   const b = useBlock('morshed');
-  const [playing, setPlaying] = useState(true);
   return (
     <section id="morshed" className="relative scroll-mt-20 overflow-hidden px-4 py-20 md:py-28">
       <div className="absolute inset-0 -z-10 [clip-path:polygon(0_6%,100%_0,100%_94%,0_100%)] bg-gradient-to-b from-violet/15 via-bg1 to-background" aria-hidden />
       <div className="absolute start-1/2 top-1/3 -z-10 h-80 w-80 rounded-full bg-violet/30 blur-[120px]" aria-hidden />
-      <div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
         <div className="reveal min-w-0">
           <div className="mb-2 font-latin text-sm font-bold tracking-[.2em] text-[hsl(254_100%_78%)]">MORSHED</div>
           <h2 className="text-[clamp(1.75rem,4.5vw,3rem)] font-black">{b.title} <span className="text-[hsl(254_100%_78%)]">{b.accent}</span></h2>
           <p className="mt-3 text-[17px] leading-[1.8] text-muted-foreground">{b.text}</p>
-          <div className="mt-6 flex flex-wrap gap-2">{b.chips.map((c) => <span key={c} className="rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-sm font-bold">{c}</span>)}</div>
+          <ul className="mt-8 space-y-4">
+            {MORSHED_FEATURES.map((f) => (
+              <li key={f.t} className="flex items-start gap-4">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-violet/15 text-[hsl(254_100%_80%)] ring-1 ring-violet/30"><f.icon className="h-5 w-5" /></span>
+                <div className="min-w-0"><h3 className="text-lg font-extrabold">{f.t}</h3><p className="mt-0.5 text-[15px] leading-7 text-muted-foreground">{f.d}</p></div>
+              </li>
+            ))}
+          </ul>
+          <KButton to="/app/morshed" size="lg" className="mt-8">ورود به مرشد <ArrowLeft className="h-5 w-5" /></KButton>
         </div>
-        <div className="reveal relative min-w-0">
-          <img src="/media/img_oPmkOrwF9MOWO-W_.jpg" alt="هدفون و گوشی روی کف باشگاه" width={1376} height={768} loading="lazy" className="aspect-video w-full rounded-[28px] object-cover opacity-80" />
-          <Glass className="relative -mt-16 mx-3 p-4 sm:mx-8">
-            <div className="mb-3 flex items-center justify-between"><span className="text-sm text-muted-foreground">در حال پخش</span><SampleBadge /></div>
-            <div className="flex items-center gap-3">
-              <Cover hue={254} className="h-14 w-14 shrink-0" />
-              <div className="min-w-0 flex-1"><div className="truncate font-bold">ضرب‌آهنگ شروع قدرتی</div><div className="truncate text-sm text-muted-foreground">مرشد کایار</div></div>
-              <button className="press tap grid h-12 w-12 place-items-center rounded-full bg-violet text-white" onClick={() => setPlaying((p) => !p)} aria-label={playing ? 'توقف' : 'پخش'}>{playing ? <Pause className="h-5 w-5 fill-current" /> : <Play className="h-5 w-5 fill-current" />}</button>
-            </div>
-            <Waveform bars={40} playing={playing} className="mt-3 w-full justify-between" color="bg-[hsl(254_100%_75%)]" />
-          </Glass>
-        </div>
+        <div className="reveal min-w-0"><MorshedVisual /></div>
       </div>
     </section>
   );
