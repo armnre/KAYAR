@@ -4,7 +4,7 @@ import { requireStaff } from '../server/rbac';
 import { tokenField } from '../server/util';
 import { bad } from '../server/content';
 import { audit } from '../server/audit';
-import { searchPodcasts, addPodcast, syncAllShows, searchMusic, queueMusic } from '../server/scout';
+import { searchPodcasts, addPodcast, addPodcasts, previewPodcast, syncAllShows, searchMusic, queueMusic } from '../server/scout';
 
 const row = z.object({
   title: z.string().max(200), artist: z.string().max(200), album: z.string().max(200), art: z.string().max(2000), audioUrl: z.string().max(2000),
@@ -18,14 +18,14 @@ const podcast = z.object({
 });
 const music = z.object({
   id: z.string(), title: z.string(), artist: z.string(), art: z.string(), audioUrl: z.string(), durationSec: z.number(), license: z.string(),
-  sourceName: z.string(), sourceUrl: z.string(), status: z.enum(['ok', 'duplicate', 'rejected', 'unreachable']), reason: z.string(), row,
+  sourceName: z.string(), sourceUrl: z.string(), status: z.enum(['ok', 'duplicate', 'rejected', 'unreachable']), reason: z.string(), quality: z.number(), row,
 });
 
 export default createEndpoint({
   description: 'Admin: advanced Morshed discovery — scored podcast search, add by link, bulk sync, and open-licence music search into the review queue',
   inputSchema: z.object({
     token: tokenField,
-    action: z.enum(['podcastSearch', 'podcastAdd', 'syncAll', 'musicSearch', 'musicQueue']),
+    action: z.enum(['podcastSearch', 'podcastAdd', 'podcastAddMany', 'podcastPreview', 'syncAll', 'musicSearch', 'musicQueue']),
     query: z.string().max(200).optional(),
     lang: z.enum(['fa', 'en', 'any']).optional(),
     probe: z.boolean().optional(),
@@ -35,11 +35,18 @@ export default createEndpoint({
     maxSec: z.number().int().min(0).max(3600).optional(),
     rows: z.array(row).max(100).optional(),
     publish: z.boolean().optional(),
+    urls: z.array(z.string().max(2000)).max(20).optional(),
+    minEpisodes: z.number().int().min(0).max(1000).optional(),
+    activeOnly: z.boolean().optional(),
+    sources: z.array(z.enum(['openverse', 'ccmixter', 'archive'])).max(3).optional(),
+    style: z.string().max(40).optional(),
   }),
   outputSchema: z.object({
     podcasts: z.array(podcast).optional(),
     music: z.array(music).optional(),
     message: z.string().optional(),
+    log: z.array(z.string()).optional(),
+    preview: z.object({ feedUrl: z.string(), title: z.string(), description: z.string(), episodes: z.array(z.object({ title: z.string(), audioUrl: z.string(), publishedAt: z.string().nullable(), durationSec: z.number().nullable() })) }).optional(),
     sync: z.object({ shows: z.number(), newEpisodes: z.number(), failed: z.array(z.string()) }).optional(),
   }),
   execute: async ({ input }) => {
@@ -47,7 +54,7 @@ export default createEndpoint({
     switch (input.action) {
       case 'podcastSearch': {
         if (!input.query?.trim()) throw bad('عبارت جست‌وجو را بنویس.');
-        return { podcasts: await searchPodcasts(input.query.trim(), { lang: input.lang, probe: input.probe }) };
+        return { podcasts: await searchPodcasts(input.query.trim(), { lang: input.lang, probe: input.probe, minEpisodes: input.minEpisodes, activeOnly: input.activeOnly }) };
       }
       case 'podcastAdd': {
         if (!input.url) throw bad('آدرس را وارد کن.');
@@ -57,6 +64,16 @@ export default createEndpoint({
           return { message: r.message };
         } catch (e) { throw bad((e as Error).message || 'افزودن انجام نشد.'); }
       }
+      case 'podcastAddMany': {
+        if (!input.urls?.length) throw bad('پادکستی انتخاب نشده.');
+        const r = await addPodcasts(input.urls, input.category ?? 'fitness');
+        if (r.added) await audit(member.id, 'morshed.podcast.addMany', 'show', '', { count: r.added });
+        return { message: r.message };
+      }
+      case 'podcastPreview': {
+        if (!input.url) throw bad('آدرس را وارد کن.');
+        try { return { preview: await previewPodcast(input.url) }; } catch (e) { throw bad((e as Error).message || 'فید خوانده نشد.'); }
+      }
       case 'syncAll': {
         const sync = await syncAllShows();
         await audit(member.id, 'morshed.podcast.syncAll', 'show', '', { shows: sync.shows, newEpisodes: sync.newEpisodes });
@@ -64,10 +81,11 @@ export default createEndpoint({
       }
       case 'musicSearch': {
         if (!input.query?.trim()) throw bad('عبارت جست‌وجو را بنویس.');
-        return { music: await searchMusic(input.query.trim(), { probe: input.probe, minSec: input.minSec, maxSec: input.maxSec }) };
+        const r = await searchMusic(input.query.trim(), { probe: input.probe, minSec: input.minSec, maxSec: input.maxSec, sources: input.sources });
+        return { music: r.hits, log: r.log };
       }
       case 'musicQueue': {
-        const n = await queueMusic(input.rows ?? [], !!input.publish);
+        const n = await queueMusic(input.rows ?? [], !!input.publish, input.style);
         await audit(member.id, 'morshed.scout.queue', 'track', '', { count: n, publish: !!input.publish });
         return { message: `${n} ترک ${input.publish ? 'منتشر شد' : 'به صف بررسی اضافه شد'}.` };
       }
