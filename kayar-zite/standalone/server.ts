@@ -115,8 +115,13 @@ app.post('/api/:name', express.json({ limit: API_BODY_LIMIT }), apiLimiter, asyn
       write: async (chunk: unknown) => { send('data', chunk); },
       forward: async (it: AsyncIterable<string>) => { let all = ''; for await (const c of it) { all += c; send('data', c); } return all; },
     };
+    // Heartbeat: an SSE comment every 10s so proxies (Liara/nginx) never drop a quiet stream while the
+    // model is thinking or failing over. Clients ignore comment lines.
+    const beat = setInterval(() => { if (!res.writableEnded) res.write(': ping\n\n'); }, 10_000);
+    beat.unref();
     try { const p = ep.execute({ input, context, stream }); send('result', AI_ENDPOINTS.has(name) ? await withTimeout(p, AI_TIMEOUT) : await p); }
     catch (e) { send('error', fail(e).body); }
+    finally { clearInterval(beat); }
     return res.end();
   }
   try {
