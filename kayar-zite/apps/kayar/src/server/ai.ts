@@ -12,10 +12,22 @@ import { ZiteError } from 'zitejs/backend';
 export type AiMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 export type AiOptions = { maxTokens?: number; temperature?: number };
 
-type Provider = 'groq' | 'openrouter';
+type Provider = 'liara' | 'groq' | 'openrouter';
 type Target = { provider: Provider; base: string; key: string; model: string; json: boolean };
 
+const csv = (v: string | undefined, d: string[]) => (v ? v.split(',').map((x) => x.trim()).filter(Boolean) : d);
+
+/** Groq and OpenRouter refuse requests from Iranian servers (HTTP 403), so on a host inside Iran
+ * (e.g. Liara) the Liara AI gateway goes first. Base URL from the Liara console, e.g.
+ * https://ai.liara.ir/api/<workspace-id>/v1 */
 const PROVIDERS = [
+  {
+    provider: 'liara' as const,
+    base: (process.env.ZITE_LIARA_AI_BASE_URL || '').trim().replace(/\/+$/, '').replace(/\/chat\/completions$/, ''),
+    env: 'ZITE_LIARA_AI_API_KEY',
+    json: false,
+    models: csv(process.env.ZITE_LIARA_AI_MODELS, ['openai/gpt-4o-mini', 'google/gemini-2.5-flash']),
+  },
   {
     provider: 'groq' as const,
     base: 'https://api.groq.com/openai/v1',
@@ -42,7 +54,7 @@ function targets(): Target[] {
   const all: Target[] = [];
   for (const p of PROVIDERS) {
     const key = (process.env as Record<string, string | undefined>)[p.env]?.trim();
-    if (!key) continue;
+    if (!key || !p.base) continue;
     for (const model of p.models) all.push({ provider: p.provider, base: p.base, key, model, json: p.json });
   }
   if (!all.length) throw new ZiteError({ code: 'INTERNAL_ERROR', message: 'No AI provider key configured', userFacingMessage: NOT_CONFIGURED });
@@ -84,7 +96,7 @@ function request(t: Target, messages: AiMessage[], o: { json?: boolean; stream?:
     body.max_tokens = Math.min(o.maxTokens, t.model.startsWith('qwen/') ? 900 : 4500);
     if (t.model.startsWith('openai/gpt-oss')) { body.reasoning_effort = 'low'; body.include_reasoning = false; }
     else if (t.model.startsWith('qwen/')) body.reasoning_format = 'hidden';
-  } else {
+  } else if (t.provider === 'openrouter') {
     // Keep thinking short and out of the answer so the token budget goes to the reply.
     body.reasoning = { effort: 'low', exclude: true };
     body.max_tokens = Math.max(o.maxTokens, 3000);
