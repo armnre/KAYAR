@@ -1,0 +1,6 @@
+{
+  "platform": "docker",
+  "app": "kayar",
+  "port": 3000,
+  "disks": [{ "name": "uploads", "mountTo": "/data/uploads" }]
+}
