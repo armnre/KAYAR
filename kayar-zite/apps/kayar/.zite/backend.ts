@@ -117,7 +117,8 @@ declare global {
       "ZITE_AUTH_PEPPER": string;
       "ZITE_BOOTSTRAP_ADMIN_PASSWORD": string;
       "ZITE_BOOTSTRAP_ADMIN_USERNAME": string;
-      "ZITE_NARAROUTER_API_KEY": string;
+      "ZITE_GROQ_API_KEY": string;
+      "ZITE_OPENROUTER_API_KEY": string;
     }
   }
 }

@@ -3,7 +3,7 @@ import { memberId } from '../server/rbac';
 import { tokenField } from '../server/util';
 import { createEndpoint } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
-import { aiStream } from '../server/nara';
+import { aiStream } from '../server/ai';
 
 export default createEndpoint({
   description: 'Answers a fitness or nutrition question with the BodyYar AI coach',

@@ -13,8 +13,10 @@ declare namespace NodeJS {
     ZITE_BOOTSTRAP_ADMIN_PASSWORD: string;
     /** Username of the first admin account created automatically */
     ZITE_BOOTSTRAP_ADMIN_USERNAME: string;
-    /** API key for the NaraRouter AI service used by the coach chat and plan generator */
-    ZITE_NARAROUTER_API_KEY: string;
+    /** Groq API key — primary AI provider */
+    ZITE_GROQ_API_KEY: string;
+    /** OpenRouter API key — fallback AI provider */
+    ZITE_OPENROUTER_API_KEY: string;
     [key: string]: string | undefined;
   }
 }

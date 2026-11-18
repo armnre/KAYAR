@@ -34,7 +34,7 @@ PWA فارسی و موبایل‌محور برند ورزشی «کاپوش»: س
 ## متغیرهای محیطی
 نمونه در `.env.example`. **هیچ مقدار واقعی را commit نکنید.**
 
-اجباری: `DATABASE_URL`، `PUBLIC_URL`، `ZITE_AUTH_PEPPER`، `ZITE_NARAROUTER_API_KEY`، و برای اولین راه‌اندازی `ZITE_BOOTSTRAP_ADMIN_USERNAME` / `ZITE_BOOTSTRAP_ADMIN_PASSWORD`.
+اجباری: `DATABASE_URL`، `PUBLIC_URL`، `ZITE_AUTH_PEPPER`، `ZITE_GROQ_API_KEY` (دستیار هوشمند — اصلی) و در صورت امکان `ZITE_OPENROUTER_API_KEY` (پشتیبان)، و برای اولین راه‌اندازی `ZITE_BOOTSTRAP_ADMIN_USERNAME` / `ZITE_BOOTSTRAP_ADMIN_PASSWORD`.
 
 اختیاری (همه پیش‌فرض امن دارند؛ بدون تنظیم، دپلوی فعلی بدون تغییر بالا می‌آید):
 

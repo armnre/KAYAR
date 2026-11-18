@@ -1,4 +1,4 @@
-import { aiChat, extractJson } from './nara';
+import { aiChat, extractJson } from './ai';
 import { computeTargets } from './macros';
 import { nutritionSchema, type Nutrition, type Plan, type Profile } from './schemas';
 

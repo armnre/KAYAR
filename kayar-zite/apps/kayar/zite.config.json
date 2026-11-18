@@ -11,8 +11,11 @@
     "ZITE_BOOTSTRAP_ADMIN_USERNAME": {
       "description": "Username of the first admin account created automatically"
     },
-    "ZITE_NARAROUTER_API_KEY": {
-      "description": "API key for the NaraRouter AI service used by the coach chat and plan generator"
+    "ZITE_GROQ_API_KEY": {
+      "description": "Groq API key — primary AI provider for the coach chat and plan generator"
+    },
+    "ZITE_OPENROUTER_API_KEY": {
+      "description": "OpenRouter API key — fallback AI provider (free models) for the coach chat and plan generator"
     }
   }
 }

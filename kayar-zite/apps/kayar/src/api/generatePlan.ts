@@ -3,7 +3,7 @@ import { memberId } from '../server/rbac';
 import { tokenField } from '../server/util';
 import { createEndpoint, ZiteError } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
-import { aiChat, extractJson } from '../server/nara';
+import { aiChat, extractJson } from '../server/ai';
 import { planSchema, nutritionSchema, type Plan, type Nutrition } from '../server/schemas';
 import { generateNutrition } from '../server/nutrition';
 
