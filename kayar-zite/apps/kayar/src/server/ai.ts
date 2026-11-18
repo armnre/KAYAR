@@ -20,6 +20,9 @@ const csv = (v: string | undefined, d: string[]) => (v ? v.split(',').map((x) =>
 /** Groq and OpenRouter refuse requests from Iranian servers (HTTP 403), so on a host inside Iran
  * (e.g. Liara) the Liara AI gateway goes first. Base URL from the Liara console, e.g.
  * https://ai.liara.ir/api/<workspace-id>/v1 */
+/** Free relay outside Iran (see standalone/ai-proxy-worker.js). When set, Groq/OpenRouter go through it. */
+const PROXY = (process.env.ZITE_AI_PROXY_URL || '').trim().replace(/\/+$/, '');
+
 const PROVIDERS = [
   {
     provider: 'liara' as const,
@@ -30,14 +33,14 @@ const PROVIDERS = [
   },
   {
     provider: 'groq' as const,
-    base: 'https://api.groq.com/openai/v1',
+    base: PROXY ? `${PROXY}/groq/openai/v1` : 'https://api.groq.com/openai/v1',
     env: 'ZITE_GROQ_API_KEY',
     json: false, // strict JSON mode rejects long Persian outputs (json_validate_failed); prompt + extractJson is more reliable
     models: ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'],
   },
   {
     provider: 'openrouter' as const,
-    base: 'https://openrouter.ai/api/v1',
+    base: PROXY ? `${PROXY}/openrouter/api/v1` : 'https://openrouter.ai/api/v1',
     env: 'ZITE_OPENROUTER_API_KEY',
     json: false,
     models: ['nvidia/nemotron-3-ultra-550b-a55b:free', 'nvidia/nemotron-3.5-super-vl:free', 'google/gemma-4-31b-it:free'],
